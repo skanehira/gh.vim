@@ -35,7 +35,7 @@ function! s:read(chan, part) abort
   while ch_status(a:chan, {'part' : a:part}) =~# 'open\|buffered'
     call add(out, ch_read(a:chan, {'part' : a:part}))
   endwhile
-  return join(out, "\n")
+  return join(out, "\r")
 endfunction
 
 function! s:sh(...) abort
