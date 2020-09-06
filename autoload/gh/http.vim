@@ -40,6 +40,7 @@ endfunction
 
 function! s:sh(...) abort
   let cmd = join(a:000, ' ')
+
   return s:Promise.new({resolve, reject -> job_start(cmd, {
         \   'drop' : 'never',
         \   'close_cb' : {ch -> 'do nothing'},
@@ -56,28 +57,43 @@ function! s:make_response(header_tmp, body) abort
   let headers = map(header_chunks, 'split(v:val, "\r\n")')[0]
   let header = s:parseHeader(headers[1:])
 
+  let body = a:body
+  if header["Content-Type"] is# 'application/json; charset=utf-8'
+    let body = json_decode(a:body)
+  endif
+
   let resp = #{
         \ status: split(headers[0], " ")[1],
         \ header: header,
-        \ body: a:body,
+        \ body: body,
         \ }
   return resp
 endfunction
 
-function! gh#http#get(url) abort
+function! gh#http#get(url, ...) abort
   let tmp = s:_tempname()
   let token = get(g:, 'gh_token', '')
   if empty(token)
     return
   endif
 
-  let cmd = ['curl', '-H', printf('"Authorization: token %s"', token), printf('--dump-header "%s"', tmp)]
-  " TODO add header and query parameters
+  let cmd = ['curl', printf('--dump-header "%s"', tmp), '-H', printf('"Authorization: token %s"', token)]
+
+  let length = len(a:000)
+
+  if  length > 0
+    for k in keys(a:1)
+      let cmd += ['-H', printf('"%s: %s"', k, a:1[k])]
+    endfor
+  endif
+
+  if length > 1
+    " TODO query parameter
+  endif
+
   let cmd += [a:url]
 
   return call('s:sh', cmd)
-        \.then({data -> json_decode(data)})
         \.then(function('s:make_response', [tmp]))
         \.then({res -> res.status is# '200' ? s:Promise.resolve(res) : s:Promise.reject(res.body.message)})
-        \.catch({err -> s:Promise.reject(err)})
 endfunction
