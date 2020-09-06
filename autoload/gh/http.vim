@@ -79,5 +79,5 @@ function! gh#http#get(url) abort
         \.then({data -> json_decode(data)})
         \.then(function('s:make_response', [tmp]))
         \.then({res -> res.status is# '200' ? s:Promise.resolve(res) : s:Promise.reject(res.body.message)})
-        \.catch({err -> execute('throw ' . err)})
+        \.catch({err -> s:Promise.reject(err)})
 endfunction
