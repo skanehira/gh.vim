@@ -75,3 +75,30 @@ function! gh#gh#pull_diff() abort
         \.catch(function('s:error'))
         \.finally(function('s:do_finally'))
 endfunction
+
+function! s:issues(resp) abort
+  let lines = []
+  for issue in a:resp.body
+    call add(lines, printf("%s\t%s\t%s\t%s", issue.number, issue.state, issue.title, issue.user.login))
+  endfor
+
+  if len(lines) is# 0
+    call setline(1, '-- no data --')
+  else
+    call setline(1, lines)
+  endif
+endfunction
+
+function! gh#gh#issues() abort
+  setlocal buftype=nofile
+  setlocal nonumber
+
+  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues$')
+
+  call setline(1, '-- loading --')
+
+  call gh#github#issues(m[1], m[2])
+        \.then(function('s:issues'))
+        \.catch(function('s:error'))
+        \.finally(function('s:do_finally'))
+endfunction
