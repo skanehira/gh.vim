@@ -2,10 +2,8 @@
 " Author: skanehira
 " License: MIT
 
-function! gh#error(msg) abort
-  echohl ErrorMsg
-  echom '[gh.vim] ' . a:msg
-  echohl None
+function! gh#gh#error(msg) abort
+  call setline(1, printf('-- %s --', a:msg))
 endfunction
 
 function! s:pulls(resp) abort
@@ -42,7 +40,7 @@ function! gh#gh#pulls() abort
 
   call gh#github#pulls(m[1], m[2])
         \.then(function('s:pulls'))
-        \.catch(function('gh#error'))
+        \.catch(function('gh#gh#error'))
 endfunction
 
 function! s:set_pull_diff(resp) abort
@@ -67,5 +65,5 @@ function! gh#gh#pull_diff() abort
 
   call gh#github#pulls_diff(m[1], m[2], m[3])
         \.then(function('s:set_pull_diff'))
-        \.catch(function('gh#error'))
+        \.catch(function('gh#gh#error'))
 endfunction

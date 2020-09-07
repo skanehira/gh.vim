@@ -95,5 +95,5 @@ function! gh#http#get(url, ...) abort
 
   return call('s:sh', cmd)
         \.then(function('s:make_response', [tmp]))
-        \.then({res -> res.status is# '200' ? s:Promise.resolve(res) : s:Promise.reject(res.body.message)})
+        \.then({res -> res.status is# '200' ? res : s:Promise.reject(res.body.message)})
 endfunction
