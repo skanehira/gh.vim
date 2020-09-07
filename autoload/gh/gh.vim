@@ -70,6 +70,11 @@ function! s:pull_diff() abort
         \.catch(function('gh#error'))
 endfunction
 
+function! gh#gh#pulls(arg) abort
+  let args = split(a:arg, '/')
+  call execute(printf('new gh://%s/%s/pulls', args[0], args[1])) 
+endfunction
+
 augroup gh-pulls
   au!
   au BufReadCmd gh://*/*/pulls call s:pull_list()
