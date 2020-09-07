@@ -7,4 +7,8 @@ if exists('loaded_gh')
 endif
 let g:loaded_gh = 1
 
-command! -nargs=1 GhPulls call gh#gh#pulls(<f-args>)
+augroup gh
+  au!
+  au BufReadCmd gh://*/*/pulls call gh#gh#pulls()
+  au BufReadCmd gh://*/*/pulls/*/diff call gh#gh#pull_diff()
+augroup END

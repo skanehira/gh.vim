@@ -30,7 +30,7 @@ function! s:pull_open() abort
   call system("xdg-open " . url)
 endfunction
 
-function! s:pull_list() abort
+function! gh#gh#pulls() abort
   setlocal buftype=nofile
   setlocal nonumber
 
@@ -56,7 +56,7 @@ function! s:open_pull_diff() abort
   call execute(printf('vnew gh://%s/%s/pulls/%s/diff', m[1], m[2], number))
 endfunction
 
-function! s:pull_diff() abort
+function! gh#gh#pull_diff() abort
   setlocal buftype=nofile
   setlocal ft=diff
   setlocal nonumber
@@ -69,14 +69,3 @@ function! s:pull_diff() abort
         \.then(function('s:set_pull_diff'))
         \.catch(function('gh#error'))
 endfunction
-
-function! gh#gh#pulls(arg) abort
-  let args = split(a:arg, '/')
-  call execute(printf('new gh://%s/%s/pulls', args[0], args[1])) 
-endfunction
-
-augroup gh-pulls
-  au!
-  au BufReadCmd gh://*/*/pulls call s:pull_list()
-  au BufReadCmd gh://*/*/pulls/*/diff call s:pull_diff()
-augroup END
