@@ -2,8 +2,15 @@
 " Author: skanehira
 " License: MIT
 
-function! gh#gh#error(msg) abort
+function! s:error(msg) abort
   call setline(1, printf('-- %s --', a:msg))
+endfunction
+
+function! s:do_finally() abort
+  setlocal nomodifiable
+  nnoremap <buffer> <silent> q :bw!<CR>
+  setlocal cursorline
+  setlocal cursorlineopt=line
 endfunction
 
 function! s:pulls(resp) abort
@@ -17,7 +24,9 @@ function! s:pulls(resp) abort
   else
     call setline(1, lines)
   endif
-  setlocal nomodifiable
+
+  nnoremap <buffer> <silent> o :call <SID>pull_open()<CR>
+  nnoremap <buffer> <silent> dd :call <SID>open_pull_diff()<CR>
 endfunction
 
 function! s:pull_open() abort
@@ -32,20 +41,14 @@ function! gh#gh#pulls() abort
   setlocal buftype=nofile
   setlocal nonumber
 
-  nnoremap <buffer> <silent> q :bw!<CR>
-  nnoremap <buffer> <silent> o :call <SID>pull_open()<CR>
-  nnoremap <buffer> <silent> dd :call <SID>open_pull_diff()<CR>
-
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/pulls$')
+
+  call setline(1, '-- loading --')
 
   call gh#github#pulls(m[1], m[2])
         \.then(function('s:pulls'))
-        \.catch(function('gh#gh#error'))
-endfunction
-
-function! s:set_pull_diff(resp) abort
-  call setline(1, split(a:resp.body, "\r"))
-  setlocal nomodifiable
+        \.catch(function('s:error'))
+        \.finally(function('s:do_finally'))
 endfunction
 
 function! s:open_pull_diff() abort
@@ -54,16 +57,21 @@ function! s:open_pull_diff() abort
   call execute(printf('vnew gh://%s/%s/pulls/%s/diff', m[1], m[2], number))
 endfunction
 
+function! s:set_diff_contents(resp) abort
+  call setline(1, split(a:resp.body, "\r")) 
+  setlocal ft=diff
+endfunction
+
 function! gh#gh#pull_diff() abort
   setlocal buftype=nofile
-  setlocal ft=diff
   setlocal nonumber
-
-  nnoremap <buffer> <silent> q :bw!<CR>
 
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/pulls/\(.*\)/diff$')
 
+  call setline(1, '-- loading --')
+
   call gh#github#pulls_diff(m[1], m[2], m[3])
-        \.then(function('s:set_pull_diff'))
-        \.catch(function('gh#gh#error'))
+        \.then(function('s:set_diff_contents'))
+        \.catch(function('s:error'))
+        \.finally(function('s:do_finally'))
 endfunction
