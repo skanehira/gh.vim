@@ -14,6 +14,14 @@ function! s:do_finally() abort
   setlocal nowrap
 endfunction
 
+function! s:open_url(url) abort
+  let cmd = 'open'
+  if has('linux')
+    let cmd = 'xdg-open'
+  endif
+  call system(printf('%s %s', cmd, a:url))
+endfunction
+
 function! s:pulls(resp) abort
   let lines = []
   for pr in a:resp.body
@@ -35,7 +43,7 @@ function! s:pull_open() abort
   let number = split(line, "\t")[0]
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/pulls$')
   let url = printf('https://github.com/%s/%s/pull/%s', m[1], m[2], number)
-  call system("xdg-open " . url)
+  call s:open_url(url)
 endfunction
 
 function! gh#gh#pulls() abort
@@ -83,6 +91,32 @@ function! s:issue_preview() abort
   call setbufline(t:preview_bufid, 1, split(s:issues[number].body, '\r\?\n'))
 endfunction
 
+function! s:open_issue_preview() abort
+  let winid = win_getid()
+  belowright vnew gh://issues/preview
+  setlocal buftype=nofile
+
+  let t:preview_bufid = bufnr()
+  let s:preview_winid = win_getid()
+
+  call win_gotoid(winid)
+
+  augroup gh-preview
+    au!
+    autocmd CursorMoved <buffer> call s:issue_preview()
+  augroup END
+
+  call s:issue_preview()
+endfunction
+
+function! s:issue_open() abort
+  let line = getline('.')
+  let number = split(line, "\t")[0]
+  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues$')
+  let url = printf('https://github.com/%s/%s/issues/%s', m[1], m[2], number)
+  call s:open_url(url)
+endfunction
+
 function! s:issues(resp) abort
   let s:issues = {}
   let lines = []
@@ -95,18 +129,8 @@ function! s:issues(resp) abort
     call setline(1, '-- no data --')
   else
     call setline(1, lines)
-    let winid = win_getid()
-    belowright vnew gh://issues/preview
-    setlocal buftype=nofile
-    let t:preview_bufid = bufnr()
-    let s:preview_winid = win_getid()
-    nnoremap <buffer> <silent> q :bw!<CR>
-    call win_gotoid(winid)
-    augroup gh-preview
-      au!
-      autocmd CursorMoved <buffer> call s:issue_preview()
-    augroup END
-    call s:issue_preview()
+    call s:open_issue_preview()
+    nnoremap <buffer> <silent> o :call <SID>issue_open()<CR>
   endif
 endfunction
 
