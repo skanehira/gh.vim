@@ -100,6 +100,7 @@ function! s:open_issue_preview() abort
   let winid = win_getid()
   belowright vnew gh://issues/preview
   setlocal buftype=nofile
+  setlocal ft=markdown
 
   let t:gh_preview_bufid = bufnr()
   let s:gh_preview_winid = win_getid()
