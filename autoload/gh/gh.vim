@@ -11,6 +11,7 @@ function! s:do_finally() abort
   nnoremap <buffer> <silent> q :bw!<CR>
   setlocal cursorline
   setlocal cursorlineopt=line
+  setlocal nowrap
 endfunction
 
 function! s:pulls(resp) abort
@@ -76,16 +77,36 @@ function! gh#gh#pull_diff() abort
         \.finally(function('s:do_finally'))
 endfunction
 
+function! s:issue_preview() abort
+  call win_execute(s:preview_winid, '%d_')
+  let number = split(getline('.'), "\t")[0]
+  call setbufline(t:preview_bufid, 1, split(s:issues[number].body, '\r\?\n'))
+endfunction
+
 function! s:issues(resp) abort
+  let s:issues = {}
   let lines = []
   for issue in a:resp.body
     call add(lines, printf("%s\t%s\t%s\t%s", issue.number, issue.state, issue.title, issue.user.login))
+    let s:issues[issue.number] = issue
   endfor
 
   if len(lines) is# 0
     call setline(1, '-- no data --')
   else
     call setline(1, lines)
+    let winid = win_getid()
+    belowright vnew gh://issues/preview
+    setlocal buftype=nofile
+    let t:preview_bufid = bufnr()
+    let s:preview_winid = win_getid()
+    nnoremap <buffer> <silent> q :bw!<CR>
+    call win_gotoid(winid)
+    augroup gh-preview
+      au!
+      autocmd CursorMoved <buffer> call s:issue_preview()
+    augroup END
+    call s:issue_preview()
   endif
 endfunction
 
