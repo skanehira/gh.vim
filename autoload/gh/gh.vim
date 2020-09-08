@@ -121,8 +121,10 @@ function! s:issues(resp) abort
   let s:issues = {}
   let lines = []
   for issue in a:resp.body
-    call add(lines, printf("%s\t%s\t%s\t%s", issue.number, issue.state, issue.title, issue.user.login))
-    let s:issues[issue.number] = issue
+    if !has_key(issue, 'pull_request')
+      call add(lines, printf("%s\t%s\t%s\t%s", issue.number, issue.state, issue.title, issue.user.login))
+      let s:issues[issue.number] = issue
+    endif
   endfor
 
   if len(lines) is# 0
