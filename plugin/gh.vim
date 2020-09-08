@@ -5,7 +5,7 @@
 if exists('loaded_gh')
   finish
 endif
-"let g:loaded_gh = 1
+let g:loaded_gh = 1
 
 augroup gh
   au!
