@@ -63,7 +63,7 @@ endfunction
 function! s:open_pull_diff() abort
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/pulls$')
   let number = split(getline('.'), "\t")[0]
-  if get(t:, 'gh_preview_diff_bufid', '') isnot# ''
+  if get(t:, 'gh_preview_diff_bufid', '') isnot# '' && bufexists(t:gh_preview_diff_bufid)
     call execute('bw ' . t:gh_preview_diff_bufid)
   endif
   call execute(printf('belowright vnew gh://%s/%s/pulls/%s/diff', m[1], m[2], number))
@@ -91,9 +91,9 @@ function! gh#gh#pull_diff() abort
 endfunction
 
 function! s:issue_preview() abort
-  call win_execute(s:preview_winid, '%d_')
+  call win_execute(s:gh_preview_winid, '%d_')
   let number = split(getline('.'), "\t")[0]
-  call setbufline(t:preview_bufid, 1, split(s:issues[number].body, '\r\?\n'))
+  call setbufline(t:gh_preview_bufid, 1, split(s:issues[number].body, '\r\?\n'))
 endfunction
 
 function! s:open_issue_preview() abort
@@ -101,8 +101,8 @@ function! s:open_issue_preview() abort
   belowright vnew gh://issues/preview
   setlocal buftype=nofile
 
-  let t:preview_bufid = bufnr()
-  let s:preview_winid = win_getid()
+  let t:gh_preview_bufid = bufnr()
+  let s:gh_preview_winid = win_getid()
 
   call win_gotoid(winid)
 
