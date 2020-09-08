@@ -63,12 +63,16 @@ endfunction
 function! s:open_pull_diff() abort
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/pulls$')
   let number = split(getline('.'), "\t")[0]
+  if get(t:, 'gh_preview_diff_bufid', '') isnot# ''
+    call execute('bw ' . t:gh_preview_diff_bufid)
+  endif
   call execute(printf('belowright vnew gh://%s/%s/pulls/%s/diff', m[1], m[2], number))
 endfunction
 
 function! s:set_diff_contents(resp) abort
   let t:gh_preview_diff_bufid = bufnr()
   call setline(1, split(a:resp.body, "\r")) 
+  setlocal buftype=nofile
   setlocal ft=diff
 endfunction
 
