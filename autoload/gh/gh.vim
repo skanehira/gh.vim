@@ -67,6 +67,7 @@ function! s:open_pull_diff() abort
 endfunction
 
 function! s:set_diff_contents(resp) abort
+  let t:gh_preview_diff_bufid = bufnr()
   call setline(1, split(a:resp.body, "\r")) 
   setlocal ft=diff
 endfunction
