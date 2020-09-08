@@ -63,7 +63,7 @@ endfunction
 function! s:open_pull_diff() abort
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/pulls$')
   let number = split(getline('.'), "\t")[0]
-  call execute(printf('vnew gh://%s/%s/pulls/%s/diff', m[1], m[2], number))
+  call execute(printf('belowright vnew gh://%s/%s/pulls/%s/diff', m[1], m[2], number))
 endfunction
 
 function! s:set_diff_contents(resp) abort
