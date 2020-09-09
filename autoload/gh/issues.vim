@@ -2,6 +2,14 @@
 " Author: skanehira
 " License: MIT
 
+function! s:issue_repo_info() abort
+  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues$')
+  return #{
+        \ owner: m[1],
+        \ name: m[2],
+        \ }
+endfunction
+
 function! s:issue_preview() abort
   call win_execute(s:gh_preview_winid, '%d_')
   let number = split(getline('.'), "\t")[0]
@@ -10,7 +18,9 @@ endfunction
 
 function! s:open_issue_preview() abort
   let winid = win_getid()
-  belowright vnew gh://issues/preview
+  let repo = s:issue_repo_info()
+  call execute('belowright vnew ' . printf('gh://%s/%s/issues/preview', repo.owner, repo.name))
+
   setlocal buftype=nofile
   setlocal ft=markdown
 
@@ -28,10 +38,9 @@ function! s:open_issue_preview() abort
 endfunction
 
 function! s:issue_open() abort
-  let line = getline('.')
-  let number = split(line, "\t")[0]
-  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues$')
-  let url = printf('https://github.com/%s/%s/issues/%s', m[1], m[2], number)
+  let number = split(getline('.'), "\t")[0]
+  let repo = s:issue_repo_info()
+  let url = printf('https://github.com/%s/%s/issues/%s', repo.owner, repo.name, number)
   call gh#gh#open_url(url)
 endfunction
 
@@ -56,14 +65,19 @@ function! s:issues(resp) abort
 endfunction
 
 function! gh#issues#list() abort
+  call gh#gh#delete_tabpage_buffer('gh_issues_list_bufid')
+  call gh#gh#delete_tabpage_buffer('gh_preview_bufid')
+
+  let t:gh_issues_list_bufid = bufnr()
+
   setlocal buftype=nofile
   setlocal nonumber
 
-  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues$')
+  let repo = s:issue_repo_info()
 
   call setline(1, '-- loading --')
 
-  call gh#github#issues(m[1], m[2])
+  call gh#github#issues(repo.owner, repo.name)
         \.then(function('s:issues'))
         \.catch(function('gh#gh#error'))
         \.finally(function('gh#gh#global_buf_settings'))

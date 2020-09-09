@@ -23,3 +23,8 @@ function! gh#gh#open_url(url) abort
   call system(printf('%s %s', cmd, a:url))
 endfunction
 
+function! gh#gh#delete_tabpage_buffer(name) abort
+  if has_key(t:, a:name) && bufexists(t:[a:name])
+    call execute('bw '. t:[a:name])
+  endif
+endfunction

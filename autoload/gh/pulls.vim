@@ -28,6 +28,11 @@ function! s:pull_open() abort
 endfunction
 
 function! gh#pulls#list() abort
+  call gh#gh#delete_tabpage_buffer('gh_pulls_list_bufid')
+  call gh#gh#delete_tabpage_buffer('gh_preview_diff_bufid')
+
+  let t:gh_pulls_list_bufid = bufnr()
+
   setlocal buftype=nofile
   setlocal nonumber
 
