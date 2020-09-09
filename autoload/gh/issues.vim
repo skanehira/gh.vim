@@ -2,14 +2,6 @@
 " Author: skanehira
 " License: MIT
 
-function! s:issue_repo_info() abort
-  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues$')
-  return #{
-        \ owner: m[1],
-        \ name: m[2],
-        \ }
-endfunction
-
 function! s:issue_preview() abort
   call win_execute(s:gh_preview_winid, '%d_')
   let number = split(getline('.'), "\t")[0]
@@ -18,8 +10,7 @@ endfunction
 
 function! s:open_issue_preview() abort
   let winid = win_getid()
-  let repo = s:issue_repo_info()
-  call execute('belowright vnew ' . printf('gh://%s/%s/issues/preview', repo.owner, repo.name))
+  call execute('belowright vnew ' . printf('gh://%s/%s/issues/preview', s:repo.owner, s:repo.name))
 
   setlocal buftype=nofile
   setlocal ft=markdown
@@ -39,8 +30,7 @@ endfunction
 
 function! s:issue_open() abort
   let number = split(getline('.'), "\t")[0]
-  let repo = s:issue_repo_info()
-  let url = printf('https://github.com/%s/%s/issues/%s', repo.owner, repo.name, number)
+  let url = printf('https://github.com/%s/%s/issues/%s', s:repo.owner, s:repo.name, number)
   call gh#gh#open_url(url)
 endfunction
 
@@ -73,11 +63,15 @@ function! gh#issues#list() abort
   setlocal buftype=nofile
   setlocal nonumber
 
-  let repo = s:issue_repo_info()
+  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues$')
+  let s:repo = #{
+        \ owner: m[1],
+        \ name: m[2],
+        \ }
 
   call setline(1, '-- loading --')
 
-  call gh#github#issues(repo.owner, repo.name)
+  call gh#github#issues(s:repo.owner, s:repo.name)
         \.then(function('s:issues'))
         \.catch(function('gh#gh#error'))
         \.finally(function('gh#gh#global_buf_settings'))

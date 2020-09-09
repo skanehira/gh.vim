@@ -22,8 +22,7 @@ endfunction
 function! s:pull_open() abort
   let line = getline('.')
   let number = split(line, "\t")[0]
-  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/pulls$')
-  let url = printf('https://github.com/%s/%s/pull/%s', m[1], m[2], number)
+  let url = printf('https://github.com/%s/%s/pull/%s', s:repo.owner, s:repo.name, number)
   call gh#gh#open_url(url)
 endfunction
 
@@ -33,14 +32,18 @@ function! gh#pulls#list() abort
 
   let t:gh_pulls_list_bufid = bufnr()
 
+  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/pulls')
+  let s:repo = #{
+        \ owner: m[1],
+        \ name: m[2],
+        \ }
+
   setlocal buftype=nofile
   setlocal nonumber
 
-  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/pulls$')
-
   call setline(1, '-- loading --')
 
-  call gh#github#pulls(m[1], m[2])
+  call gh#github#pulls(s:repo.owner, s:repo.name)
         \.then(function('s:pulls'))
         \.catch(function('gh#gh#error'))
         \.finally(function('gh#gh#global_buf_settings'))
@@ -52,12 +55,12 @@ function! s:open_pull_diff() abort
   if get(t:, 'gh_preview_diff_bufid', '') isnot# '' && bufexists(t:gh_preview_diff_bufid)
     call execute('bw ' . t:gh_preview_diff_bufid)
   endif
-  call execute(printf('belowright vnew gh://%s/%s/pulls/%s/diff', m[1], m[2], number))
+  call execute(printf('belowright vnew gh://%s/%s/pulls/%s/diff', s:repo.owner, s:repo.name, number))
 endfunction
 
 function! s:set_diff_contents(resp) abort
   let t:gh_preview_diff_bufid = bufnr()
-  call setline(1, split(a:resp.body, "\r")) 
+  call setline(1, split(a:resp.body, "\r"))
   setlocal buftype=nofile
   setlocal ft=diff
 endfunction
