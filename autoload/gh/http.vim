@@ -74,7 +74,7 @@ function! gh#http#get(url, ...) abort
   let tmp = s:_tempname()
   let token = get(g:, 'gh_token', '')
   if empty(token)
-    return
+    return s:Promise.reject('[qh.vim] g:gh_token is undefined')
   endif
 
   let cmd = ['curl', printf('--dump-header "%s"', tmp), '-H', printf('"Authorization: token %s"', token)]
