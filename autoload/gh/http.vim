@@ -70,6 +70,14 @@ function! s:make_response(header_tmp, body) abort
   return resp
 endfunction
 
+function! s:handling_error(resp) abort
+  if a:resp.status is# '200'
+    return s:Promise.resolve(a:resp)
+  endif
+  let body = has_key(a:resp.body, 'message') ? a:resp.body.message : a:resp.body
+  return s:Promise.reject(body)
+endfunction
+
 function! gh#http#get(url, ...) abort
   let tmp = s:_tempname()
   let token = get(g:, 'gh_token', '')
@@ -95,5 +103,5 @@ function! gh#http#get(url, ...) abort
 
   return call('s:sh', cmd)
         \.then(function('s:make_response', [tmp]))
-        \.then({res -> res.status is# '200' ? res : s:Promise.reject(res.body.message)})
+        \.then(function('s:handling_error'))
 endfunction
