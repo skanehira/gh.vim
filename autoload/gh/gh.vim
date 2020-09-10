@@ -4,6 +4,13 @@
 
 function! gh#gh#error(msg) abort
   call setline(1, printf('-- %s --', a:msg))
+
+function! gh#gh#set_response_to_buf(bufid, resp) abort
+  if has_key(a:resp, 'exception')
+    call setbufline(a:bufid, 1, a:resp.exception)
+    return
+  endif
+  call setbufline(a:bufid, 1, split(a:resp.body, '\r'))
 endfunction
 
 function! gh#gh#global_buf_settings() abort

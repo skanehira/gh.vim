@@ -17,3 +17,12 @@ function! gh#github#issues(owner, repo) abort
   return gh#http#get(url)
 endfunction
 
+function! gh#github#repos(owner) abort
+  let url = printf('https://api.github.com/users/%s/repos', a:owner)
+  return gh#http#get(url)
+endfunction
+
+function! gh#github#repo_readme(owner, repo) abort
+  let url = printf('https://raw.githubusercontent.com/%s/%s/master/README.md', a:owner, a:repo)
+  return gh#http#get(url)
+endfunction

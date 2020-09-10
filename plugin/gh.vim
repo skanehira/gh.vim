@@ -9,6 +9,10 @@ let g:loaded_gh = 1
 
 augroup gh
   au!
+  au BufReadCmd gh://*/repos call gh#repos#list()
+  au BufDelete gh://*/repos if has_key(t:, 'gh_repo_preview_bufid') && bufexists(t:gh_repo_preview_bufid) |
+        \ call execute('bw '. t:gh_repo_preview_bufid) |
+        \ endif
   au BufDelete gh://*/*/issues if has_key(t:, 'gh_preview_bufid') && bufexists(t:gh_preview_bufid) |
         \ call execute('bw '. t:gh_preview_bufid) |
         \ endif
