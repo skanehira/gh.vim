@@ -6,14 +6,30 @@ function! s:repo_open() abort
   call gh#gh#open_url(s:repos[line('.') - 1].html_url)
 endfunction
 
+function! s:set_response_to_buf(repo_name, resp) abort
+  if has_key(a:resp, 'exception')
+    call setbufline(t:gh_repo_preview_bufid, 1, a:resp.exception)
+    return
+  endif
+  call setbufline(t:gh_repo_preview_bufid, 1, split(a:resp.body, '\r'))
+  let t:gh_cache_repos[a:repo_name] = a:resp
+endfunction
+
 function! s:repo_preview() abort
   call win_execute(s:gh_repo_preview_winid, '%d_')
   call setbufline(t:gh_repo_preview_bufid, 1, '-- loading --')
 
   let repo = s:repos[line('.') - 1]
+
+  if has_key(t:gh_cache_repos, repo.full_name)
+    let resp = t:gh_cache_repos[repo.full_name]
+    call s:set_response_to_buf(repo.full_name, resp)
+    return
+  endif
+
   call gh#github#repo_readme(repo.owner.login, repo.name)
-        \.then(function('gh#gh#set_response_to_buf', [t:gh_repo_preview_bufid]))
-        \.catch(function('gh#gh#set_response_to_buf', [t:gh_repo_preview_bufid]))
+        \.then(function('s:set_response_to_buf', [repo.full_name]))
+        \.catch(function('s:set_response_to_buf',[repo.full_name]))
 endfunction
 
 function! s:open_repo_preview() abort
@@ -58,6 +74,7 @@ function! gh#repos#list() abort
   call gh#gh#delete_tabpage_buffer('gh_repo_list_bufid')
   call gh#gh#delete_tabpage_buffer('gh_repo_preview_bufid')
 
+  let t:gh_cache_repos = {}
   let t:gh_repo_list_bufid = bufnr()
 
   setlocal buftype=nofile
