@@ -71,7 +71,7 @@ function! gh#issues#list() abort
 
   call setline(1, '-- loading --')
 
-  call gh#github#issues(s:repo.owner, s:repo.name)
+  call gh#github#issues#list(s:repo.owner, s:repo.name)
         \.then(function('s:issues'))
         \.catch(function('gh#gh#error'))
         \.finally(function('gh#gh#global_buf_settings'))

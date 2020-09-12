@@ -27,7 +27,7 @@ function! s:repo_preview() abort
     return
   endif
 
-  call gh#github#repo_readme(repo.owner.login, repo.name)
+  call gh#github#repos#readme(repo.owner.login, repo.name)
         \.then(function('s:set_response_to_buf', [repo.full_name]))
         \.catch(function('s:set_response_to_buf',[repo.full_name]))
 endfunction
@@ -83,7 +83,7 @@ function! gh#repos#list() abort
   call setline(1, '-- loading --')
 
   let owner = matchlist(bufname(), 'gh://\(.*\)/repos$')[1]
-  call gh#github#repos(owner)
+  call gh#github#repos#list(owner)
         \.then(function('s:repos_list'))
         \.catch(function('gh#gh#error'))
         \.finally(function('gh#gh#global_buf_settings'))

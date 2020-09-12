@@ -43,7 +43,7 @@ function! gh#pulls#list() abort
 
   call setline(1, '-- loading --')
 
-  call gh#github#pulls(s:repo.owner, s:repo.name)
+  call gh#github#pulls#list(s:repo.owner, s:repo.name)
         \.then(function('s:pulls'))
         \.catch(function('gh#gh#error'))
         \.finally(function('gh#gh#global_buf_settings'))
@@ -73,7 +73,7 @@ function! gh#pulls#diff() abort
 
   call setline(1, '-- loading --')
 
-  call gh#github#pulls_diff(m[1], m[2], m[3])
+  call gh#github#pulls#diff(m[1], m[2], m[3])
         \.then(function('s:set_diff_contents'))
         \.catch(function('gh#gh#error'))
         \.finally(function('gh#gh#global_buf_settings'))
