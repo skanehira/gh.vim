@@ -7,10 +7,6 @@ function! s:repo_open() abort
 endfunction
 
 function! s:set_response_to_buf(repo_name, resp) abort
-  if has_key(a:resp, 'exception')
-    call setbufline(t:gh_repo_preview_bufid, 1, a:resp.exception)
-    return
-  endif
   call setbufline(t:gh_repo_preview_bufid, 1, split(a:resp.body, '\r'))
   let t:gh_cache_repos[a:repo_name] = a:resp
 endfunction

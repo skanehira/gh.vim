@@ -56,29 +56,27 @@ function! s:make_response(body) abort
   if has_key(s:tmp_file, 'body')
     call delete(s:tmp_file.body)
   endif
+
   let header_chunks = split(headerstr, "\r\n\r\n")
   let headers = map(header_chunks, 'split(v:val, "\r\n")')[0]
+  let status = split(headers[0], " ")[1]
   let header = s:parseHeader(headers[1:])
 
   let body = a:body
   if header["Content-Type"] is# 'application/json; charset=utf-8'
     let body = json_decode(a:body)
+    if status isnot# '200' && has_key(body, 'message')
+        let body = body.message
+    endif
   endif
 
   let resp = #{
-        \ status: split(headers[0], " ")[1],
+        \ status: status,
         \ header: header,
         \ body: body,
         \ }
-  return resp
-endfunction
 
-function! s:handling_error(resp) abort
-  if a:resp.status is# '200'
-    return s:Promise.resolve(a:resp)
-  endif
-  let body = has_key(a:resp.body, 'message') ? a:resp.body.message : a:resp.body
-  return s:Promise.reject(body)
+  return status is# '200' ? s:Promise.resolve(resp) : s:Promise.reject(resp)
 endfunction
 
 function! gh#http#get(url) abort
@@ -123,5 +121,4 @@ function! gh#http#request(settings) abort
 
   return call('s:sh', cmd)
         \.then(function('s:make_response'))
-        \.then(function('s:handling_error'))
 endfunction
