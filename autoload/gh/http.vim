@@ -76,7 +76,10 @@ function! s:make_response(body) abort
         \ body: body,
         \ }
 
-  return status is# '200' ? s:Promise.resolve(resp) : s:Promise.reject(resp)
+  if status is# '200' || status is# '201' || status is# '204'
+    return s:Promise.resolve(resp)
+  endif
+  return s:Promise.reject(resp)
 endfunction
 
 function! gh#http#get(url) abort
