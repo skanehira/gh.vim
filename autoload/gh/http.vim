@@ -113,7 +113,11 @@ function! gh#http#request(settings) abort
     endfor
   endif
 
-  let cmd += [a:settings.url]
+  if has_key(a:settings, 'param')
+    let cmd += [printf('"%s?%s"', a:settings.url, s:HTTP.encodeURI(a:settings.param))]
+  else
+    let cmd += [a:settings.url]
+  endif
 
   if method is# 'POST'
     let cmd += ['-H', '"Content-Type: application/json"', '-d', '@' . s:tmp_file.body]
