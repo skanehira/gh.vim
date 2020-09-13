@@ -6,6 +6,18 @@ function! gh#gh#error(msg) abort
   call setline(1, printf('-- %s --', a:msg))
 endfunction
 
+function! gh#gh#error_message(msg) abort
+  echohl ErrorMsg
+  echom '[gh.vim] ' . a:msg
+  echohl None
+endfunction
+
+function! gh#gh#message(msg) abort
+  echohl Directory
+  echom '[gh.vim] ' . a:msg
+  echohl None
+endfunction
+
 function! gh#gh#global_buf_settings() abort
   setlocal nomodifiable
   setlocal cursorline
