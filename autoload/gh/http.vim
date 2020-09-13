@@ -107,7 +107,7 @@ function! gh#http#request(settings) abort
     let s:tmp_file['body'] = tmp
   endif
 
-  let cmd = ['curl', '-X', method, printf('--dump-header "%s"', s:tmp_file.header),
+  let cmd = ['curl', '-s', '-X', method, printf('--dump-header "%s"', s:tmp_file.header),
         \ '-H', printf('"Authorization: token %s"', token)]
 
   if has_key(a:settings, 'headers')
@@ -128,4 +128,14 @@ function! gh#http#request(settings) abort
 
   return call('s:sh', cmd)
         \.then(function('s:make_response'))
+        \.catch(function('s:make_error_responsee'))
+endfunction
+
+function! s:make_error_responsee(err) abort
+  if type(a:err) is# type({})
+    return s:Promise.reject(a:err)
+  endif
+  return s:Promise.reject(#{
+        \ body: 'unknown error',
+        \ })
 endfunction
