@@ -77,3 +77,108 @@ function! gh#issues#list() abort
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
 
+function! gh#issues#new() abort
+  let s:issue_title = input('[gh.vim] issue title ')
+  echom ''
+  redraw
+  if s:issue_title is# ''
+    call gh#gh#error_message('no issue title')
+    bw!
+    return
+  endif
+
+  setlocal buftype=nofile
+  setlocal nonumber
+
+  call setline(1, '-- loading --')
+
+  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/new$')
+  let s:repo = #{
+        \ owner: m[1],
+        \ name: m[2],
+        \ }
+
+  call gh#github#repos#files(s:repo.owner, s:repo.name, 'master')
+        \.then(function('s:get_template_files'))
+        \.then(function('s:open_template_list'))
+        \.catch(function('s:get_template_error'))
+endfunction
+
+function! s:get_template_error(error) abort
+  if a:error.status is# 404
+    call gh#gh#error_message('not found issue template')
+  else
+    call gh#gh#error_message('failed to get tempalte: ' . a:error.body)
+  endif
+  call s:open_template_list([])
+endfunction
+
+function! s:create_issue() abort
+  call gh#gh#message('issue creating...')
+  let data = #{
+        \ title: s:issue_title,
+        \ body: join(getline(1, '$'), "\r\n"),
+        \ }
+
+  call gh#github#issues#new(s:repo.owner, s:repo.name, data)
+        \.then(function('s:create_issue_success'))
+        \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
+endfunction
+
+function! s:create_issue_success(resp) abort
+  bw!
+  redraw!
+  call gh#gh#message('create success')
+endfunction
+
+function! s:set_issue_template_buffer(resp) abort
+  bw!
+  call execute(printf('new gh://%s/%s/issues/%s', s:repo.owner, s:repo.name, s:issue_title))
+  set buftype=acwrite
+  set ft=markdown
+
+  if !empty(a:resp.body)
+    call setline(1, split(a:resp.body, '\r'))
+  endif
+
+  augroup gh-create-issue
+    au!
+    au BufWriteCmd <buffer> call s:create_issue()
+  augroup END
+endfunction
+
+function! s:get_template() abort
+  let url = s:files[line('.')-1].url
+  call gh#github#repos#get_file(url)
+        \.then(function('s:set_issue_template_buffer'))
+        \.catch({err -> execute('%d_ | call setline(1, err.body)', '')})
+endfunction
+
+function! s:open_template_list(files) abort
+  if empty(a:files)
+    call s:set_issue_template_buffer(#{body: ''})
+    return
+  endif
+  let s:files = a:files
+  call setline(1, map(copy(a:files), {_, v -> v.file}))
+  nnoremap <buffer> <silent> <CR> :call <SID>get_template()<CR>
+endfunction
+
+function! s:file_basename(file) abort
+  let p = split(a:file, '/')
+  return p[len(p)-1]
+endfunction
+
+function! s:get_template_files(resp) abort
+  if !has_key(a:resp.body, 'tree')
+    return []
+  endif
+
+  let files = filter(a:resp.body.tree,
+        \ {_, v -> v.type is# 'blob' && (matchstr(v.path, '\.github/ISSUE_TEMPLATE.*') is# '' ? 0 : 1)})
+
+  let files = map(files, {_, v -> #{file: s:file_basename(v.path),
+        \ url: printf('https://raw.githubusercontent.com/%s/%s/master/%s',
+        \ s:repo.owner, s:repo.name, v.path)}})
+  return files
+endfunction
