@@ -136,6 +136,7 @@ function! s:make_error_responsee(err) abort
     return s:Promise.reject(a:err)
   endif
   return s:Promise.reject(#{
+        \ status: '999',
         \ body: 'unknown error',
         \ })
 endfunction
