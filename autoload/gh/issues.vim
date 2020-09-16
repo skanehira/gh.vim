@@ -4,8 +4,7 @@
 
 function! s:issue_preview() abort
   call win_execute(s:gh_preview_winid, '%d_')
-  let number = split(getline('.'), "\t")[0]
-  call setbufline(t:gh_preview_bufid, 1, split(s:issues[number].body, '\r\?\n'))
+  call setbufline(t:gh_preview_bufid, 1, s:issues[line('.')-1].body)
 endfunction
 
 function! s:open_issue_preview() abort
@@ -29,9 +28,7 @@ function! s:open_issue_preview() abort
 endfunction
 
 function! s:issue_open() abort
-  let number = split(getline('.'), "\t")[0]
-  let url = printf('https://github.com/%s/%s/issues/%s', s:repo.owner, s:repo.name, number)
-  call gh#gh#open_url(url)
+  call gh#gh#open_url(s:issues[line('.') -1].url)
 endfunction
 
 function! s:issues(resp) abort
@@ -40,12 +37,16 @@ function! s:issues(resp) abort
     return
   endif
 
-  let s:issues = {}
+  let s:issues = []
   let lines = []
   for issue in a:resp.body
     if !has_key(issue, 'pull_request')
       call add(lines, printf("%s\t%s\t%s\t%s", issue.number, issue.state, issue.title, issue.user.login))
-      let s:issues[issue.number] = issue
+      call add(s:issues, #{
+            \ number: issue.number,
+            \ body: split(issue.body, '\r\?\n'),
+            \ url: printf('https://github.com/%s/%s/issues/%s', s:repo.owner, s:repo.name, issue.number),
+            \ })
     endif
   endfor
 
