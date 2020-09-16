@@ -101,14 +101,15 @@ function! gh#http#request(settings) abort
         \ header: s:_tempname(),
         \ }
 
-  if method is# 'POST'
-    let tmp = s:_tempname() 
-    call writefile([json_encode(a:settings.data)], tmp)
-    let s:tmp_file['body'] = tmp
-  endif
-
   let cmd = ['curl', '-s', '-X', method, printf('--dump-header "%s"', s:tmp_file.header),
         \ '-H', printf('"Authorization: token %s"', token)]
+
+  if method is# 'POST' || method is# 'PUT' || method is# 'PATCH'
+    let tmp = s:_tempname()
+    call writefile([json_encode(a:settings.data)], tmp)
+    let s:tmp_file['body'] = tmp
+    let cmd += ['-H', '"Content-Type: application/json"', '-d', '@' . s:tmp_file.body]
+  endif
 
   if has_key(a:settings, 'headers')
     for k in keys(a:settings.headers)
@@ -120,10 +121,6 @@ function! gh#http#request(settings) abort
     let cmd += [printf('"%s?%s"', a:settings.url, s:HTTP.encodeURI(a:settings.param))]
   else
     let cmd += [a:settings.url]
-  endif
-
-  if method is# 'POST'
-    let cmd += ['-H', '"Content-Type: application/json"', '-d', '@' . s:tmp_file.body]
   endif
 
   return call('s:sh', cmd)
