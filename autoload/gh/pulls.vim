@@ -9,8 +9,13 @@ function! s:pulls(resp) abort
   endif
 
   let lines = []
+  let s:pulls = []
   for pr in a:resp.body
     call add(lines, printf("%s\t%s\t%s\t%s", pr.number, pr.state, pr.title, pr.user.login))
+    call add(s:pulls, #{
+          \ number: pr.number,
+          \ url: printf('https://github.com/%s/%s/pull/%s', s:repo.owner, s:repo.name, pr.number),
+          \ })
   endfor
 
   call setline(1, lines)
@@ -20,10 +25,7 @@ function! s:pulls(resp) abort
 endfunction
 
 function! s:pull_open() abort
-  let line = getline('.')
-  let number = split(line, "\t")[0]
-  let url = printf('https://github.com/%s/%s/pull/%s', s:repo.owner, s:repo.name, number)
-  call gh#gh#open_url(url)
+  call gh#gh#open_url(s:pulls[line('.')-1].url)
 endfunction
 
 function! gh#pulls#list() abort
@@ -50,11 +52,10 @@ function! gh#pulls#list() abort
 endfunction
 
 function! s:open_pull_diff() abort
-  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/pulls$')
-  let number = split(getline('.'), "\t")[0]
-  if get(t:, 'gh_preview_diff_bufid', '') isnot# '' && bufexists(t:gh_preview_diff_bufid)
+  if bufexists(t:gh_preview_diff_bufid)
     call execute('bw ' . t:gh_preview_diff_bufid)
   endif
+  let number = s:pulls[line('.')-1].number
   call execute(printf('belowright vnew gh://%s/%s/pulls/%s/diff', s:repo.owner, s:repo.name, number))
 endfunction
 
