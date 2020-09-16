@@ -27,7 +27,7 @@ function! s:open_issue_preview() abort
   call s:issue_preview()
 endfunction
 
-function! s:issue_open() abort
+function! s:issue_open_on_list() abort
   call gh#gh#open_url(s:issues[line('.') -1].url)
 endfunction
 
@@ -52,7 +52,7 @@ function! s:issues(resp) abort
 
   call setline(1, lines)
   call s:open_issue_preview()
-  nnoremap <buffer> <silent> o :call <SID>issue_open()<CR>
+  nnoremap <buffer> <silent> o :call <SID>issue_open_on_list()<CR>
 endfunction
 
 function! gh#issues#list() abort
@@ -182,4 +182,59 @@ function! s:get_template_files(resp) abort
         \ url: printf('https://raw.githubusercontent.com/%s/%s/master/%s',
         \ s:repo.owner, s:repo.name, v.path)}})
   return files
+endfunction
+
+function! s:update_issue_success(resp) abort
+  bw!
+  redraw!
+  call gh#gh#message('update success')
+endfunction
+
+function! s:update_issue() abort
+  call gh#gh#message('issue updating...')
+  let data = #{
+        \ body: join(getline(1, '$'), "\r\n"),
+        \ }
+
+  call gh#github#issues#update(s:repo.owner, s:repo.name, s:repo.issue.number, data)
+        \.then(function('s:update_issue_success'))
+        \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
+endfunction
+
+function! s:open_issue() abort
+  call gh#gh#open_url(s:repo.issue.url)
+endfunction
+
+function! s:set_issues_body(resp) abort
+  call setline(1, split(a:resp.body.body, '\r\?\n'))
+  setlocal buftype=acwrite
+  setlocal ft=markdown
+
+  nnoremap <buffer> <silent> o :call <SID>open_issue()<CR>
+
+  augroup gh-update-issue
+    au!
+    au BufWriteCmd <buffer> call s:update_issue()
+  augroup END
+endfunction
+
+function! gh#issues#issue() abort
+  if bufexists(t:gh_issues_bufid)
+    call execute('bw ' . t:gh_issues_bufid)
+  endif
+  let t:gh_issues_bufid = bufnr()
+
+  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/\(.*\)$')
+  let s:repo = #{
+        \ owner: m[1],
+        \ name: m[2],
+        \ issue: #{
+        \   number:  m[3],
+        \   url: printf('https://github.com/%s/%s/issues/%s', m[1], m[2], m[3]),
+        \ },
+        \ }
+
+  call gh#github#issues#issue(s:repo.owner, s:repo.name, s:repo.issue.number)
+        \.then(function('s:set_issues_body'))
+        \.catch(function('gh#gh#error'))
 endfunction
