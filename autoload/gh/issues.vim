@@ -135,8 +135,8 @@ endfunction
 function! s:set_issue_template_buffer(resp) abort
   bw!
   call execute(printf('new gh://%s/%s/issues/%s', s:repo.owner, s:repo.name, s:issue_title))
-  set buftype=acwrite
-  set ft=markdown
+  setlocal buftype=acwrite
+  setlocal ft=markdown
 
   if !empty(a:resp.body)
     call setline(1, split(a:resp.body, '\r'))
@@ -208,6 +208,7 @@ endfunction
 function! s:set_issues_body(resp) abort
   call setline(1, split(a:resp.body.body, '\r\?\n'))
   setlocal buftype=acwrite
+  setlocal noswapfile nobuflisted
   setlocal ft=markdown
 
   nnoremap <buffer> <silent> o :call <SID>open_issue()<CR>
