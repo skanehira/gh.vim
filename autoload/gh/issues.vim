@@ -112,7 +112,7 @@ endfunction
 function! s:create_issue_success(resp) abort
   bw!
   redraw!
-  call gh#gh#message('create success')
+  call gh#gh#message(printf('create success: %s', a:resp.body.html_url))
 endfunction
 
 function! s:set_issue_template_buffer(resp) abort
