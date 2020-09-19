@@ -7,14 +7,8 @@ function! s:issue_open_on_list() abort
 endfunction
 
 function! s:edit_issue() abort
-  if bufexists(t:gh_issues_edit_bufid)
-    call execute('bw ' . t:gh_issues_edit_bufid)
-  endif
-
   let number = s:issues[line('.')-1].number
   call execute(printf('belowright vnew gh://%s/%s/issues/%s', s:repo.owner, s:repo.name, number))
-  let t:gh_issues_edit_bufid = bufnr()
-  nnoremap <buffer> <silent> q :bw<CR>
 endfunction
 
 function! s:issues(resp) abort
@@ -202,6 +196,7 @@ function! s:set_issues_body(resp) abort
   setlocal ft=markdown
 
   nnoremap <buffer> <silent> <C-o> :call <SID>open_issue()<CR>
+  nnoremap <buffer> <silent> q :bw<CR>
 
   augroup gh-update-issue
     au!
@@ -210,10 +205,10 @@ function! s:set_issues_body(resp) abort
 endfunction
 
 function! gh#issues#issue() abort
-  if bufexists(t:gh_issues_bufid)
-    call execute('bw ' . t:gh_issues_bufid)
+  if bufexists(t:gh_issues_edit_bufid)
+    call execute('bw ' . t:gh_issues_edit_bufid)
   endif
-  let t:gh_issues_bufid = bufnr()
+  let t:gh_issues_edit_bufid = bufnr()
 
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/\(.*\)$')
   let s:repo = #{
@@ -225,6 +220,7 @@ function! gh#issues#issue() abort
         \ },
         \ }
 
+  call setline(1, '-- loading --')
   call gh#github#issues#issue(s:repo.owner, s:repo.name, s:repo.issue.number)
         \.then(function('s:set_issues_body'))
         \.catch(function('gh#gh#error'))
