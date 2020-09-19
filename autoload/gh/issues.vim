@@ -191,6 +191,9 @@ function! s:update_issue_success(resp) abort
 endfunction
 
 function! s:update_issue() abort
+  if &modified is# 0
+    return
+  endif
   call gh#gh#message('issue updating...')
   let data = #{
         \ body: join(getline(1, '$'), "\r\n"),
@@ -207,11 +210,12 @@ endfunction
 
 function! s:set_issues_body(resp) abort
   call setline(1, split(a:resp.body.body, '\r\?\n'))
-  setlocal buftype=acwrite
+  setlocal nomodified
+  setlocal buftype=acwrite bufhidden=wipe
   setlocal noswapfile nobuflisted
   setlocal ft=markdown
 
-  nnoremap <buffer> <silent> o :call <SID>open_issue()<CR>
+  nnoremap <buffer> <silent> <C-o> :call <SID>open_issue()<CR>
 
   augroup gh-update-issue
     au!
