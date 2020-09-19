@@ -8,7 +8,7 @@ function! gh#github#issues#list(owner, repo, param) abort
   let settings = #{
         \ method: 'GET',
         \ url: printf('https://api.github.com/repos/%s/%s/issues', a:owner, a:repo),
-        \ param: gh#http#decode_param(a:param),
+        \ param: a:param,
         \ }
   return gh#http#request(settings)
 endfunction

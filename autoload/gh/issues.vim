@@ -11,9 +11,12 @@ function! s:edit_issue() abort
   call execute(printf('belowright vnew gh://%s/%s/issues/%s', s:repo.owner, s:repo.name, number))
 endfunction
 
-function! s:issues(resp) abort
+function! s:issue_list(resp) abort
+  nnoremap <buffer> <silent> <C-l> :call <SID>issue_list_change_page('+')<CR>
+  nnoremap <buffer> <silent> <C-h> :call <SID>issue_list_change_page('-')<CR>
+
   if empty(a:resp.body)
-    call gh#gh#error('no found issues')
+    call gh#gh#error('not found issues')
     return
   endif
 
@@ -29,10 +32,33 @@ function! s:issues(resp) abort
             \ })
     endif
   endfor
-
   call setline(1, lines)
+  setlocal nomodifiable nomodified
   nnoremap <buffer> <silent> o :call <SID>issue_open_on_list()<CR>
   nnoremap <buffer> <silent> e :call <SID>edit_issue()<CR>
+endfunction
+
+function! s:issue_list_change_page(op) abort
+  if a:op is# '+'
+    let s:repo.issue.param.page += 1
+  else
+    if s:repo.issue.param.page < 2
+      return
+    endif
+    let s:repo.issue.param.page -= 1
+  endif
+
+  let vs = []
+  for k in keys(s:repo.issue.param)
+    call add(vs, printf('%s=%s', k, s:repo.issue.param[k]))
+  endfor
+
+  let cmd = printf('vnew gh://%s/%s/issues', s:repo.owner, s:repo.name)
+  if len(vs) > 0
+    let cmd = printf('%s?%s', cmd, join(vs, '&'))
+  endif
+
+  call execute(cmd)
 endfunction
 
 function! gh#issues#list() abort
@@ -41,22 +67,27 @@ function! gh#issues#list() abort
 
   let t:gh_issues_list_bufid = bufnr()
 
-  setlocal buftype=nofile
+  setlocal buftype=nofile bufhidden=wipe
   setlocal nonumber
+  setlocal noswapfile nobuflisted
 
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues?*\(.*\)')
+  let param = gh#http#decode_param(m[3])
+  if !has_key(param, 'page')
+    let param['page'] = 1
+  endif
   let s:repo = #{
         \ owner: m[1],
         \ name: m[2],
         \ issue: #{
-        \   param: m[3],
+        \   param: param,
         \ },
         \ }
 
   call setline(1, '-- loading --')
 
   call gh#github#issues#list(s:repo.owner, s:repo.name, s:repo.issue.param)
-        \.then(function('s:issues'))
+        \.then(function('s:issue_list'))
         \.catch(function('gh#gh#error'))
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
