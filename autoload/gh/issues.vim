@@ -32,7 +32,7 @@ function! s:issues(resp) abort
 
   call setline(1, lines)
   nnoremap <buffer> <silent> o :call <SID>issue_open_on_list()<CR>
-  nnoremap <buffer> <silent> dd :call <SID>edit_issue()<CR>
+  nnoremap <buffer> <silent> e :call <SID>edit_issue()<CR>
 endfunction
 
 function! gh#issues#list() abort
