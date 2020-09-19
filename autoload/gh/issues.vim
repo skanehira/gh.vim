@@ -122,6 +122,8 @@ function! s:set_issue_template_buffer(resp) abort
     call setline(1, split(a:resp.body, '\r'))
   endif
 
+  setlocal nomodified
+  nnoremap <buffer> <silent> q :bw<CR>
   augroup gh-create-issue
     au!
     au BufWriteCmd <buffer> call s:create_issue()
