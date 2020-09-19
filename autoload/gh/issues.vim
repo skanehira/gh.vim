@@ -2,33 +2,19 @@
 " Author: skanehira
 " License: MIT
 
-function! s:issue_preview() abort
-  call win_execute(s:gh_preview_winid, '%d_')
-  call setbufline(t:gh_preview_bufid, 1, s:issues[line('.')-1].body)
-endfunction
-
-function! s:open_issue_preview() abort
-  let winid = win_getid()
-  call execute('belowright vnew ' . printf('gh://%s/%s/issues/preview', s:repo.owner, s:repo.name))
-
-  setlocal buftype=nofile
-  setlocal ft=markdown
-
-  let t:gh_preview_bufid = bufnr()
-  let s:gh_preview_winid = win_getid()
-
-  call win_gotoid(winid)
-
-  augroup gh-issue-preview
-    au!
-    autocmd CursorMoved <buffer> call s:issue_preview()
-  augroup END
-
-  call s:issue_preview()
-endfunction
-
 function! s:issue_open_on_list() abort
   call gh#gh#open_url(s:issues[line('.') -1].url)
+endfunction
+
+function! s:edit_issue() abort
+  if bufexists(t:gh_issues_edit_bufid)
+    call execute('bw ' . t:gh_issues_edit_bufid)
+  endif
+
+  let number = s:issues[line('.')-1].number
+  call execute(printf('belowright vnew gh://%s/%s/issues/%s', s:repo.owner, s:repo.name, number))
+  let t:gh_issues_edit_bufid = bufnr()
+  nnoremap <buffer> <silent> q :bw<CR>
 endfunction
 
 function! s:issues(resp) abort
@@ -51,8 +37,8 @@ function! s:issues(resp) abort
   endfor
 
   call setline(1, lines)
-  call s:open_issue_preview()
   nnoremap <buffer> <silent> o :call <SID>issue_open_on_list()<CR>
+  nnoremap <buffer> <silent> dd :call <SID>edit_issue()<CR>
 endfunction
 
 function! gh#issues#list() abort

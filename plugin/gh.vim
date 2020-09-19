@@ -10,7 +10,8 @@ let g:loaded_gh = 1
 for var in ['gh_repo_preview_bufid', 'gh_preview_bufid', 
       \ 'gh_preview_diff_bufid', 'gh_repo_list_bufid',
       \ 'gh_repo_preview_bufid', 'gh_issues_list_bufid',
-      \ 'gh_pulls_list_bufid', 'gh_issues_bufid']
+      \ 'gh_pulls_list_bufid', 'gh_issues_bufid',
+      \ 'gh_issues_edit_bufid']
   let t:[var] = ''
 endfor
 
