@@ -2,8 +2,15 @@
 " Author: skanehira
 " License: MIT
 
-function! gh#github#issues#list(owner, repo) abort
-  return gh#http#get(printf('https://api.github.com/repos/%s/%s/issues', a:owner, a:repo))
+let s:Promise = vital#vital#import('Async.Promise')
+
+function! gh#github#issues#list(owner, repo, param) abort
+  let settings = #{
+        \ method: 'GET',
+        \ url: printf('https://api.github.com/repos/%s/%s/issues', a:owner, a:repo),
+        \ param: gh#http#decode_param(a:param),
+        \ }
+  return gh#http#request(settings)
 endfunction
 
 function! gh#github#issues#issue(owner, repo, number) abort

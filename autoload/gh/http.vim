@@ -137,3 +137,15 @@ function! s:make_error_responsee(err) abort
         \ body: 'unknown error',
         \ })
 endfunction
+
+function! gh#http#decode_param(arg) abort
+  let param = {}
+  for p in split(a:arg, '&')
+    let kv = split(p, '=')
+    if len(kv) is# 1
+      continue
+    endif
+    let param[kv[0]] = kv[1]
+  endfor
+  return param
+endfunction

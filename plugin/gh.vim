@@ -25,6 +25,7 @@ augroup gh
         \ call execute('bw '. t:gh_preview_bufid) |
         \ endif
   au BufReadCmd gh://*/*/issues call gh#issues#list()
+  au BufReadCmd gh://*/*/issues\?* call gh#issues#list()
   au BufReadCmd gh://*/*/issues/new call gh#issues#new()
   au BufReadCmd gh://*/*/issues/\d call gh#issues#issue()
   au BufReadCmd gh://*/*/pulls call gh#pulls#list()

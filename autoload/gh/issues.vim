@@ -44,15 +44,18 @@ function! gh#issues#list() abort
   setlocal buftype=nofile
   setlocal nonumber
 
-  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues$')
+  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues?*\(.*\)')
   let s:repo = #{
         \ owner: m[1],
         \ name: m[2],
+        \ issue: #{
+        \   param: m[3],
+        \ },
         \ }
 
   call setline(1, '-- loading --')
 
-  call gh#github#issues#list(s:repo.owner, s:repo.name)
+  call gh#github#issues#list(s:repo.owner, s:repo.name, s:repo.issue.param)
         \.then(function('s:issues'))
         \.catch(function('gh#gh#error'))
         \.finally(function('gh#gh#global_buf_settings'))
