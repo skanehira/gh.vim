@@ -8,7 +8,8 @@ endfunction
 
 function! s:edit_issue() abort
   let number = s:issues[line('.')-1].number
-  call execute(printf('belowright vnew gh://%s/%s/issues/%s', s:repo.owner, s:repo.name, number))
+  call execute(printf('belowright vnew gh://%s/%s/issues/%s',
+        \ s:issue_list.repo.owner, s:issue_list.repo.name, number))
 endfunction
 
 function! s:issue_list(resp) abort
@@ -22,13 +23,15 @@ function! s:issue_list(resp) abort
 
   let s:issues = []
   let lines = []
+  let url = printf('https://github.com/%s/%s/issues/', s:issue_list.repo.owner, s:issue_list.repo.name)
+
   for issue in a:resp.body
     if !has_key(issue, 'pull_request')
       call add(lines, printf("%s\t%s\t%s\t%s", issue.number, issue.state, issue.title, issue.user.login))
       call add(s:issues, #{
             \ number: issue.number,
             \ body: split(issue.body, '\r\?\n'),
-            \ url: printf('https://github.com/%s/%s/issues/%s', s:repo.owner, s:repo.name, issue.number),
+            \ url: url . issue.number, 
             \ })
     endif
   endfor
@@ -39,30 +42,21 @@ endfunction
 
 function! s:issue_list_change_page(op) abort
   if a:op is# '+'
-    let s:repo.issue.param.page += 1
+    let s:issue_list.param.page += 1
   else
-    if s:repo.issue.param.page < 2
+    if s:issue_list.param.page < 2
       return
     endif
-    let s:repo.issue.param.page -= 1
+    let s:issue_list.param.page -= 1
   endif
 
-  let vs = []
-  for k in keys(s:repo.issue.param)
-    call add(vs, printf('%s=%s', k, s:repo.issue.param[k]))
-  endfor
-
-  let cmd = printf('vnew gh://%s/%s/issues', s:repo.owner, s:repo.name)
-  if len(vs) > 0
-    let cmd = printf('%s?%s', cmd, join(vs, '&'))
-  endif
-
+  let cmd = printf('vnew gh://%s/%s/issues?%s',
+        \ s:issue_list.repo.owner, s:issue_list.repo.name, gh#http#encode_param(s:issue_list.param))
   call execute(cmd)
 endfunction
 
 function! gh#issues#list() abort
   call gh#gh#delete_tabpage_buffer('gh_issues_list_bufid')
-  call gh#gh#delete_tabpage_buffer('gh_preview_bufid')
 
   let t:gh_issues_list_bufid = bufnr()
 
@@ -73,17 +67,19 @@ function! gh#issues#list() abort
   if !has_key(param, 'page')
     let param['page'] = 1
   endif
-  let s:repo = #{
-        \ owner: m[1],
-        \ name: m[2],
-        \ issue: #{
-        \   param: param,
+
+
+  let s:issue_list = #{
+        \ repo: #{
+        \   owner: m[1],
+        \   name: m[2],
         \ },
+        \ param: param,
         \ }
 
   call gh#gh#set_message_buf('loading')
 
-  call gh#github#issues#list(s:repo.owner, s:repo.name, s:repo.issue.param)
+  call gh#github#issues#list(s:issue_list.repo.owner, s:issue_list.repo.name, s:issue_list.param)
         \.then(function('s:issue_list'))
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
         \.finally(function('gh#gh#global_buf_settings'))
@@ -104,12 +100,12 @@ function! gh#issues#new() abort
   call gh#gh#set_message_buf('loading')
 
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/new$')
-  let s:repo = #{
+  let s:issue_new = #{
         \ owner: m[1],
         \ name: m[2],
         \ }
 
-  call gh#github#repos#files(s:repo.owner, s:repo.name, 'master')
+  call gh#github#repos#files(s:issue_new.owner, s:issue_new.name, 'master')
         \.then(function('s:get_template_files'))
         \.then(function('s:open_template_list'))
         \.catch(function('s:get_template_error'))
@@ -192,7 +188,7 @@ function! s:get_template_files(resp) abort
 
   let files = map(files, {_, v -> #{file: s:file_basename(v.path),
         \ url: printf('https://raw.githubusercontent.com/%s/%s/master/%s',
-        \ s:repo.owner, s:repo.name, v.path)}})
+        \ s:issue_new.owner, s:issue_new.name, v.path)}})
   return files
 endfunction
 
@@ -211,13 +207,13 @@ function! s:update_issue() abort
         \ body: join(getline(1, '$'), "\r\n"),
         \ }
 
-  call gh#github#issues#update(s:repo.owner, s:repo.name, s:repo.issue.number, data)
+  call gh#github#issues#update(s:issue.repo.owner, s:issue.repo.name, s:issue.number, data)
         \.then(function('s:update_issue_success'))
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
 endfunction
 
 function! s:open_issue() abort
-  call gh#gh#open_url(s:repo.issue.url)
+  call gh#gh#open_url(s:issue.url)
 endfunction
 
 function! s:set_issues_body(resp) abort
@@ -240,17 +236,17 @@ function! gh#issues#issue() abort
   call gh#gh#init_buffer()
 
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/\(.*\)$')
-  let s:repo = #{
-        \ owner: m[1],
-        \ name: m[2],
-        \ issue: #{
-        \   number:  m[3],
-        \   url: printf('https://github.com/%s/%s/issues/%s', m[1], m[2], m[3]),
+  let s:issue = #{
+        \ repo: #{
+        \   owner: m[1],
+        \   name: m[2],
         \ },
+        \ number:  m[3],
+        \ url: printf('https://github.com/%s/%s/issues/%s', m[1], m[2], m[3]),
         \ }
 
   call gh#gh#set_message_buf('loading')
-  call gh#github#issues#issue(s:repo.owner, s:repo.name, s:repo.issue.number)
+  call gh#github#issues#issue(s:issue.repo.owner, s:issue.repo.name, s:issue.number)
         \.then(function('s:set_issues_body'))
         \.catch({err -> execute('call gh#gh#set_message_buf(err.body)', '')})
 endfunction

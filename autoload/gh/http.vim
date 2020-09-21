@@ -149,3 +149,7 @@ function! gh#http#decode_param(arg) abort
   endfor
   return param
 endfunction
+
+function! gh#http#encode_param(arg) abort
+  return join(map(keys(a:arg), {_, k -> join([k, a:arg[k]], '=')}), '&')
+endfunction
