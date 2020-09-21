@@ -61,7 +61,6 @@ function! gh#issues#list() abort
 
   call gh#gh#delete_tabpage_buffer('gh_issues_list_bufid')
   let t:gh_issues_list_bufid = bufnr()
-  call gh#gh#init_buffer()
 
   let param = gh#http#decode_param(m[3])
   if !has_key(param, 'page')
