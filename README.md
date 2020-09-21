@@ -57,17 +57,17 @@ currently `gh.vim` provide buffers is bellow.
   - [ ] close
   - [ ] reopen
   - [x] update
-    - [ ] update title
+    - [x] update title
+- pull request
+  - [x] list
+    - [x] paging
+  - [x] diff
+  - [ ] create
+  - [ ] merge
 - repositories
   - [x] list
-    - [ ] paging
+    - [x] paging
   - [ ] create
   - [ ] delete
   - [ ] transfer
   - [ ] make public/private
-- pull request
-  - [x] list
-    - [ ] paging
-  - [x] diff
-  - [ ] create
-  - [ ] merge
