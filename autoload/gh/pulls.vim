@@ -72,7 +72,7 @@ function! gh#pulls#list() abort
 
   call gh#github#pulls#list(s:pull_list.repo.owner, s:pull_list.repo.name, s:pull_list.param)
         \.then(function('s:pull_list'))
-        \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
+        \.catch({err -> execute('call gh#gh#set_message_buf(err.body)', '')})
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
 
@@ -97,7 +97,7 @@ function! gh#pulls#diff() abort
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/pulls/\(.*\)/diff$')
   call gh#github#pulls#diff(m[1], m[2], m[3])
         \.then(function('s:set_diff_contents'))
-        \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
+        \.catch({err -> execute('call gh#gh#set_message_buf(err.body)', '')})
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
 
