@@ -39,6 +39,41 @@ function! s:issue_list(resp) abort
   call setline(1, lines)
   nnoremap <buffer> <silent> o :call <SID>issue_open_on_list()<CR>
   nnoremap <buffer> <silent> e :call <SID>edit_issue()<CR>
+  nnoremap <buffer> <silent> ghc :call <SID>issue_close()<CR>
+  nnoremap <buffer> <silent> gho :call <SID>issue_open()<CR>
+endfunction
+
+function! s:issue_close() abort
+  let number = s:issues[line('.')-1].number
+  call gh#gh#message("closing issue")
+  call gh#github#issues#update_state(s:issue_list.repo.owner, s:issue_list.repo.name, number, 'close')
+        \.then(function('s:issue_close_success'))
+        \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
+endfunction
+
+function! s:issue_close_success(resp) abort
+  call gh#gh#message("closed issue")
+  call s:issue_list_refresh()
+endfunction
+
+function! s:issue_open() abort
+  let number = s:issues[line('.')-1].number
+  call gh#gh#message("opening issue")
+  call gh#github#issues#update_state(s:issue_list.repo.owner, s:issue_list.repo.name, number, 'open')
+        \.then(function('s:issue_open_success'))
+        \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
+endfunction
+
+function! s:issue_open_success(resp) abort
+  call gh#gh#message("opend issue")
+  call s:issue_list_refresh()
+endfunction
+
+function! s:issue_list_refresh() abort
+  call gh#gh#delete_tabpage_buffer('gh_issues_list_bufid')
+  let cmd = printf('e gh://%s/%s/issues?%s',
+        \ s:issue_list.repo.owner, s:issue_list.repo.name, gh#http#encode_param(s:issue_list.param))
+  call execute(cmd)
 endfunction
 
 function! s:issue_list_change_page(op) abort
