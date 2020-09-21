@@ -29,6 +29,7 @@ augroup gh
   au BufReadCmd gh://*/*/issues/new call gh#issues#new()
   au BufReadCmd gh://*/*/issues/[0-9]* call gh#issues#issue()
   au BufReadCmd gh://*/*/pulls call gh#pulls#list()
+  au BufReadCmd gh://*/*/pulls\?* call gh#pulls#list()
   au BufDelete gh://*/*/pulls if bufexists(t:gh_preview_diff_bufid) |
         \ call execute('bw '. t:gh_preview_diff_bufid) |
         \ let t:gh_preview_diff_bufid = '' |
