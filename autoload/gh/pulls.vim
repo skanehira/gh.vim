@@ -79,9 +79,7 @@ function! gh#pulls#list() abort
 endfunction
 
 function! s:open_pull_diff() abort
-  if bufexists(t:gh_preview_diff_bufid)
-    call execute('bw ' . t:gh_preview_diff_bufid)
-  endif
+  call gh#gh#delete_tabpage_buffer('gh_preview_diff_bufid')
   let number = s:pulls[line('.')-1].number
   call execute(printf('belowright vnew gh://%s/%s/pulls/%s/diff',
         \ s:pull_list.repo.owner, s:pull_list.repo.name, number))

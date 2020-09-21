@@ -7,8 +7,7 @@ if exists('loaded_gh')
 endif
 let g:loaded_gh = 1
 
-for var in ['gh_repo_preview_bufid', 'gh_preview_bufid', 
-      \ 'gh_preview_diff_bufid', 'gh_repo_list_bufid',
+for var in ['gh_preview_diff_bufid', 'gh_repo_list_bufid',
       \ 'gh_repo_preview_bufid', 'gh_issues_list_bufid',
       \ 'gh_pulls_list_bufid', 'gh_issues_edit_bufid',
       \ ]
@@ -18,12 +17,6 @@ endfor
 augroup gh
   au!
   au BufReadCmd gh://*/repos call gh#repos#list()
-  au BufDelete gh://*/repos if bufexists(t:gh_repo_preview_bufid) |
-        \ call execute('bw '. t:gh_repo_preview_bufid) |
-        \ endif
-  au BufDelete gh://*/*/issues if bufexists(t:gh_preview_bufid) |
-        \ call execute('bw '. t:gh_preview_bufid) |
-        \ endif
   au BufReadCmd gh://*/*/issues call gh#issues#list()
   au BufReadCmd gh://*/*/issues\?* call gh#issues#list()
   au BufReadCmd gh://*/*/issues/new call gh#issues#new()

@@ -7,6 +7,7 @@ function! s:issue_open_on_list() abort
 endfunction
 
 function! s:edit_issue() abort
+  call gh#gh#delete_tabpage_buffer('gh_issues_edit_bufid')
   let number = s:issues[line('.')-1].number
   call execute(printf('belowright vnew gh://%s/%s/issues/%s',
         \ s:issue_list.repo.owner, s:issue_list.repo.name, number))
