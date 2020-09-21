@@ -2,8 +2,14 @@
 " Author: skanehira
 " License: MIT
 
+function! gh#gh#init_buffer() abort
+  setlocal buftype=nofile bufhidden=wipe
+        \ noswapfile nobuflisted nonumber
+endfunction
+
 function! gh#gh#set_message_buf(msg) abort
   call setline(1, printf('-- %s --', a:msg))
+  nnoremap <buffer> <silent> q :bw<CR>
 endfunction
 
 function! gh#gh#error_message(msg) abort

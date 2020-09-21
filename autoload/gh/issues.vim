@@ -33,7 +33,6 @@ function! s:issue_list(resp) abort
     endif
   endfor
   call setline(1, lines)
-  setlocal nomodifiable nomodified
   nnoremap <buffer> <silent> o :call <SID>issue_open_on_list()<CR>
   nnoremap <buffer> <silent> e :call <SID>edit_issue()<CR>
 endfunction
@@ -67,9 +66,7 @@ function! gh#issues#list() abort
 
   let t:gh_issues_list_bufid = bufnr()
 
-  setlocal buftype=nofile bufhidden=wipe
-  setlocal nonumber
-  setlocal noswapfile nobuflisted
+  call gh#gh#init_buffer()
 
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues?*\(.*\)')
   let param = gh#http#decode_param(m[3])
@@ -88,7 +85,7 @@ function! gh#issues#list() abort
 
   call gh#github#issues#list(s:repo.owner, s:repo.name, s:repo.issue.param)
         \.then(function('s:issue_list'))
-        \.catch(function('gh#gh#set_message_buf'))
+        \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
 
@@ -102,8 +99,7 @@ function! gh#issues#new() abort
     return
   endif
 
-  setlocal buftype=nofile
-  setlocal nonumber
+  call gh#gh#init_buffer()
 
   call gh#gh#set_message_buf('loading')
 
@@ -168,7 +164,7 @@ function! s:get_template() abort
   let url = s:files[line('.')-1].url
   call gh#github#repos#get_file(url)
         \.then(function('s:set_issue_template_buffer'))
-        \.catch({err -> execute('%d_ | call setline(1, err.body)', '')})
+        \.catch({err -> execute('%d_ | call gh#gh#set_message_buf(err.body)', '')})
 endfunction
 
 function! s:open_template_list(files) abort
@@ -226,10 +222,7 @@ endfunction
 
 function! s:set_issues_body(resp) abort
   call setline(1, split(a:resp.body.body, '\r\?\n'))
-  setlocal nomodified
-  setlocal buftype=acwrite bufhidden=wipe
-  setlocal noswapfile nobuflisted
-  setlocal ft=markdown
+  setlocal nomodified buftype=acwrite ft=markdown
 
   nnoremap <buffer> <silent> <C-o> :call <SID>open_issue()<CR>
   nnoremap <buffer> <silent> q :bw<CR>
@@ -241,10 +234,10 @@ function! s:set_issues_body(resp) abort
 endfunction
 
 function! gh#issues#issue() abort
-  if bufexists(t:gh_issues_edit_bufid)
-    call execute('bw ' . t:gh_issues_edit_bufid)
-  endif
+  call gh#gh#delete_tabpage_buffer('gh_issues_edit_bufid')
   let t:gh_issues_edit_bufid = bufnr()
+
+  call gh#gh#init_buffer()
 
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/\(.*\)$')
   let s:repo = #{
@@ -259,5 +252,5 @@ function! gh#issues#issue() abort
   call gh#gh#set_message_buf('loading')
   call gh#github#issues#issue(s:repo.owner, s:repo.name, s:repo.issue.number)
         \.then(function('s:set_issues_body'))
-        \.catch(function('gh#gh#set_message_buf'))
+        \.catch({err -> execute('call gh#gh#set_message_buf(err.body)', '')})
 endfunction
