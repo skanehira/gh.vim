@@ -57,18 +57,16 @@ function! s:issue_list_change_page(op) abort
 endfunction
 
 function! gh#issues#list() abort
+  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues?*\(.*\)')
+
   call gh#gh#delete_tabpage_buffer('gh_issues_list_bufid')
-
   let t:gh_issues_list_bufid = bufnr()
-
   call gh#gh#init_buffer()
 
-  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues?*\(.*\)')
   let param = gh#http#decode_param(m[3])
   if !has_key(param, 'page')
     let param['page'] = 1
   endif
-
 
   let s:issue_list = #{
         \ repo: #{
@@ -78,6 +76,7 @@ function! gh#issues#list() abort
         \ param: param,
         \ }
 
+  call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
 
   call gh#github#issues#list(s:issue_list.repo.owner, s:issue_list.repo.name, s:issue_list.param)
@@ -243,12 +242,11 @@ function! s:set_issues_body(resp) abort
 endfunction
 
 function! gh#issues#issue() abort
+  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/\(.*\)$')
+
   call gh#gh#delete_tabpage_buffer('gh_issues_edit_bufid')
   let t:gh_issues_edit_bufid = bufnr()
 
-  call gh#gh#init_buffer()
-
-  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/\(.*\)$')
   let s:issue = #{
         \ repo: #{
         \   owner: m[1],
@@ -258,7 +256,9 @@ function! gh#issues#issue() abort
         \ url: printf('https://github.com/%s/%s/issues/%s', m[1], m[2], m[3]),
         \ }
 
+  call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
+
   call gh#github#issues#issue(s:issue.repo.owner, s:issue.repo.name, s:issue.number)
         \.then(function('s:set_issues_body'))
         \.catch({err -> execute('call gh#gh#set_message_buf(err.body)', '')})

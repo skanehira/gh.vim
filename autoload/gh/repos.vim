@@ -67,6 +67,8 @@ function! s:repos_list(resp) abort
 endfunction
 
 function! gh#repos#list() abort
+  let owner = matchlist(bufname(), 'gh://\(.*\)/repos$')[1]
+
   call gh#gh#delete_tabpage_buffer('gh_repo_list_bufid')
   call gh#gh#delete_tabpage_buffer('gh_repo_preview_bufid')
 
@@ -78,7 +80,6 @@ function! gh#repos#list() abort
 
   call gh#gh#set_message_buf('loading')
 
-  let owner = matchlist(bufname(), 'gh://\(.*\)/repos$')[1]
   call gh#github#repos#list(owner)
         \.then(function('s:repos_list'))
         \.catch(function('gh#gh#set_message_buf'))

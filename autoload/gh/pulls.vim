@@ -48,18 +48,17 @@ function! s:pull_open() abort
 endfunction
 
 function! gh#pulls#list() abort
+  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/pulls?*\(.*\)')
+
   call gh#gh#delete_tabpage_buffer('gh_pulls_list_bufid')
   call gh#gh#delete_tabpage_buffer('gh_preview_diff_bufid')
-
   let t:gh_pulls_list_bufid = bufnr()
 
-  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/pulls?*\(.*\)')
   let param = gh#http#decode_param(m[3])
   if !has_key(param, 'page')
     let param['page'] = 1
   endif
 
-  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/pulls')
   let s:pull_list = #{
         \ repo: #{
         \   owner: m[1],
@@ -69,7 +68,6 @@ function! gh#pulls#list() abort
         \ }
 
   call gh#gh#init_buffer()
-
   call gh#gh#set_message_buf('loading')
 
   call gh#github#pulls#list(s:pull_list.repo.owner, s:pull_list.repo.name, s:pull_list.param)
