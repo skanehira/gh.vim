@@ -8,7 +8,7 @@ endif
 let g:loaded_gh = 1
 
 for var in ['gh_preview_diff_bufid', 'gh_repo_list_bufid',
-      \ 'gh_repo_preview_bufid', 'gh_issues_list_bufid',
+      \ 'gh_repo_readme_bufid', 'gh_issues_list_bufid',
       \ 'gh_pulls_list_bufid', 'gh_issues_edit_bufid',
       \ ]
   let t:[var] = ''
@@ -17,6 +17,8 @@ endfor
 augroup gh
   au!
   au BufReadCmd gh://*/repos call gh#repos#list()
+  au BufReadCmd gh://*/repos\?* call gh#repos#list()
+  au BufReadCmd gh://*/*/readme call gh#repos#readme()
   au BufReadCmd gh://*/*/issues call gh#issues#list()
   au BufReadCmd gh://*/*/issues\?* call gh#issues#list()
   au BufReadCmd gh://*/*/issues/new call gh#issues#new()

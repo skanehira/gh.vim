@@ -6,82 +6,87 @@ function! s:repo_open() abort
   call gh#gh#open_url(s:repos[line('.') - 1].html_url)
 endfunction
 
-function! s:set_response_to_buf(repo_name, resp) abort
-  call setbufline(t:gh_repo_preview_bufid, 1, split(a:resp.body, '\r'))
-  let t:gh_cache_repos[a:repo_name] = a:resp
+function! s:repo_open_readme() abort
+  call gh#gh#delete_tabpage_buffer('gh_repo_readme_bufid')
+  let full_name = s:repos[line('.')-1].full_name
+  call execute(printf('belowright vnew gh://%s/readme', full_name))
 endfunction
 
-function! s:repo_preview() abort
-  call win_execute(s:gh_repo_preview_winid, '%d_')
-  call setbufline(t:gh_repo_preview_bufid, 1, '-- loading --')
-
-  let repo = s:repos[line('.') - 1]
-
-  if has_key(t:gh_cache_repos, repo.full_name)
-    let resp = t:gh_cache_repos[repo.full_name]
-    call s:set_response_to_buf(repo.full_name, resp)
-    return
+function! s:repo_list_change_page(op) abort
+  if a:op is# '+'
+    let s:repo_list.param.page += 1
+  else
+    if s:repo_list.param.page < 2
+      return
+    endif
+    let s:repo_list.param.page -= 1
   endif
 
-  call gh#github#repos#readme(repo.owner.login, repo.name)
-        \.then(function('s:set_response_to_buf', [repo.full_name]))
-        \.catch(function('s:set_response_to_buf',[repo.full_name]))
+  let cmd = printf('vnew gh://%s/repos?%s',
+        \ s:repo_list.owner, gh#http#encode_param(s:repo_list.param))
+  call execute(cmd)
 endfunction
 
-function! s:open_repo_preview() abort
-  let winid = win_getid()
-  call execute('belowright vnew ' . printf('gh://%s/repo/preview', s:repos[line('.') - 1].full_name))
+function! s:repo_list(resp) abort
+  nnoremap <buffer> <silent> <C-l> :call <SID>repo_list_change_page('+')<CR>
+  nnoremap <buffer> <silent> <C-h> :call <SID>repo_list_change_page('-')<CR>
 
-  setlocal buftype=nofile
-  setlocal ft=markdown
-
-  let t:gh_repo_preview_bufid = bufnr()
-  let s:gh_repo_preview_winid = win_getid()
-
-  call win_gotoid(winid)
-
-  augroup gh-repo-preview
-    au!
-    autocmd CursorMoved <buffer> call s:repo_preview()
-  augroup END
-
-  call s:repo_preview()
-endfunction
-
-function! s:repos_list(resp) abort
   if empty(a:resp.body)
     call gh#gh#set_message_buf('not found repositories')
     return
   endif
 
-  let lines = []
   let s:repos = []
+  let lines = []
   for repo in a:resp.body
     call add(lines, printf("%s\t%s", repo.stargazers_count, repo.full_name))
     call add(s:repos, repo)
   endfor
 
   call setline(1, lines)
-  call s:open_repo_preview()
   nnoremap <buffer> <silent> o :call <SID>repo_open()<CR>
+  nnoremap <buffer> <silent> <C-r> :call <SID>repo_open_readme()<CR>
 endfunction
 
 function! gh#repos#list() abort
-  let owner = matchlist(bufname(), 'gh://\(.*\)/repos$')[1]
+  let m = matchlist(bufname(), 'gh://\(.*\)/repos?*\(.*\)')
+  let param = gh#http#decode_param(m[2])
+  if !has_key(param, 'page')
+    let param['page'] = 1
+  endif
+
+  let s:repo_list = #{
+        \ owner: m[1],
+        \ param: param,
+        \ }
 
   call gh#gh#delete_tabpage_buffer('gh_repo_list_bufid')
-  call gh#gh#delete_tabpage_buffer('gh_repo_preview_bufid')
-
-  let t:gh_cache_repos = {}
   let t:gh_repo_list_bufid = bufnr()
 
-  setlocal buftype=nofile
-  setlocal nonumber
-
+  call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
 
-  call gh#github#repos#list(owner)
-        \.then(function('s:repos_list'))
-        \.catch(function('gh#gh#set_message_buf'))
+  call gh#github#repos#list(s:repo_list.owner, s:repo_list.param)
+        \.then(function('s:repo_list'))
+        \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
         \.finally(function('gh#gh#global_buf_settings'))
+endfunction
+
+function! gh#repos#readme() abort
+  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/readme')
+  call gh#gh#delete_tabpage_buffer('gh_repo_readme_bufid')
+  let t:gh_repo_readme_bufid = bufnr()
+
+  call gh#gh#init_buffer()
+  call gh#gh#set_message_buf('loading')
+
+  call gh#github#repos#readme(m[1], m[2])
+        \.then(function('s:set_readme_body'))
+        \.catch({err -> execute('call gh#gh#set_message_buf(err.body)', '')})
+        \.finally(function('gh#gh#global_buf_settings'))
+endfunction
+
+function! s:set_readme_body(resp) abort
+  call setline(1, split(a:resp.body, "\r"))
+  setlocal ft=markdown
 endfunction

@@ -2,8 +2,15 @@
 " Author: skanehira
 " License: MIT
 
-function! gh#github#repos#list(owner) abort
-  return gh#http#get(printf('https://api.github.com/users/%s/repos', a:owner))
+let s:Promise = vital#vital#import('Async.Promise')
+
+function! gh#github#repos#list(owner, param) abort
+  let settings = #{
+        \ method: 'GET',
+        \ url: printf('https://api.github.com/users/%s/repos', a:owner),
+        \ param: a:param,
+        \ }
+  return gh#http#request(settings)
 endfunction
 
 function! gh#github#repos#files(owner, repo, branch) abort
@@ -21,6 +28,26 @@ function! gh#github#repos#get_file(url) abort
 endfunction
 
 function! gh#github#repos#readme(owner, repo) abort
-  return gh#http#get(printf('https://raw.githubusercontent.com/%s/%s/master/README.md', a:owner, a:repo))
-        \.catch({res -> gh#http#get(printf('https://raw.githubusercontent.com/%s/%s/master/README', a:owner, a:repo))})
+  return gh#github#repos#files(a:owner, a:repo, 'master')
+        \.then(function('s:get_readme', [a:owner, a:repo]))
+endfunction
+
+function! s:get_readme(owner, repo, resp) abort
+  if !has_key(a:resp.body, 'tree')
+    return s:Promise.reject(#{
+        \ body: 'not found readme',
+        \ })
+  endif
+
+  let files = filter(a:resp.body.tree,
+        \ {_, v -> v.type is# 'blob' && (matchstr(v.path, '^README.*') is# '' ? 0 : 1)})
+
+  if len(files) is# 0
+    return s:Promise.reject(#{
+        \ body: 'not found readme',
+        \ })
+  endif
+
+  let url = printf('https://raw.githubusercontent.com/%s/%s/master/%s', a:owner, a:repo, files[0].path)
+  return gh#http#get(url)
 endfunction
