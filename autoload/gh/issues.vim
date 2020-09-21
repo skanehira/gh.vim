@@ -200,11 +200,22 @@ function! s:update_issue_success(resp) abort
 endfunction
 
 function! s:update_issue() abort
-  if &modified is# 0
+  let title = input(printf('[title] %s -> ', s:issue.title))
+  echom ''
+  redraw!
+
+  if &modified is# 0 && title is# ''
+    bw!
     return
   endif
+
+  if title is# ''
+    let title = s:issue.title
+  endif
+
   call gh#gh#message('issue updating...')
   let data = #{
+        \ title: title,
         \ body: join(getline(1, '$'), "\r\n"),
         \ }
 
@@ -218,6 +229,7 @@ function! s:open_issue() abort
 endfunction
 
 function! s:set_issues_body(resp) abort
+  let s:issue['title'] = a:resp.body.title
   call setline(1, split(a:resp.body.body, '\r\?\n'))
   setlocal nomodified buftype=acwrite ft=markdown
 
