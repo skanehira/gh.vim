@@ -4,7 +4,7 @@
 
 function! s:pulls(resp) abort
   if empty(a:resp.body)
-    call gh#gh#error('no found pull requests')
+    call gh#gh#set_message_buf('no found pull requests')
     return
   endif
 
@@ -43,11 +43,11 @@ function! gh#pulls#list() abort
   setlocal buftype=nofile
   setlocal nonumber
 
-  call setline(1, '-- loading --')
+  call gh#gh#set_message_buf('loading')
 
   call gh#github#pulls#list(s:repo.owner, s:repo.name)
         \.then(function('s:pulls'))
-        \.catch(function('gh#gh#error'))
+        \.catch(function('gh#gh#set_message_buf'))
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
 
@@ -72,11 +72,11 @@ function! gh#pulls#diff() abort
 
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/pulls/\(.*\)/diff$')
 
-  call setline(1, '-- loading --')
+  call gh#gh#set_message_buf('loading')
 
   call gh#github#pulls#diff(m[1], m[2], m[3])
         \.then(function('s:set_diff_contents'))
-        \.catch(function('gh#gh#error'))
+        \.catch(function('gh#gh#set_message_buf'))
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
 

@@ -16,7 +16,7 @@ function! s:issue_list(resp) abort
   nnoremap <buffer> <silent> <C-h> :call <SID>issue_list_change_page('-')<CR>
 
   if empty(a:resp.body)
-    call gh#gh#error('not found issues')
+    call gh#gh#set_message_buf('not found issues')
     return
   endif
 
@@ -84,11 +84,11 @@ function! gh#issues#list() abort
         \ },
         \ }
 
-  call setline(1, '-- loading --')
+  call gh#gh#set_message_buf('loading')
 
   call gh#github#issues#list(s:repo.owner, s:repo.name, s:repo.issue.param)
         \.then(function('s:issue_list'))
-        \.catch(function('gh#gh#error'))
+        \.catch(function('gh#gh#set_message_buf'))
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
 
@@ -105,7 +105,7 @@ function! gh#issues#new() abort
   setlocal buftype=nofile
   setlocal nonumber
 
-  call setline(1, '-- loading --')
+  call gh#gh#set_message_buf('loading')
 
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/new$')
   let s:repo = #{
@@ -256,8 +256,8 @@ function! gh#issues#issue() abort
         \ },
         \ }
 
-  call setline(1, '-- loading --')
+  call gh#gh#set_message_buf('loading')
   call gh#github#issues#issue(s:repo.owner, s:repo.name, s:repo.issue.number)
         \.then(function('s:set_issues_body'))
-        \.catch(function('gh#gh#error'))
+        \.catch(function('gh#gh#set_message_buf'))
 endfunction

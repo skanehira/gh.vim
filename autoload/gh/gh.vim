@@ -2,7 +2,7 @@
 " Author: skanehira
 " License: MIT
 
-function! gh#gh#error(msg) abort
+function! gh#gh#set_message_buf(msg) abort
   call setline(1, printf('-- %s --', a:msg))
 endfunction
 

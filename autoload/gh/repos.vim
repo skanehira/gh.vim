@@ -50,7 +50,7 @@ endfunction
 
 function! s:repos_list(resp) abort
   if empty(a:resp.body)
-    call gh#gh#error('not found repositories')
+    call gh#gh#set_message_buf('not found repositories')
     return
   endif
 
@@ -76,11 +76,11 @@ function! gh#repos#list() abort
   setlocal buftype=nofile
   setlocal nonumber
 
-  call setline(1, '-- loading --')
+  call gh#gh#set_message_buf('loading')
 
   let owner = matchlist(bufname(), 'gh://\(.*\)/repos$')[1]
   call gh#github#repos#list(owner)
         \.then(function('s:repos_list'))
-        \.catch(function('gh#gh#error'))
+        \.catch(function('gh#gh#set_message_buf'))
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
