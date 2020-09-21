@@ -34,14 +34,15 @@ So if you want see issue list, please open buffer like bellow
 ## Buffer list
 currently `gh.vim` provide buffers is bellow.
 
-| buffer                                              | opration               |
-|-----------------------------------------------------|------------------------|
-| `gh://:owner/:repo/issues[?state=open&creator=xxx]` | issue list             |
-| `gh://:owner/:repo/issues/:number`                  | issue edit             |
-| `gh://:owner/:repo/issues/new`                      | issue create           |
-| `gh://:owner/repos`                                 | repository list        |
-| `gh://:owner/:repo/pulls`                           | pull request list      |
-| `gh://:owner/:repo/pulls/:number/diff`              | pull request list diff |
+| buffer                                     | opration               |
+|--------------------------------------------|------------------------|
+| `gh://:owner/:repo/issues[?state=open&..]` | issue list             |
+| `gh://:owner/:repo/issues/:number`         | issue edit             |
+| `gh://:owner/:repo/issues/new`             | issue create           |
+| `gh://:owner/repos`                        | repository list        |
+| `gh://:owner/:repo/readme`                 | repository readme      |
+| `gh://:owner/:repo/pulls[?state=open&...]` | pull request list      |
+| `gh://:owner/:repo/pulls/:number/diff`     | pull request list diff |
 
 ## Keymap list
 | buffer                                              | keymap                                  |
@@ -54,8 +55,8 @@ currently `gh.vim` provide buffers is bellow.
   - [x] list
     - [x] paging
   - [x] create
-  - [ ] close
-  - [ ] reopen
+  - [x] close
+  - [x] reopen
   - [x] update
     - [x] update title
 - pull request
