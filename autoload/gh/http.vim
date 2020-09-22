@@ -4,8 +4,8 @@
 " reference https://github.com/vim-jp/vital.vim/blob/master/autoload/vital/__vital__/Web/HTTP.vim
 
 " from Vital.Async.Promise-example-job help
-let s:Promise = vital#vital#import('Async.Promise')
-let s:HTTP = vital#vital#import('Web.HTTP')
+let s:Promise = vital#gh#import('Async.Promise')
+let s:HTTP = vital#gh#import('Web.HTTP')
 
 function! s:_readfile(file) abort
   if filereadable(a:file)

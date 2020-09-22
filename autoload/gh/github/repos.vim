@@ -2,7 +2,7 @@
 " Author: skanehira
 " License: MIT
 
-let s:Promise = vital#vital#import('Async.Promise')
+let s:Promise = vital#gh#import('Async.Promise')
 
 function! gh#github#repos#list(owner, param) abort
   let url = printf('https://api.github.com/users/%s/repos', a:owner)
