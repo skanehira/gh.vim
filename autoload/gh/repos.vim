@@ -55,7 +55,6 @@ function! s:issue_list_refresh() abort
   call gh#gh#delete_tabpage_buffer('gh_repo_list_bufid')
   let cmd = printf('e gh://%s/repos?%s',
         \ s:repo_list.owner, gh#http#encode_param(s:repo_list.param))
-  echom cmd
   call execute(cmd)
 endfunction
 
@@ -75,9 +74,9 @@ function! s:repo_list(resp) abort
     call add(s:repos, repo)
   endfor
 
-  call setline(1, lines)
   nnoremap <buffer> <silent> o :call <SID>repo_open()<CR>
   nnoremap <buffer> <silent> <C-r> :call <SID>repo_open_readme()<CR>
+  call setbufline(t:gh_repo_list_bufid, 1, lines)
   if has_key(g:, 'gh_enable_delete_repository') &&
         \ g:gh_enable_delete_repository is# 1
     nnoremap <buffer> <silent> ghd :call <SID>repo_delete()<CR>
@@ -123,13 +122,15 @@ function! gh#repos#readme() abort
 endfunction
 
 function! s:set_readme_body(resp) abort
-  call setline(1, split(a:resp.body, "\r"))
+  call setbufline(t:gh_repo_readme_bufid, 1, split(a:resp.body, "\r"))
   setlocal ft=markdown
 endfunction
 
 function! gh#repos#new() abort
+  let t:gh_repo_new_bufid = bufnr()
+
   let lines = ['name: ', 'description: ', 'private: false', 'delete_branch_on_merge: true']
-  call setline(1, lines)
+  call setbufline(t:gh_repo_new_bufid, 1, lines)
 
   call gh#gh#init_buffer()
   setlocal buftype=acwrite

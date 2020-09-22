@@ -41,6 +41,7 @@ function! s:issue_list(resp) abort
   nnoremap <buffer> <silent> e :call <SID>edit_issue()<CR>
   nnoremap <buffer> <silent> ghc :call <SID>issue_close()<CR>
   nnoremap <buffer> <silent> gho :call <SID>issue_open()<CR>
+  call setbufline(t:gh_issues_list_bufid, 1, lines)
 endfunction
 
 function! s:issue_close() abort
@@ -129,6 +130,7 @@ function! gh#issues#new() abort
     return
   endif
 
+  let t:gh_issues_new_bufid = bufnr()
   call gh#gh#init_buffer()
 
   call gh#gh#set_message_buf('loading')
@@ -202,7 +204,7 @@ function! s:open_template_list(files) abort
     return
   endif
   let s:files = a:files
-  call setline(1, map(copy(a:files), {_, v -> v.file}))
+  call setbufline(t:gh_issues_new_bufid, 1, map(copy(a:files), {_, v -> v.file}))
   nnoremap <buffer> <silent> <CR> :call <SID>get_template()<CR>
 endfunction
 
@@ -262,7 +264,7 @@ endfunction
 
 function! s:set_issues_body(resp) abort
   let s:issue['title'] = a:resp.body.title
-  call setline(1, split(a:resp.body.body, '\r\?\n'))
+  call setbufline(t:gh_issues_edit_bufid, 1, split(a:resp.body.body, '\r\?\n'))
   setlocal nomodified buftype=acwrite ft=markdown
 
   nnoremap <buffer> <silent> <C-o> :call <SID>open_issue()<CR>

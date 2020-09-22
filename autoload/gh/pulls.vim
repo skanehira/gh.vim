@@ -7,7 +7,7 @@ function! s:pull_list(resp) abort
   nnoremap <buffer> <silent> <C-h> :call <SID>pull_list_change_page('-')<CR>
 
   if empty(a:resp.body)
-    call gh#gh#set_message_buf('no found pull requests')
+    call gh#gh#set_message_buf('not found pull requests')
     return
   endif
 
@@ -23,9 +23,9 @@ function! s:pull_list(resp) abort
           \ })
   endfor
 
-  call setline(1, lines)
   nnoremap <buffer> <silent> o :call <SID>pull_open()<CR>
   nnoremap <buffer> <silent> dd :call <SID>open_pull_diff()<CR>
+  call setbufline(t:gh_pulls_list_bufid, 1, lines)
 endfunction
 
 function! s:pull_list_change_page(op) abort
@@ -84,13 +84,15 @@ function! s:open_pull_diff() abort
 endfunction
 
 function! s:set_diff_contents(resp) abort
-  let t:gh_preview_diff_bufid = bufnr()
-  call setline(1, split(a:resp.body, "\r"))
+  call setbufline(t:gh_preview_diff_bufid, 1, split(a:resp.body, "\r"))
   setlocal buftype=nofile
   setlocal ft=diff
 endfunction
 
 function! gh#pulls#diff() abort
+  call gh#gh#delete_tabpage_buffer('gh_preview_diff_bufid')
+  let t:gh_preview_diff_bufid = bufnr()
+
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
 
