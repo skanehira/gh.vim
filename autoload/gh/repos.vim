@@ -90,3 +90,56 @@ function! s:set_readme_body(resp) abort
   call setline(1, split(a:resp.body, "\r"))
   setlocal ft=markdown
 endfunction
+
+function! gh#repos#new() abort
+  let lines = ['name: ', 'description: ', 'private: false', 'delete_branch_on_merge: true']
+  call setline(1, lines)
+
+  augroup gh-create-repo
+    au!
+    au BufWriteCmd <buffer> call s:repo_create()
+  augroup END
+endfunction
+
+function! s:repo_create() abort
+  let param = #{
+        \ name: '',
+        \ description: '',
+        \ private: v:false,
+        \ delete_branch_on_merge: v:true,
+        \ }
+
+  let contents = {}
+  let lines = getline(1, '$')
+  for l in lines
+    let kv = split(l, ':')
+    if len(kv) > 1
+      let contents[kv[0]] = trim(kv[1])
+    endif
+  endfor
+
+  for [k, v] in items(contents)
+    if v is# 'true'
+      let v = v:true
+    elseif v is# 'false'
+      let v = v:false
+    endif
+    let param[k] = v
+  endfor
+
+  if param['name'] is# ''
+    call gh#gh#error_message('required repository name')
+    return
+  endif
+
+  call gh#gh#message('repository creating...')
+  call gh#github#repos#create(param)
+        \.then(function('s:repo_create_success'))
+        \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
+endfunction
+
+function! s:repo_create_success(resp) abort
+  bw!
+  redraw!
+  call gh#gh#message(printf('repository created: %s', a:resp.body.html_url))
+endfunction

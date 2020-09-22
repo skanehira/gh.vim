@@ -55,3 +55,12 @@ function! s:get_readme(owner, repo, resp) abort
   let url = printf('https://raw.githubusercontent.com/%s/%s/master/%s', a:owner, a:repo, files[0].path)
   return gh#http#get(url)
 endfunction
+
+function! gh#github#repos#create(data) abort
+  let settings = #{
+        \ method: 'POST',
+        \ url: 'https://api.github.com/user/repos',
+        \ data: a:data,
+        \ }
+  return gh#http#request(settings)
+endfunction

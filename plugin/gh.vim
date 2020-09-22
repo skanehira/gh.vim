@@ -16,6 +16,7 @@ endfor
 
 augroup gh
   au!
+  au BufReadCmd gh://user/repos/new call gh#repos#new()
   au BufReadCmd gh://*/repos call gh#repos#list()
   au BufReadCmd gh://*/repos\?* call gh#repos#list()
   au BufReadCmd gh://*/*/readme call gh#repos#readme()
