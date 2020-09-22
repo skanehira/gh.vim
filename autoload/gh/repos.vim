@@ -59,8 +59,10 @@ function! s:issue_list_refresh() abort
 endfunction
 
 function! s:repo_list(resp) abort
-  nnoremap <buffer> <silent> <C-l> :call <SID>repo_list_change_page('+')<CR>
-  nnoremap <buffer> <silent> <C-h> :call <SID>repo_list_change_page('-')<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_repo_list_next) :<C-u>call <SID>repo_list_change_page('+')<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_repo_list_prev) :<C-u>call <SID>repo_list_change_page('-')<CR>
+  nmap <C-l> <Plug>(gh_repo_list_next)
+  nmap <C-h> <Plug>(gh_repo_list_prev)
 
   if empty(a:resp.body)
     call gh#gh#set_message_buf('not found repositories')
@@ -74,12 +76,17 @@ function! s:repo_list(resp) abort
     call add(s:repos, repo)
   endfor
 
-  nnoremap <buffer> <silent> o :call <SID>repo_open()<CR>
-  nnoremap <buffer> <silent> <C-r> :call <SID>repo_open_readme()<CR>
   call setbufline(t:gh_repo_list_bufid, 1, lines)
+
+  nnoremap <buffer> <silent> <Plug>(gh_repo_open_browser) :<C-u>call <SID>repo_open()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_repo_show_readme) :<C-u>call <SID>repo_open_readme()<CR>
+  nmap <C-o> <Plug>(gh_repo_open_browser)
+  nmap gho <Plug>(gh_repo_show_readme)
+
   if has_key(g:, 'gh_enable_delete_repository') &&
         \ g:gh_enable_delete_repository is# 1
-    nnoremap <buffer> <silent> ghd :call <SID>repo_delete()<CR>
+    nnoremap <buffer> <silent> <Plug>(gh_repo_delete) :<C-u>call <SID>repo_delete()<CR>
+    nmap ghd <Plug>(gh_repo_delete)
   endif
 endfunction
 
@@ -134,7 +141,6 @@ function! gh#repos#new() abort
 
   call gh#gh#init_buffer()
   setlocal buftype=acwrite
-
   augroup gh-create-repo
     au!
     au BufWriteCmd <buffer> call s:repo_create()

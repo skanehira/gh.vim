@@ -3,8 +3,10 @@
 " License: MIT
 
 function! s:pull_list(resp) abort
-  nnoremap <buffer> <silent> <C-l> :call <SID>pull_list_change_page('+')<CR>
-  nnoremap <buffer> <silent> <C-h> :call <SID>pull_list_change_page('-')<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_pull_list_next) :<C-u>call <SID>pull_list_change_page('+')<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_pull_list_prev) :<C-u>call <SID>pull_list_change_page('-')<CR>
+  nmap <C-l> <Plug>(gh_pull_list_next)
+  nmap <C-h> <Plug>(gh_pull_list_prev)
 
   if empty(a:resp.body)
     call gh#gh#set_message_buf('not found pull requests')
@@ -23,9 +25,12 @@ function! s:pull_list(resp) abort
           \ })
   endfor
 
-  nnoremap <buffer> <silent> o :call <SID>pull_open()<CR>
-  nnoremap <buffer> <silent> dd :call <SID>open_pull_diff()<CR>
   call setbufline(t:gh_pulls_list_bufid, 1, lines)
+
+  nnoremap <buffer> <silent> <Plug>(gh_pull_open_browser) :<C-u>call <SID>pull_open()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_pull_diff) :<C-u>call <SID>open_pull_diff()<CR>
+  nmap <C-o> <Plug>(gh_pull_open_browser)
+  nmap ghd <Plug>(gh_pull_diff)
 endfunction
 
 function! s:pull_list_change_page(op) abort

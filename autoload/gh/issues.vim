@@ -2,7 +2,7 @@
 " Author: skanehira
 " License: MIT
 
-function! s:issue_open_on_list() abort
+function! s:issue_open_browser() abort
   call gh#gh#open_url(s:issues[line('.') -1].url)
 endfunction
 
@@ -14,8 +14,10 @@ function! s:edit_issue() abort
 endfunction
 
 function! s:issue_list(resp) abort
-  nnoremap <buffer> <silent> <C-l> :call <SID>issue_list_change_page('+')<CR>
-  nnoremap <buffer> <silent> <C-h> :call <SID>issue_list_change_page('-')<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_issue_list_next) :<C-u>call <SID>issue_list_change_page('+')<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_issue_list_prev) :<C-u>call <SID>issue_list_change_page('-')<CR>
+  nmap <C-l> <Plug>(gh_issue_list_next)
+  nmap <C-h> <Plug>(gh_issue_list_prev)
 
   if empty(a:resp.body)
     call gh#gh#set_message_buf('not found issues')
@@ -36,12 +38,17 @@ function! s:issue_list(resp) abort
             \ })
     endif
   endfor
-  call setline(1, lines)
-  nnoremap <buffer> <silent> o :call <SID>issue_open_on_list()<CR>
-  nnoremap <buffer> <silent> e :call <SID>edit_issue()<CR>
-  nnoremap <buffer> <silent> ghc :call <SID>issue_close()<CR>
-  nnoremap <buffer> <silent> gho :call <SID>issue_open()<CR>
   call setbufline(t:gh_issues_list_bufid, 1, lines)
+
+  nnoremap <buffer> <silent> <Plug>(gh_issue_open_browser) :<C-u>call <SID>issue_open_browser()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_issue_edit) :<C-u>call <SID>edit_issue()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_issue_close) :<C-u>call <SID>issue_close()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_issue_open) :<C-u>call <SID>issue_open()<CR>
+
+  nmap <C-o> <Plug>(gh_issue_open_browser)
+  nmap ghe   <Plug>(gh_issue_edit)
+  nmap ghc   <Plug>(gh_issue_close)
+  nmap gho   <Plug>(gh_issue_open)
 endfunction
 
 function! s:issue_close() abort
@@ -132,7 +139,6 @@ function! gh#issues#new() abort
 
   let t:gh_issues_new_bufid = bufnr()
   call gh#gh#init_buffer()
-
   call gh#gh#set_message_buf('loading')
 
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/new$')
@@ -258,16 +264,11 @@ function! s:update_issue() abort
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
 endfunction
 
-function! s:open_issue() abort
-  call gh#gh#open_url(s:issue.url)
-endfunction
-
 function! s:set_issues_body(resp) abort
   let s:issue['title'] = a:resp.body.title
   call setbufline(t:gh_issues_edit_bufid, 1, split(a:resp.body.body, '\r\?\n'))
   setlocal nomodified buftype=acwrite ft=markdown
 
-  nnoremap <buffer> <silent> <C-o> :call <SID>open_issue()<CR>
   nnoremap <buffer> <silent> q :bw<CR>
 
   augroup gh-update-issue
