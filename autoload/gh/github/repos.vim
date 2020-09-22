@@ -5,9 +5,13 @@
 let s:Promise = vital#vital#import('Async.Promise')
 
 function! gh#github#repos#list(owner, param) abort
+  let url = printf('https://api.github.com/users/%s/repos', a:owner)
+  if a:owner is# 'user'
+    let url = 'https://api.github.com/user/repos'
+  endif
   let settings = #{
         \ method: 'GET',
-        \ url: printf('https://api.github.com/users/%s/repos', a:owner),
+        \ url: url,
         \ param: a:param,
         \ }
   return gh#http#request(settings)
