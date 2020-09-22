@@ -27,6 +27,38 @@ function! s:repo_list_change_page(op) abort
   call execute(cmd)
 endfunction
 
+
+function! s:repo_delete() abort
+  let full_name = s:repos[line('.')-1].full_name
+  let name = input('[gh.vim] please input repository name: ')
+  echom ''
+  redraw
+
+  if full_name isnot# name
+    call gh#gh#error_message('wrong repository name')
+    return
+  endif
+
+  call gh#gh#message('deleting repository')
+  call gh#github#repos#delete(full_name)
+        \.then({-> execute('call timer_start(2000, function("s:repo_delete_success"))', '')}) " to wait delete repository
+        \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
+endfunction
+
+function! s:repo_delete_success(timer) abort
+  redraw!
+  call gh#gh#message('deleted repository')
+  call s:issue_list_refresh()
+endfunction
+
+function! s:issue_list_refresh() abort
+  call gh#gh#delete_tabpage_buffer('gh_repo_list_bufid')
+  let cmd = printf('e gh://%s/repos?%s',
+        \ s:repo_list.owner, gh#http#encode_param(s:repo_list.param))
+  echom cmd
+  call execute(cmd)
+endfunction
+
 function! s:repo_list(resp) abort
   nnoremap <buffer> <silent> <C-l> :call <SID>repo_list_change_page('+')<CR>
   nnoremap <buffer> <silent> <C-h> :call <SID>repo_list_change_page('-')<CR>
@@ -46,6 +78,10 @@ function! s:repo_list(resp) abort
   call setline(1, lines)
   nnoremap <buffer> <silent> o :call <SID>repo_open()<CR>
   nnoremap <buffer> <silent> <C-r> :call <SID>repo_open_readme()<CR>
+  if has_key(g:, 'gh_enable_delete_repository') &&
+        \ g:gh_enable_delete_repository is# 1
+    nnoremap <buffer> <silent> ghd :call <SID>repo_delete()<CR>
+  endif
 endfunction
 
 function! gh#repos#list() abort
@@ -94,6 +130,9 @@ endfunction
 function! gh#repos#new() abort
   let lines = ['name: ', 'description: ', 'private: false', 'delete_branch_on_merge: true']
   call setline(1, lines)
+
+  call gh#gh#init_buffer()
+  setlocal buftype=acwrite
 
   augroup gh-create-repo
     au!

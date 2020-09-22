@@ -61,12 +61,15 @@ function! s:make_response(body) abort
   let headers = map(header_chunks, 'split(v:val, "\r\n")')[0]
   let status = split(headers[0], " ")[1]
   let header = s:parseHeader(headers[1:])
-
   let body = a:body
-  if header["Content-Type"] is# 'application/json; charset=utf-8'
-    let body = json_decode(a:body)
-    if status isnot# '200' && has_key(body, 'message')
+
+  if has_key(header, 'Content-Type') &&
+        \ header["Content-Type"] is# 'application/json; charset=utf-8'
+    if body isnot# ''
+      let body = json_decode(a:body)
+      if status isnot# '200' && has_key(body, 'message')
         let body = body.message
+      endif
     endif
   endif
 
@@ -102,7 +105,8 @@ function! gh#http#request(settings) abort
         \ }
 
   let cmd = ['curl', '-s', '-X', method, printf('--dump-header "%s"', s:tmp_file.header),
-        \ '-H', printf('"Authorization: token %s"', token)]
+        \ '-H', printf('"Authorization: token %s"', token),
+        \ '-H', 'Accept: application/vnd.github.v3+json']
 
   if method is# 'POST' || method is# 'PUT' || method is# 'PATCH'
     let tmp = s:_tempname()
