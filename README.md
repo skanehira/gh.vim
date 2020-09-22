@@ -31,24 +31,58 @@ So if you want see issue list, please open buffer like bellow
 `:owner` is user name or organization name.
 `:repo` is repository name.
 
+## Options
+
+| option                        | default | description                        |
+|-------------------------------|---------|------------------------------------|
+| `gh_token`                    | ''      | GitHub personal access token       |
+| `gh_enable_delete_repository` | false   | enable delete repository operation |
+
 ## Buffer list
 currently `gh.vim` provide buffers is bellow.
 
-| buffer                                     | opration               |
-|--------------------------------------------|------------------------|
-| `gh://:owner/:repo/issues[?state=open&..]` | issue list             |
-| `gh://:owner/:repo/issues/:number`         | issue edit             |
-| `gh://:owner/:repo/issues/new`             | issue create           |
-| `gh://:owner/repos`                        | repository list        |
-| `gh://:owner/:repo/readme`                 | repository readme      |
-| `gh://:owner/:repo/pulls[?state=open&...]` | pull request list      |
-| `gh://:owner/:repo/pulls/:number/diff`     | pull request list diff |
+| buffer                                     | description                            |
+|--------------------------------------------|----------------------------------------|
+| `gh://:owner/:repo/issues[?state=open&..]` | get issue list                         |
+| `gh://:owner/:repo/issues/:number`         | edit issue                             |
+| `gh://:owner/:repo/issues/new`             | create issue                           |
+| `gh://:owner/repos`                        | get repository list                    |
+| `gh://user/repos`                          | get authenticated user repository list |
+| `gh://:owner/repos/new`                    | create repository                      |
+| `gh://:owner/:repo/readme`                 | get repository readme                  |
+| `gh://:owner/:repo/pulls[?state=open&...]` | get pull request list                  |
+| `gh://:owner/:repo/pulls/:number/diff`     | show pull request list diff            |
 
 ## Keymap list
-| buffer                                              | keymap                                  |
-|-----------------------------------------------------|-----------------------------------------|
-| `gh://:owner/:repo/issues[?state=open&creator=xxx]` | `<C-l>`: next, `<C-h>`: prev, `e`: edit |
-| `gh://:owner/:repo/pulls`                           | `dd`: diff                              |
+### issue list
+
+| keymap                          | default | description           |
+|---------------------------------|---------|-----------------------|
+| `<Plug>(gh_issue_list_prev)`    | `<C-h>` | previous page         |
+| `<Plug>(gh_issue_list_next)`    | `<C-l>` | next page             |
+| `<Plug>(gh_issue_open_browser)` | `<C-o>` | open issue on browser |
+| `<Plug>(gh_issue_edit)`         | `ghe`   | edit issue            |
+| `<Plug>(gh_issue_close)`        | `ghc`   | close issue           |
+| `<Plug>(gh_issue_open)`         | `gho`   | open issue            |
+
+### pull request list
+
+| keymap                         | default | description                  |
+|--------------------------------|---------|------------------------------|
+| `<Plug>(gh_pull_list_next)`    | `<C-h>` | previous page                |
+| `<Plug>(gh_pull_list_prev)`    | `<C-l>` | next page                    |
+| `<Plug>(gh_pull_open_browser)` | `<C-o>` | open pull request on browser |
+| `<Plug>(gh_pull_diff)`         | `ghd`   | show pull request diff       |
+
+### repository list
+
+| keymap                         | default | description                                                         |
+|--------------------------------|---------|---------------------------------------------------------------------|
+| `<Plug>(gh_repo_list_next)`    | `<C-h>` | previous page                                                       |
+| `<Plug>(gh_repo_list_prev)`    | `<C-l>` | next page                                                           |
+| `<Plug>(gh_repo_open_browser)` | `<C-o>` | open repository on browser                                          |
+| `<Plug>(gh_repo_show_readme)`  | `gho`   | show repository readme                                              |
+| `<Plug>(gh_repo_delete)`       | `ghd`   | delete repository(if `gh_enable_delete_repository` options is true) |
 
 ## Loadmap
 - issues
@@ -68,7 +102,7 @@ currently `gh.vim` provide buffers is bellow.
 - repositories
   - [x] list
     - [x] paging
-  - [ ] create
-  - [ ] delete
+  - [x] create
+  - [x] delete
   - [ ] transfer
   - [ ] make public/private
