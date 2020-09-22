@@ -1,10 +1,12 @@
 # gh.vim
-Vim plugin for GitHub(in development)
+Vim plugin for GitHub
+
+![](https://i.imgur.com/VK6rebH.gif)
 
 ## Features
-- create/update/list issues
-- list repo
-- list pull request
+- create/edit/close/open/list issues
+- create/delete/list repo
+- diff/list pull request
 
 ## Installation
 Please install `curl` before installtion.
@@ -21,8 +23,8 @@ Set your personal access token.
 let g:gh_token = 'xxxxxxxxxxxxxxxxxxxx'
 ```
 
-`gh.vim` just provide virtual buffer `gh://xxx`, no any commands.
-So if you want see issue list, please open buffer like bellow
+`gh.vim` just provide virtual buffer likes `gh://xxx`, no any commands.
+So if you want see issue list, please open buffer likes bellow
 
 ```
 :new gh://:owner/:repo/issues
@@ -84,7 +86,7 @@ currently `gh.vim` provide buffers is bellow.
 | `<Plug>(gh_repo_show_readme)`  | `gho`   | show repository readme                                              |
 | `<Plug>(gh_repo_delete)`       | `ghd`   | delete repository(if `gh_enable_delete_repository` options is true) |
 
-## Loadmap
+## Roadmap
 - issues
   - [x] list
     - [x] paging
