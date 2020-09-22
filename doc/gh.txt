@@ -1,0 +1,208 @@
+*gh.txt*	Vim plugin for GitHub
+
+Author: skanehira <sho19921005@gmail.com>
+License : MIT license  {{{
+    Permission is hereby granted, free of charge, to any person obtaining
+    a copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+}}}
+
+==============================================================================
+CONTENTS					*gh-contents*
+
+INTRODUCTION			|gh-introduction|
+USAGE				|gh-usage|
+INTERFACE			|gh-interface|
+  VARIABLES			  |gh-variables|
+  BUFFER			  |gh-buffers|
+  KEY-MAPPINGS			  |gh-key-mappings|
+  FUNCTIONS			  |gh-functions|
+TODO				|gh-todo|
+CHANGELOG			|gh-changelog|
+
+
+==============================================================================
+INTRODUCTION					*gh-introduction*
+
+*gh* is a Vim plugin 
+
+Latest version:
+https://github.com/skanehira/gh.vim
+
+
+==============================================================================
+USAGE						*gh-usage*
+
+
+
+==============================================================================
+INTERFACE					*gh-interface*
+
+------------------------------------------------------------------------------
+VARIABLES					*gh-variables*
+
+g:gh_enable_delete_repository			*g:gh_enable_delete_repository*
+	enable delete repository using by key mapping.
+	default is disable.
+
+g:gh_token					*g:gh_token*
+	GitHub personal access token.
+	please refrence https://git.io/JJyrT
+
+------------------------------------------------------------------------------
+BUFFER						*gh-buffer*
+
+gh://:owner/:repo/issues[?state=open&..]	*gh-buffer-issue-list*
+	show :owner/:repo issues.
+	you can use query parameters(https://git.io/JUzlg)
+
+gh://:owner/:repo/issues/:number		*gh-buffer-issue-edit*
+	show issue contents and can edit it.
+	can use *:w* to update contents and title.
+
+gh://:owner/:repo/issues/new			*gh-buffer-issue-new*
+	create new issue.
+	at first, you have to input issue title at cmdline.
+	if repository has template, can use it to create issue.
+	use *:w* to create issue.
+
+gh://:owner/:repo/pulls[?state=open&...]	*gh-buffer-pull-list*
+	show :owner/:repo pull reuqests.
+	you can use query parameters(https://git.io/JUzl5)
+
+gh://:owner/:repo/pulls/:number/diff		*gh-buffer-pull-diff*
+	show pull request diff.
+
+gh://:owner/repos[?sort=created&...]		*gh-buffer-repo-list*
+	show :owner repositories.
+	you can use query parameters(https://git.io/JUzlo)
+
+gh://user/repos[?type=all&...]			*gh-buffer-user-repo-list*
+	show authenticated user repositories.
+	this can show your private/orgnization repositories.
+	you can use query parameters(https://git.io/JUzli)
+
+gh://user/repos/new				*gh-buffer-repo-new*
+	create new repository.
+	input contens must be "key: value".
+	requred repository name.
+	also some parameters(https://git.io/JUzlS) can use.
+	
+gh://:owner/:repo/readme			*gh-buffer-repo-readme*
+	show repository readme if repository has README.*
+
+------------------------------------------------------------------------------
+KEY-MAPPINGS					*gh-key-mappings*
+
+<Plug>(gh_repo_list_next)			*<Plug>(gh_repo_list_next)*
+	show next page of repository list
+	default mappings: <C-l>
+
+<Plug>(gh_pull_list_next)			*<Plug>(gh_pull_list_next)*
+	show next page of pull reuqest list
+	default mappings: <C-l>
+
+<Plug>(gh_issue_list_next)			*<Plug>(gh_issue_list_next)*
+	show next page of issue list
+	default mappings: <C-l>
+
+<Plug>(gh_repo_list_prev)			*<Plug>(gh_repo_list_prev)*
+	show previous page of repository list
+	default mappings: <C-h>
+
+<Plug>(gh_pull_list_prev)			*<Plug>(gh_pull_list_prev)*
+	show previous page of pull reuqest list
+	default mappings: <C-h>
+
+<Plug>(gh_issue_list_prev)			*<Plug>(gh_issue_list_prev)*
+	show previous page of issue list
+	default mappings: <C-h>
+
+<Plug>(gh_repo_open_browser)			*<Plug>(gh_repo_open_browser)*
+	open repository on browser
+	default mappings: <C-o>
+
+<Plug>(gh_issue_open_browser)		*<Plug>(gh_issue_open_browser)*
+	open issue on browser
+	default mappings: <C-o>
+
+<Plug>(gh_pull_open_browser)			*<Plug>(gh_pull_open_browser)*
+	open pull request on browser
+	default mappings: <C-o>
+
+<Plug>(gh_pull_diff)				*<Plug>(gh_pull_diff)*
+	show diff of pull request
+	default mappings: ghd
+
+<Plug>(gh_repo_show_readme)			*<Plug>(gh_repo_show_readme)*
+	show radme of repository
+	default mappings: gho
+
+<Plug>(gh_issue_edit)				*<Plug>(gh_issue_edit)*
+	edit issue
+	default mappings: ghe
+
+<Plug>(gh_issue_close)				*<Plug>(gh_issue_close)*
+	close issue
+	default mappings: ghc
+
+<Plug>(gh_issue_open)				*<Plug>(gh_issue_open)*
+	open issue
+	default mappings: gho
+
+<Plug>(gh_repo_delete)				*<Plug>(gh_repo_delete)*
+	delete repository.
+	this is disable on default.
+	if use this keymapping, please set 1 to |gh_enable_delete_repository|
+	default mappings: ghd
+
+						*gh-default-key-mappings*
+
+default mappings
+{buffer}						{lhs}		{rhs}
+------------------------------------------------	--------	------------------------
+*gh-buffer-issue-list*					<C-h>		<Plug>(gh_issue_list_prev)
+							<C-l>		<Plug>(gh_issue_list_next)
+							<C-o>		<Plug>(gh_issue_open_browser)
+							ghe		<Plug>(gh_issue_edit)
+							ghc		<Plug>(gh_issue_close)
+							gho		<Plug>(gh_issue_open)
+*gh-buffer-pull-list*					<C-h>		<Plug>(gh_pull_list_prev)    
+							<C-l>		<Plug>(gh_pull_list_next)    
+							<C-o>		<Plug>(gh_pull_open_browser) 
+							ghd		<Plug>(gh_pull_diff) 
+*gh-buffer-user-repo-list* or *gh-buffer-repo-list*	<C-l>		<Plug>(gh_repo_list_next)
+							<C-o>		<Plug>(gh_repo_open_browser)
+							gho		<Plug>(gh_repo_show_readme)
+							ghd		<Plug>(gh_repo_delete)
+
+
+------------------------------------------------------------------------------
+FUNCTIONS					*gh-functions*
+
+
+==============================================================================
+TODO						*gh-todo*
+
+
+
+==============================================================================
+CHANGELOG					*gh-changelog*
+
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:noet:fen:

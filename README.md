@@ -48,7 +48,7 @@ currently `gh.vim` provide buffers is bellow.
 | `gh://:owner/:repo/issues/new`             | create issue                           |
 | `gh://:owner/repos`                        | get repository list                    |
 | `gh://user/repos`                          | get authenticated user repository list |
-| `gh://:owner/repos/new`                    | create repository                      |
+| `gh://user/repos/new`                      | create repository                      |
 | `gh://:owner/:repo/readme`                 | get repository readme                  |
 | `gh://:owner/:repo/pulls[?state=open&...]` | get pull request list                  |
 | `gh://:owner/:repo/pulls/:number/diff`     | show pull request list diff            |
