@@ -161,7 +161,7 @@ function! s:create_issue() abort
         \ body: join(getline(1, '$'), "\r\n"),
         \ }
 
-  call gh#github#issues#new(s:repo.owner, s:repo.name, data)
+  call gh#github#issues#new(s:issue_new.owner, s:issue_new.name, data)
         \.then(function('s:create_issue_success'))
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
 endfunction
@@ -173,8 +173,7 @@ function! s:create_issue_success(resp) abort
 endfunction
 
 function! s:set_issue_template_buffer(resp) abort
-  bw!
-  call execute(printf('new gh://%s/%s/issues/%s', s:repo.owner, s:repo.name, s:issue_title))
+  call execute(printf('e gh://%s/%s/issues/%s', s:issue_new.owner, s:issue_new.name, s:issue_title))
   setlocal buftype=acwrite
   setlocal ft=markdown
 
