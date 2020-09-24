@@ -72,13 +72,13 @@ gh://:owner/:repo/issues[?state=open&..]		*gh-buffer-issue-list*
 
 gh://:owner/:repo/issues/:number			*gh-buffer-issue-edit*
 	show issue contents and can edit it.
-	can use *:w* to update contents and title.
+	can use |:w| to update contents and title.
 
 gh://:owner/:repo/issues/new				*gh-buffer-issue-new*
 	create new issue.
 	at first, you have to input issue title at cmdline.
 	if repository has template, can use it to create issue.
-	use *:w* to create issue.
+	use |:w| to create issue.
 
 gh://:owner/:repo/issues/:number/comments[?page=1&...]	*gh-buffer-issue-comment-list*
 	show issue comments.
@@ -198,22 +198,22 @@ KEY-MAPPINGS					*gh-key-mappings*
 default mappings
 {buffer}						{lhs}		{rhs}
 ------------------------------------------------	--------	------------------------
-*gh-buffer-issue-list*					<C-h>		<Plug>(gh_issue_list_prev)
+|gh-buffer-issue-list|					<C-h>		<Plug>(gh_issue_list_prev)
 							<C-l>		<Plug>(gh_issue_list_next)
 							<C-o>		<Plug>(gh_issue_open_browser)
 							ghe		<Plug>(gh_issue_edit)
 							ghc		<Plug>(gh_issue_close)
 							gho		<Plug>(gh_issue_open)
 							ghm		<Plug>(gh_issue_open_comment)
-*gh-buffer-issue-comment-list*				<C-h>		<Plug>(gh_issue_comment_list_prev)
+|gh-buffer-issue-comment-list|				<C-h>		<Plug>(gh_issue_comment_list_prev)
 							<C-l>		<Plug>(gh_issue_comment_list_next)
 							<C-o>		<Plug>(gh_issue_comment_open_browser)
 							ghn		<Plug>(gh_issue_comment_new)
-*gh-buffer-pull-list*					<C-h>		<Plug>(gh_pull_list_prev)
+|gh-buffer-pull-list|					<C-h>		<Plug>(gh_pull_list_prev)
 							<C-l>		<Plug>(gh_pull_list_next)
 							<C-o>		<Plug>(gh_pull_open_browser)
 							ghd		<Plug>(gh_pull_diff)
-*gh-buffer-user-repo-list* or *gh-buffer-repo-list*	<C-l>		<Plug>(gh_repo_list_next)
+|gh-buffer-user-repo-list| or |gh-buffer-repo-list|	<C-l>		<Plug>(gh_repo_list_next)
 							<C-o>		<Plug>(gh_repo_open_browser)
 							gho		<Plug>(gh_repo_show_readme)
 							ghd		<Plug>(gh_repo_delete)
