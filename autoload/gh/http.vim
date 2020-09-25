@@ -57,6 +57,10 @@ function! s:make_response(body) abort
     call delete(s:tmp_file.body)
   endif
 
+  if empty(headerstr)
+    return s:Promise.reject(#{status: '999', body: 'response header is empty'})
+  endif
+
   let header_chunks = split(headerstr, "\r\n\r\n")
   let headers = map(header_chunks, 'split(v:val, "\r\n")')[0]
   let status = split(headers[0], " ")[1]
