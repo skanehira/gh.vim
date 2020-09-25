@@ -299,3 +299,79 @@ function! gh#issues#issue() abort
         \.then(function('s:set_issues_body'))
         \.catch({err -> execute('call gh#gh#set_message_buf(err.body)', '')})
 endfunction
+
+function! gh#issues#comments() abort
+  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/\(.*\)/comments?*\(.*\)')
+
+  call gh#gh#delete_tabpage_buffer('gh_issues_comments_bufid')
+  let t:gh_issues_comments_bufid = bufnr()
+
+  let param = gh#http#decode_param(m[4])
+  if !has_key(param, 'page')
+    let param['page'] = 1
+  endif
+
+  let s:issue = #{
+        \ repo: #{
+        \   owner: m[1],
+        \   name: m[2],
+        \ },
+        \ number:  m[3],
+        \ param: param,
+        \ }
+
+  call gh#gh#init_buffer()
+  call gh#gh#set_message_buf('loading')
+
+  call gh#github#issues#comments(s:issue.repo.owner, s:issue.repo.name, s:issue.number, s:issue.param)
+        \.then(function('s:set_issue_comments_body'))
+        \.catch({err -> execute('call gh#gh#set_message_buf(err.body)', '')})
+endfunction
+
+function! s:set_issue_comments_body(resp) abort
+  nnoremap <buffer> <silent> <Plug>(gh_issue_comment_list_next) :<C-u>call <SID>issue_comment_list_change_page('+')<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_issue_comment_list_prev) :<C-u>call <SID>issue_comment_list_change_page('-')<CR>
+  nmap <C-l> <Plug>(gh_issue_comment_list_next)
+  nmap <C-h> <Plug>(gh_issue_comment_list_prev)
+
+  if empty(a:resp.body)
+    call gh#gh#set_message_buf('not found issue comments')
+    return
+  endif
+
+  let s:issue_comments = []
+  let lines = []
+
+  for comment in a:resp.body
+    call add(lines, printf("%s\t%s", comment.user.login, split(comment.body, '\r\?\n')[0]))
+    call add(s:issue_comments, #{
+          \ user: comment.user.login,
+          \ body: split(comment.body, '\r\?\n'),
+          \ url: comment.html_url,
+          \ })
+  endfor
+  call setbufline(t:gh_issues_list_bufid, 1, lines)
+
+  nnoremap <buffer> <silent> <Plug>(gh_issue_comment_open_browser) :<C-u>call <SID>issue_comment_open_browser()<CR>
+
+  nmap <C-o> <Plug>(gh_issue_comment_open_browser)
+endfunction
+
+function! s:issue_comment_list_change_page(op) abort
+  if a:op is# '+'
+    let s:issue.param.page += 1
+  else
+    if s:issue.param.page < 2
+      return
+    endif
+    let s:issue.param.page -= 1
+  endif
+
+  let cmd = printf('vnew gh://%s/%s/issues/%s/comments?%s',
+        \ s:issue.repo.owner, s:issue.repo.name, s:issue.number, gh#http#encode_param(s:issue.param))
+  call execute(cmd)
+endfunction
+
+function! s:issue_comment_open_browser() abort
+  call gh#gh#open_url(s:issue_comments[line('.')-1].url)
+endfunction

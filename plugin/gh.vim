@@ -11,6 +11,7 @@ for var in ['gh_preview_diff_bufid', 'gh_repo_list_bufid',
       \ 'gh_repo_readme_bufid', 'gh_issues_list_bufid',
       \ 'gh_pulls_list_bufid', 'gh_issues_edit_bufid',
       \ 'gh_repo_new_bufid', 'gh_issues_new_bufid',
+      \ 'gh_issues_comments_bufid',
       \ ]
   let t:[var] = ''
 endfor
@@ -23,6 +24,8 @@ augroup gh
   au BufReadCmd gh://*/*/readme call gh#repos#readme()
   au BufReadCmd gh://*/*/issues call gh#issues#list()
   au BufReadCmd gh://*/*/issues\?* call gh#issues#list()
+  au BufReadCmd gh://*/*/issues/*/comments call gh#issues#comments()
+  au BufReadCmd gh://*/*/issues/*/comments\?* call gh#issues#comments()
   au BufReadCmd gh://*/*/issues/new call gh#issues#new()
   au BufReadCmd gh://*/*/issues/[0-9]*$ call gh#issues#issue()
   au BufReadCmd gh://*/*/pulls call gh#pulls#list()

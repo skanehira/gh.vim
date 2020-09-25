@@ -45,3 +45,12 @@ function! gh#github#issues#update_state(owner, repo, number, state) abort
         \ }
   return gh#http#request(settings)
 endfunction
+
+function! gh#github#issues#comments(owner, repo, number, param) abort
+  let settings = #{
+        \ method: 'GET',
+        \ url: printf('https://api.github.com/repos/%s/%s/issues/%s/comments', a:owner, a:repo, a:number),
+        \ param: a:param,
+        \ }
+  return gh#http#request(settings)
+endfunction
