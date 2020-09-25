@@ -304,6 +304,8 @@ function! gh#issues#comments() abort
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/\(.*\)/comments?*\(.*\)')
 
   call gh#gh#delete_tabpage_buffer('gh_issues_comments_bufid')
+  call gh#gh#delete_tabpage_buffer('gh_issues_comment_edit_bufid')
+
   let t:gh_issues_comments_bufid = bufnr()
 
   let param = gh#http#decode_param(m[4])
@@ -343,8 +345,9 @@ function! s:set_issue_comments_body(resp) abort
   let lines = []
 
   for comment in a:resp.body
-    call add(lines, printf("%s\t%s", comment.user.login, split(comment.body, '\r\?\n')[0]))
+    call add(lines, printf("%s\t%s", comment.id, comment.user.login))
     call add(s:issue_comments, #{
+          \ id: comment.id,
           \ user: comment.user.login,
           \ body: split(comment.body, '\r\?\n'),
           \ url: comment.html_url,
@@ -355,6 +358,31 @@ function! s:set_issue_comments_body(resp) abort
   nnoremap <buffer> <silent> <Plug>(gh_issue_comment_open_browser) :<C-u>call <SID>issue_comment_open_browser()<CR>
 
   nmap <C-o> <Plug>(gh_issue_comment_open_browser)
+
+  " open preview/edit window
+  let comment = s:issue_comments[line('.')-1]
+
+  let winid = win_getid()
+  call execute(printf('belowright vnew gh://%s/%s/issues/%s/comments/%d', s:issue.repo.owner, s:issue.repo.name, s:issue.number, comment.id))
+  call gh#gh#init_buffer()
+
+  setlocal ft=markdown
+  nnoremap <buffer> <silent> q :bw<CR>
+
+  let t:gh_issues_comment_edit_bufid = bufnr()
+  let t:gh_issues_comment_edit_winid = win_getid()
+  call s:issue_comment_edit()
+
+  call win_gotoid(winid)
+  augroup gh-issue-comment-show
+    au!
+    au CursorMoved <buffer> call s:issue_comment_edit()
+  augroup END
+endfunction
+
+function! s:issue_comment_edit() abort
+  call win_execute(t:gh_issues_comment_edit_winid, '%d_')
+  call setbufline(t:gh_issues_comment_edit_bufid, 1, s:issue_comments[line('.')-1].body)
 endfunction
 
 function! s:issue_comment_list_change_page(op) abort
