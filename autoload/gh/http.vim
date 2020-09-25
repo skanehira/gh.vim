@@ -133,9 +133,15 @@ function! gh#http#request(settings) abort
 endfunction
 
 function! s:make_error_responsee(err) abort
-  if type(a:err) is# type({})
+  if has_key(a:err, 'throwpoint')
+    return s:Promise.reject(#{
+          \ status: '999',
+          \ body: printf('%s %s', a:err.throwpoint, a:err.exception),
+          \ })
+  elseif type(a:err) is# type({})
     return s:Promise.reject(a:err)
   endif
+
   return s:Promise.reject(#{
         \ status: '999',
         \ body: 'unknown error',
