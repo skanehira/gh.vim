@@ -16,8 +16,8 @@ endfunction
 function! s:issue_list(resp) abort
   nnoremap <buffer> <silent> <Plug>(gh_issue_list_next) :<C-u>call <SID>issue_list_change_page('+')<CR>
   nnoremap <buffer> <silent> <Plug>(gh_issue_list_prev) :<C-u>call <SID>issue_list_change_page('-')<CR>
-  nmap <C-l> <Plug>(gh_issue_list_next)
-  nmap <C-h> <Plug>(gh_issue_list_prev)
+  nmap <buffer> <silent> <C-l> <Plug>(gh_issue_list_next)
+  nmap <buffer> <silent> <C-h> <Plug>(gh_issue_list_prev)
 
   if empty(a:resp.body)
     call gh#gh#set_message_buf('not found issues')
@@ -46,11 +46,11 @@ function! s:issue_list(resp) abort
   nnoremap <buffer> <silent> <Plug>(gh_issue_open) :<C-u>call <SID>issue_open()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_issue_open_comment) :<C-u>call <SID>issue_open_comment()<CR>
 
-  nmap <C-o> <Plug>(gh_issue_open_browser)
-  nmap ghe   <Plug>(gh_issue_edit)
-  nmap ghc   <Plug>(gh_issue_close)
-  nmap gho   <Plug>(gh_issue_open)
-  nmap ghm   <Plug>(gh_issue_open_comment)
+  nmap <buffer> <silent> <C-o> <Plug>(gh_issue_open_browser)
+  nmap <buffer> <silent> ghe   <Plug>(gh_issue_edit)
+  nmap <buffer> <silent> ghc   <Plug>(gh_issue_close)
+  nmap <buffer> <silent> gho   <Plug>(gh_issue_open)
+  nmap <buffer> <silent> ghm   <Plug>(gh_issue_open_comment)
 endfunction
 
 function! s:issue_open_comment() abort
@@ -341,8 +341,8 @@ endfunction
 function! s:set_issue_comments_body(resp) abort
   nnoremap <buffer> <silent> <Plug>(gh_issue_comment_list_next) :<C-u>call <SID>issue_comment_list_change_page('+')<CR>
   nnoremap <buffer> <silent> <Plug>(gh_issue_comment_list_prev) :<C-u>call <SID>issue_comment_list_change_page('-')<CR>
-  nmap <C-l> <Plug>(gh_issue_comment_list_next)
-  nmap <C-h> <Plug>(gh_issue_comment_list_prev)
+  nmap <buffer> <silent> <C-l> <Plug>(gh_issue_comment_list_next)
+  nmap <buffer> <silent> <C-h> <Plug>(gh_issue_comment_list_prev)
 
   if empty(a:resp.body)
     call gh#gh#set_message_buf('not found issue comments')
@@ -365,7 +365,7 @@ function! s:set_issue_comments_body(resp) abort
 
   nnoremap <buffer> <silent> <Plug>(gh_issue_comment_open_browser) :<C-u>call <SID>issue_comment_open_browser()<CR>
 
-  nmap <C-o> <Plug>(gh_issue_comment_open_browser)
+  nmap <buffer> <silent> <C-o> <Plug>(gh_issue_comment_open_browser)
 
   " open preview/edit window
   let winid = win_getid()

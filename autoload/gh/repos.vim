@@ -61,8 +61,8 @@ endfunction
 function! s:repo_list(resp) abort
   nnoremap <buffer> <silent> <Plug>(gh_repo_list_next) :<C-u>call <SID>repo_list_change_page('+')<CR>
   nnoremap <buffer> <silent> <Plug>(gh_repo_list_prev) :<C-u>call <SID>repo_list_change_page('-')<CR>
-  nmap <C-l> <Plug>(gh_repo_list_next)
-  nmap <C-h> <Plug>(gh_repo_list_prev)
+  nmap <buffer> <silent> <C-l> <Plug>(gh_repo_list_next)
+  nmap <buffer> <silent> <C-h> <Plug>(gh_repo_list_prev)
 
   if empty(a:resp.body)
     call gh#gh#set_message_buf('not found repositories')
@@ -80,13 +80,13 @@ function! s:repo_list(resp) abort
 
   nnoremap <buffer> <silent> <Plug>(gh_repo_open_browser) :<C-u>call <SID>repo_open()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_repo_show_readme) :<C-u>call <SID>repo_open_readme()<CR>
-  nmap <C-o> <Plug>(gh_repo_open_browser)
-  nmap gho <Plug>(gh_repo_show_readme)
+  nmap <buffer> <silent> <C-o> <Plug>(gh_repo_open_browser)
+  nmap <buffer> <silent> gho <Plug>(gh_repo_show_readme)
 
   if has_key(g:, 'gh_enable_delete_repository') &&
         \ g:gh_enable_delete_repository is# 1
     nnoremap <buffer> <silent> <Plug>(gh_repo_delete) :<C-u>call <SID>repo_delete()<CR>
-    nmap ghd <Plug>(gh_repo_delete)
+    nmap <buffer> <silent> ghd <Plug>(gh_repo_delete)
   endif
 endfunction
 
