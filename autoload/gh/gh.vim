@@ -2,6 +2,32 @@
 " Author: skanehira
 " License: MIT
 
+function! gh#gh#init() abort
+  let bufname = bufname()
+  if bufname is# 'gh://user/repos/new'
+    call gh#repos#new()
+  elseif bufname =~# '^gh:\/\/[^/]\+\/repos$' || bufname =~# '^gh:\/\/[^/]\+\/repos?\+'
+    call gh#repos#list()
+  elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/readme$'
+    call gh#repos#readme()
+  elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/issues$'
+        \ || bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/issues?\+'
+    call gh#issues#list()
+  elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/issues\/[0-9]\+$'
+    call gh#issues#issue()
+  elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/issues\/new$'
+    call gh#issues#new()
+  elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/issues\/\d\+\/comments$'
+        \ || bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/issues\/\d\+\/comments?\+'
+    call gh#issues#comments()
+  elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/pulls$'
+        \ || bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/pulls?\+'
+    call gh#pulls#list()
+  elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/pulls\/\d\+\/diff$'
+    call gh#pulls#diff()
+  endif
+endfunction
+
 function! gh#gh#init_buffer() abort
   setlocal buftype=nofile bufhidden=wipe
         \ noswapfile nobuflisted nonumber
