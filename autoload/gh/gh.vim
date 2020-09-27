@@ -20,6 +20,8 @@ function! gh#gh#init() abort
   elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/issues\/\d\+\/comments$'
         \ || bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/issues\/\d\+\/comments?\+'
     call gh#issues#comments()
+  elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/issues\/\d\+\/comments\/new$'
+    call gh#issues#comment_new()
   elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/pulls$'
         \ || bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/pulls?\+'
     call gh#pulls#list()
@@ -69,6 +71,6 @@ endfunction
 
 function! gh#gh#delete_tabpage_buffer(name) abort
   if bufexists(t:[a:name])
-    call execute('bw '. t:[a:name])
+    call execute('bw! '. t:[a:name])
   endif
 endfunction

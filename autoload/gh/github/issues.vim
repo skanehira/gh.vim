@@ -54,3 +54,13 @@ function! gh#github#issues#comments(owner, repo, number, param) abort
         \ }
   return gh#http#request(settings)
 endfunction
+
+function! gh#github#issues#comment_new(owner, repo, number, data) abort
+  let settings = #{
+        \ method: 'POST',
+        \ url: printf('https://api.github.com/repos/%s/%s/issues/%s/comments', a:owner, a:repo, a:number),
+        \ data: a:data,
+        \ }
+
+  return gh#http#request(settings)
+endfunction

@@ -185,7 +185,7 @@ endfunction
 function! s:create_issue_success(resp) abort
   bw!
   redraw!
-  call gh#gh#message(printf('create success: %s', a:resp.body.html_url))
+  call gh#gh#message(printf('new issue: %s', a:resp.body.html_url))
 endfunction
 
 function! s:set_issue_template_buffer(resp) abort
@@ -333,9 +333,13 @@ function! gh#issues#comments() abort
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
 
+  nnoremap <buffer> <silent> <Plug>(gh_issue_comment_new) :<C-u>call <SID>issue_comment_new()<CR>
+  nmap <buffer> <silent> ghn <Plug>(gh_issue_comment_new)
+
   call gh#github#issues#comments(s:comment_list.repo.owner, s:comment_list.repo.name, s:comment_list.number, s:comment_list.param)
         \.then(function('s:set_issue_comments_body'))
         \.catch({err -> execute('call gh#gh#set_message_buf(has_key(err, "body") ? err.body : err)', '')})
+        \.finally(function('gh#gh#global_buf_settings'))
 endfunction
 
 function! s:set_issue_comments_body(resp) abort
@@ -364,11 +368,20 @@ function! s:set_issue_comments_body(resp) abort
   call setbufline(t:gh_issues_comments_bufid, 1, lines)
 
   nnoremap <buffer> <silent> <Plug>(gh_issue_comment_open_browser) :<C-u>call <SID>issue_comment_open_browser()<CR>
-
   nmap <buffer> <silent> <C-o> <Plug>(gh_issue_comment_open_browser)
 
   " open preview/edit window
   let winid = win_getid()
+  call s:issue_comment_open()
+  call win_gotoid(winid)
+
+  augroup gh-issue-comment-show
+    au!
+    au CursorMoved <buffer> call s:issue_comment_edit()
+  augroup END
+endfunction
+
+function! s:issue_comment_open() abort
   call execute(printf('belowright vnew gh://%s/%s/issues/%s/comments/edit',
         \ s:comment_list.repo.owner, s:comment_list.repo.name, s:comment_list.number))
   call gh#gh#init_buffer()
@@ -379,12 +392,11 @@ function! s:set_issue_comments_body(resp) abort
   let t:gh_issues_comment_edit_bufid = bufnr()
   let t:gh_issues_comment_edit_winid = win_getid()
   call s:issue_comment_edit()
+endfunction
 
-  call win_gotoid(winid)
-  augroup gh-issue-comment-show
-    au!
-    au CursorMoved <buffer> call s:issue_comment_edit()
-  augroup END
+function! s:issue_comment_new() abort
+  call execute(printf('topleft new gh://%s/%s/issues/%d/comments/new',
+        \ s:comment_list.repo.owner, s:comment_list.repo.name, s:comment_list.number))
 endfunction
 
 function! s:issue_comment_edit() abort
@@ -409,4 +421,51 @@ endfunction
 
 function! s:issue_comment_open_browser() abort
   call gh#gh#open_url(s:issue_comments[line('.')-1].url)
+endfunction
+
+function! gh#issues#comment_new() abort
+  call gh#gh#delete_tabpage_buffer('gh_issues_comment_new_bufid')
+  let t:gh_issues_comment_new_bufid = bufnr()
+  call gh#gh#init_buffer()
+  setlocal ft=markdown
+
+  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/\(.*\)/comments/new$')
+  let s:comment_new = #{
+        \ owner: m[1],
+        \ name: m[2],
+        \ issue: #{
+        \   number: m[3],
+        \ },
+        \ }
+
+  setlocal buftype=acwrite
+  nnoremap <buffer> <silent> q :bw<CR>
+
+  augroup gh-issue-comment-create
+    au!
+    au BufWriteCmd <buffer> call s:create_issue_comment()
+  augroup END
+endfunction
+
+function! s:create_issue_comment() abort
+  call gh#gh#message('comment creating...')
+  let data = #{
+        \ body: join(getline(1, '$'), "\r\n"),
+        \ }
+  if empty(data.body)
+    call gh#gh#error_message('required body')
+    return
+  endif
+
+  call gh#github#issues#comment_new(s:comment_new.owner, s:comment_new.name, s:comment_new.issue.number, data)
+        \.then(function('s:create_issue_comment_success'))
+        \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
+endfunction
+
+function s:create_issue_comment_success(resp) abort
+  call gh#gh#delete_tabpage_buffer('gh_issues_comment_new_bufid')
+  call gh#gh#message(printf('new comment: %s', a:resp.body.html_url))
+  call gh#gh#delete_tabpage_buffer('gh_issues_comments_bufid')
+  call execute(printf('new gh://%s/%s/issues/%d/comments',
+        \ s:comment_list.repo.owner, s:comment_list.repo.name, s:comment_list.number))
 endfunction
