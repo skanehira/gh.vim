@@ -23,7 +23,7 @@ Set your personal access token.
 let g:gh_token = 'xxxxxxxxxxxxxxxxxxxx'
 ```
 
-`gh.vim` just provide virtual buffer likes `gh://xxx`, no any commands.
+`gh.vim` just provides virtual buffer likes `gh://xxx`, no any commands.
 So if you want see issue list, please open buffer likes bellow
 
 ```
@@ -41,31 +41,43 @@ So if you want see issue list, please open buffer likes bellow
 | `gh_enable_delete_repository` | false   | enable delete repository operation |
 
 ## Buffer list
-currently `gh.vim` provide buffers is bellow.
+currently `gh.vim` provides buffers is bellow.
 
-| buffer                                     | description                            |
-|--------------------------------------------|----------------------------------------|
-| `gh://:owner/:repo/issues[?state=open&..]` | get issue list                         |
-| `gh://:owner/:repo/issues/:number`         | edit issue                             |
-| `gh://:owner/:repo/issues/new`             | create issue                           |
-| `gh://:owner/repos`                        | get repository list                    |
-| `gh://user/repos`                          | get authenticated user repository list |
-| `gh://user/repos/new`                      | create repository                      |
-| `gh://:owner/:repo/readme`                 | get repository readme                  |
-| `gh://:owner/:repo/pulls[?state=open&...]` | get pull request list                  |
-| `gh://:owner/:repo/pulls/:number/diff`     | show pull request list diff            |
+| buffer                                          | description                            |
+|-------------------------------------------------|----------------------------------------|
+| `gh://:owner/:repo/issues[?state=open&..]`      | get issue list                         |
+| `gh://:owner/:repo/issues/:number`              | edit issue                             |
+| `gh://:owner/:repo/issues/new`                  | new issue                              |
+| `gh://:owner/:repo/issues/comments[?page=1&..]` | get issue comment list                 |
+| `gh://:owner/:repo/issues/comments/new`         | new issue comment                      |
+| `gh://:owner/repos`                             | get repository list                    |
+| `gh://user/repos`                               | get authenticated user repository list |
+| `gh://user/repos/new`                           | new repository                         |
+| `gh://:owner/:repo/readme`                      | get repository readme                  |
+| `gh://:owner/:repo/pulls[?state=open&...]`      | get pull request list                  |
+| `gh://:owner/:repo/pulls/:number/diff`          | show pull request list diff            |
 
 ## Keymap list
 ### issue list
 
-| keymap                          | default | description           |
-|---------------------------------|---------|-----------------------|
-| `<Plug>(gh_issue_list_prev)`    | `<C-h>` | previous page         |
-| `<Plug>(gh_issue_list_next)`    | `<C-l>` | next page             |
-| `<Plug>(gh_issue_open_browser)` | `<C-o>` | open issue on browser |
-| `<Plug>(gh_issue_edit)`         | `ghe`   | edit issue            |
-| `<Plug>(gh_issue_close)`        | `ghc`   | close issue           |
-| `<Plug>(gh_issue_open)`         | `gho`   | open issue            |
+| keymap                          | default | description             |
+|---------------------------------|---------|-------------------------|
+| `<Plug>(gh_issue_list_prev)`    | `<C-h>` | previous page           |
+| `<Plug>(gh_issue_list_next)`    | `<C-l>` | next page               |
+| `<Plug>(gh_issue_open_browser)` | `<C-o>` | open issue on browser   |
+| `<Plug>(gh_issue_edit)`         | `ghe`   | edit issue              |
+| `<Plug>(gh_issue_close)`        | `ghc`   | close issue             |
+| `<Plug>(gh_issue_open)`         | `gho`   | open issue              |
+| `<Plug>(gh_issue_open_comment)` | `ghm`   | open issue comment list |
+
+### issue comment list
+
+| keymap                                  | default | description                   |
+|-----------------------------------------|---------|-------------------------------|
+| `<Plug>(gh_issue_comment_list_prev)`    | `<C-h>` | previous page                 |
+| `<Plug>(gh_issue_comment_list_next)`    | `<C-l>` | next page                     |
+| `<Plug>(gh_issue_comment_open_browser)` | `<C-o>` | open issue comment on browser |
+| `<Plug>(gh_issue_comment_new)`          | `ghn`   | new issue comment             |
 
 ### pull request list
 
@@ -95,6 +107,8 @@ currently `gh.vim` provide buffers is bellow.
   - [x] reopen
   - [x] update
     - [x] update title
+  - [x] comment list
+    - [x] create
 - pull request
   - [x] list
     - [x] paging
