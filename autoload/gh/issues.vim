@@ -408,5 +408,5 @@ function! s:issue_comment_list_change_page(op) abort
 endfunction
 
 function! s:issue_comment_open_browser() abort
-  call gh#gh#open_url(s:comment_list[line('.')-1].url)
+  call gh#gh#open_url(s:issue_comments[line('.')-1].url)
 endfunction
