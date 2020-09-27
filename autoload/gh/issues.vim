@@ -34,7 +34,7 @@ function! s:issue_list(resp) abort
       call add(s:issues, #{
             \ number: issue.number,
             \ body: split(issue.body, '\r\?\n'),
-            \ url: url . issue.number, 
+            \ url: url . issue.number,
             \ })
     endif
   endfor
@@ -313,7 +313,7 @@ function! gh#issues#comments() abort
     let param['page'] = 1
   endif
 
-  let s:issue = #{
+  let s:comment_list = #{
         \ repo: #{
         \   owner: m[1],
         \   name: m[2],
@@ -325,9 +325,9 @@ function! gh#issues#comments() abort
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
 
-  call gh#github#issues#comments(s:issue.repo.owner, s:issue.repo.name, s:issue.number, s:issue.param)
+  call gh#github#issues#comments(s:comment_list.repo.owner, s:comment_list.repo.name, s:comment_list.number, s:comment_list.param)
         \.then(function('s:set_issue_comments_body'))
-        \.catch({err -> execute('call gh#gh#set_message_buf(err.body)', '')})
+        \.catch({err -> execute('call gh#gh#set_message_buf(has_key(err, "body") ? err.body : err)', '')})
 endfunction
 
 function! s:set_issue_comments_body(resp) abort
@@ -353,17 +353,16 @@ function! s:set_issue_comments_body(resp) abort
           \ url: comment.html_url,
           \ })
   endfor
-  call setbufline(t:gh_issues_list_bufid, 1, lines)
+  call setbufline(t:gh_issues_comments_bufid, 1, lines)
 
   nnoremap <buffer> <silent> <Plug>(gh_issue_comment_open_browser) :<C-u>call <SID>issue_comment_open_browser()<CR>
 
   nmap <C-o> <Plug>(gh_issue_comment_open_browser)
 
   " open preview/edit window
-  let comment = s:issue_comments[line('.')-1]
-
   let winid = win_getid()
-  call execute(printf('belowright vnew gh://%s/%s/issues/%s/comments/%d', s:issue.repo.owner, s:issue.repo.name, s:issue.number, comment.id))
+  call execute(printf('belowright vnew gh://%s/%s/issues/%s/comments/edit',
+        \ s:comment_list.repo.owner, s:comment_list.repo.name, s:comment_list.number))
   call gh#gh#init_buffer()
 
   setlocal ft=markdown
@@ -387,19 +386,19 @@ endfunction
 
 function! s:issue_comment_list_change_page(op) abort
   if a:op is# '+'
-    let s:issue.param.page += 1
+    let s:comment_list.param.page += 1
   else
-    if s:issue.param.page < 2
+    if s:comment_list.param.page < 2
       return
     endif
-    let s:issue.param.page -= 1
+    let s:comment_list.param.page -= 1
   endif
 
   let cmd = printf('vnew gh://%s/%s/issues/%s/comments?%s',
-        \ s:issue.repo.owner, s:issue.repo.name, s:issue.number, gh#http#encode_param(s:issue.param))
+        \ s:comment_list.repo.owner, s:comment_list.repo.name, s:comment_list.number, gh#http#encode_param(s:comment_list.param))
   call execute(cmd)
 endfunction
 
 function! s:issue_comment_open_browser() abort
-  call gh#gh#open_url(s:issue_comments[line('.')-1].url)
+  call gh#gh#open_url(s:comment_list[line('.')-1].url)
 endfunction
