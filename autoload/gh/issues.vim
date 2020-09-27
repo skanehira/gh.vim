@@ -44,11 +44,19 @@ function! s:issue_list(resp) abort
   nnoremap <buffer> <silent> <Plug>(gh_issue_edit) :<C-u>call <SID>edit_issue()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_issue_close) :<C-u>call <SID>issue_close()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_issue_open) :<C-u>call <SID>issue_open()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_issue_open_comment) :<C-u>call <SID>issue_open_comment()<CR>
 
   nmap <C-o> <Plug>(gh_issue_open_browser)
   nmap ghe   <Plug>(gh_issue_edit)
   nmap ghc   <Plug>(gh_issue_close)
   nmap gho   <Plug>(gh_issue_open)
+  nmap ghm   <Plug>(gh_issue_open_comment)
+endfunction
+
+function! s:issue_open_comment() abort
+  let number = s:issues[line('.')-1].number
+  call execute(printf('new gh://%s/%s/issues/%d/comments',
+        \ s:issue_list.repo.owner, s:issue_list.repo.name, number))
 endfunction
 
 function! s:issue_close() abort
