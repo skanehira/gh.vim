@@ -5,6 +5,7 @@ Vim plugin for GitHub
 
 ## Features
 - create/edit/close/open/list issues
+- create/edit/list issue comments
 - create/delete/list repo
 - diff/list pull request
 
@@ -109,6 +110,7 @@ currently `gh.vim` provides buffers is bellow.
     - [x] update title
   - [x] comment list
     - [x] create
+    - [x] update
 - pull request
   - [x] list
     - [x] paging

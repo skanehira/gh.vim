@@ -382,16 +382,24 @@ function! s:set_issue_comments_body(resp) abort
 endfunction
 
 function! s:issue_comment_open() abort
+  call gh#gh#delete_tabpage_buffer('gh_issues_comment_edit_bufid')
   call execute(printf('belowright vnew gh://%s/%s/issues/%s/comments/edit',
         \ s:comment_list.repo.owner, s:comment_list.repo.name, s:comment_list.number))
   call gh#gh#init_buffer()
 
   setlocal ft=markdown
+  setlocal buftype=acwrite
   nnoremap <buffer> <silent> q :bw<CR>
 
   let t:gh_issues_comment_edit_bufid = bufnr()
   let t:gh_issues_comment_edit_winid = win_getid()
+
   call s:issue_comment_edit()
+
+  augroup gh-issue-comment-update
+    au!
+    au BufWriteCmd <buffer> call s:update_issue_comment()
+  augroup END
 endfunction
 
 function! s:issue_comment_new() abort
@@ -402,6 +410,35 @@ endfunction
 function! s:issue_comment_edit() abort
   call win_execute(t:gh_issues_comment_edit_winid, '%d_')
   call setbufline(t:gh_issues_comment_edit_bufid, 1, s:issue_comments[line('.')-1].body)
+  call win_execute(t:gh_issues_comment_edit_winid, 'setlocal nomodified')
+  let s:comment = s:issue_comments[line('.')-1]
+endfunction
+
+function! s:update_issue_comment() abort
+  let body = getline(1, '$')
+  if empty(body)
+    call gh#gh#error_message('required body')
+    return
+  endif
+
+  let data = #{
+        \ body: join(body, "\r\n"),
+        \ }
+
+  call gh#gh#message('comment updating...')
+
+  call gh#github#issues#comment_update(s:comment_list.repo.owner, s:comment_list.repo.name, s:comment.id, data)
+        \.then(function('s:update_issue_comment_success'))
+        \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
+endfunction
+
+function! s:update_issue_comment_success(resp) abort
+  bw!
+  call gh#gh#message('comment updated')
+  call gh#gh#delete_tabpage_buffer('gh_issues_comments_bufid')
+  call gh#gh#delete_tabpage_buffer('gh_issues_comment_edit_bufid')
+  call execute(printf('new gh://%s/%s/issues/%s/comments',
+        \ s:comment_list.repo.owner, s:comment_list.repo.name, s:comment_list.number))
 endfunction
 
 function! s:issue_comment_list_change_page(op) abort

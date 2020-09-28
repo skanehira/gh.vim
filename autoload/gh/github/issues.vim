@@ -64,3 +64,13 @@ function! gh#github#issues#comment_new(owner, repo, number, data) abort
 
   return gh#http#request(settings)
 endfunction
+
+function! gh#github#issues#comment_update(owner, repo, id, data) abort
+  let settings = #{
+        \ method: 'PATCH',
+        \ url: printf('https://api.github.com/repos/%s/%s/issues/comments/%s', a:owner, a:repo, a:id),
+        \ data: a:data,
+        \ }
+
+  return gh#http#request(settings)
+endfunction
