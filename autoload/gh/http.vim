@@ -83,7 +83,7 @@ function! s:make_response(body) abort
         \ body: body,
         \ }
 
-  if status is# '200' || status is# '201' || status is# '204'
+  if status is# '200' || status is# '201' || status is# '204' || status is# '100'
     return s:Promise.resolve(resp)
   endif
   return s:Promise.reject(resp)
