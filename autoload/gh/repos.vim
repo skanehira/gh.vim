@@ -119,6 +119,12 @@ function! gh#repos#readme() abort
   call gh#gh#delete_tabpage_buffer('gh_repo_readme_bufid')
   let t:gh_repo_readme_bufid = bufnr()
 
+  let s:repo_readme = #{
+        \ owner: m[1],
+        \ name: m[2],
+        \ url: printf('https://github.com/%s/%s', m[1], m[2]),
+        \ }
+
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
 
@@ -131,6 +137,13 @@ endfunction
 function! s:set_readme_body(resp) abort
   call setbufline(t:gh_repo_readme_bufid, 1, split(a:resp.body, "\r"))
   setlocal ft=markdown
+
+  nnoremap <buffer> <silent> <Plug>(gh_repo_open_browser_on_readme) :<C-u>call <SID>repo_open_on_readme()<CR>
+  nmap <buffer> <silent> <C-o> <Plug>(gh_repo_open_browser_on_readme)
+endfunction
+
+function! s:repo_open_on_readme() abort
+  call gh#gh#open_url(s:repo_readme.url)
 endfunction
 
 function! gh#repos#new() abort
