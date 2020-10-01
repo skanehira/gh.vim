@@ -320,6 +320,7 @@ function! gh#issues#issue() abort
 endfunction
 
 function! gh#issues#comments() abort
+  setlocal ft=gh-issue-comments
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/\(.*\)/comments?*\(.*\)')
 
   call gh#gh#delete_tabpage_buffer('gh_issues_comments_bufid')
@@ -374,7 +375,7 @@ function! s:set_issue_comments_body(resp) abort
   let format = gh#gh#dict_format(dict, ['id', 'user'])
 
   for comment in a:resp.body
-    call add(lines, printf(format, comment.id, printf('@%s', comment.user.login)))
+    call add(lines, printf(format, printf('#%s', comment.id), printf('@%s', comment.user.login)))
     call add(s:issue_comments, #{
           \ id: comment.id,
           \ user: comment.user.login,

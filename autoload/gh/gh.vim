@@ -88,6 +88,9 @@ function! gh#gh#def_highlight() abort
   hi! link gh_issue_closed gh_red
   hi! link gh_issue_user gh_purple
 
+  hi! link gh_issue_comment_user gh_purple
+  hi! link gh_issue_comment_number gh_blue
+
   hi! link gh_pull_number gh_blue
   hi! link gh_pull_open gh_green
   hi! link gh_pull_closed gh_red
