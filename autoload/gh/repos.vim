@@ -71,8 +71,15 @@ function! s:repo_list(resp) abort
 
   let s:repos = []
   let lines = []
+
+  let dict = map(copy(a:resp.body), {_, v -> #{
+        \ full_name: v.full_name,
+        \ stargazers_count: v.stargazers_count,
+        \ }})
+  let format = gh#gh#dict_format(dict, ['full_name', 'stargazers_count'])
+
   for repo in a:resp.body
-    call add(lines, printf("%s\t%s", repo.stargazers_count, repo.full_name))
+    call add(lines, printf(format, repo.full_name, repo.stargazers_count))
     call add(s:repos, repo)
   endfor
 
@@ -91,6 +98,7 @@ function! s:repo_list(resp) abort
 endfunction
 
 function! gh#repos#list() abort
+  setlocal ft=gh-repos
   let m = matchlist(bufname(), 'gh://\(.*\)/repos?*\(.*\)')
   let param = gh#http#decode_param(m[2])
   if !has_key(param, 'page')
