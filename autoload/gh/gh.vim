@@ -3,6 +3,7 @@
 " License: MIT
 
 function! gh#gh#init() abort
+  setlocal nolist
   let bufname = bufname()
   if bufname is# 'gh://user/repos/new'
     call gh#repos#new()
