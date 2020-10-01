@@ -76,6 +76,27 @@ function! gh#gh#delete_tabpage_buffer(name) abort
   endif
 endfunction
 
+function! gh#gh#def_highlight() abort
+  hi! gh_blue ctermfg=110 guifg=#84a0c6
+  hi! gh_green ctermfg=150 guifg=#b4be82
+  hi! gh_orange ctermfg=216 guifg=#e2a478
+  hi! link gh_purple Constant
+  hi! link gh_red WarningMsg
+
+  hi! link gh_issue_number gh_blue
+  hi! link gh_issue_open gh_green
+  hi! link gh_issue_closed gh_red
+  hi! link gh_issue_user gh_purple
+
+  hi! link gh_pull_number gh_blue
+  hi! link gh_pull_open gh_green
+  hi! link gh_pull_closed gh_red
+  hi! link gh_pull_user gh_purple
+
+  hi! link gh_repo_name gh_blue
+  hi! link gh_repo_star gh_orange
+endfunction
+
 function! s:dict_value_len(items) abort
   if len(a:items) < 1
     return {}

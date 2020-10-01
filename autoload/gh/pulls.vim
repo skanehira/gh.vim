@@ -62,6 +62,7 @@ function! s:pull_open() abort
 endfunction
 
 function! gh#pulls#list() abort
+  setlocal ft=gh-pulls
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/pulls?*\(.*\)')
 
   call gh#gh#delete_tabpage_buffer('gh_pulls_list_bufid')

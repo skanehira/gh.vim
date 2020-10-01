@@ -118,6 +118,7 @@ function! s:issue_list_change_page(op) abort
 endfunction
 
 function! gh#issues#list() abort
+  setlocal ft=gh-issues
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues?*\(.*\)')
 
   call gh#gh#delete_tabpage_buffer('gh_issues_list_bufid')

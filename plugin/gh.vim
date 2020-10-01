@@ -20,4 +20,7 @@ endfor
 augroup gh
   au!
   au BufReadCmd gh://* call gh#gh#init()
+  au ColorScheme * call gh#gh#def_highlight()
 augroup END
+
+call gh#gh#def_highlight()
