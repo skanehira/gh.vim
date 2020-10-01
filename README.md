@@ -12,9 +12,60 @@ Vim plugin for GitHub
 ## Installation
 Please install `curl` before installtion.
 
+After you have installed `curl`, you can add this repo using your favorite plugin manager.
+
+### dein.vim
+
+Using [dein.vim](https://github.com/Shougo/dein.vim) add this to your config:
+
 ```toml
 [[plugin]]
 repo = 'skanehira/gh.vim'
+```
+
+### vim-plug
+
+Using [vim-plug](https://github.com/junegunn/vim-plug/blob/master/README.md), add the following to your vimrc:
+
+```vim
+call plug#begin('~/.vim/plugged')
+Plug 'skanehira/gh.vim'
+call plug#end()
+```
+
+### Vundle
+
+Using [Vundle](https://github.com/VundleVim/Vundle.vim), add the following to your vimrc:
+
+```vim
+set nocompatible
+filetype off
+
+set rtp+=~/.vim/bundle/Vundle.vim
+
+call vundle#begin()
+Plugin 'VundleVim/Vundle.vim'
+Plugin 'skanehira/gh.vim'
+call vundle#end()
+
+filetype plugin indent on
+```
+
+### pathogen
+
+Using [pathogen](https://github.com/tpope/vim-pathogen) add the following to your vimrc:
+
+```vim
+execute pathogen#infect()
+syntax on
+filetype plugin indent on
+```
+
+And install the plugin like this:
+
+```sh
+cd ~/.vim/bundle && \
+git clone https://github.com/skanehira/gh.vim
 ```
 
 ## Usage
