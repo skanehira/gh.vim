@@ -1,7 +1,7 @@
 # gh.vim
 Vim plugin for GitHub
 
-![](https://i.imgur.com/VK6rebH.gif)
+![](https://i.imgur.com/tTTSZs6.gif)
 
 ## Features
 - create/edit/close/open/list issues
