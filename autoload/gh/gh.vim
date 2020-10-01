@@ -74,3 +74,27 @@ function! gh#gh#delete_tabpage_buffer(name) abort
     call execute('bw! '. t:[a:name])
   endif
 endfunction
+
+function! s:dict_value_len(items) abort
+  if len(a:items) < 1
+    return {}
+  endif
+
+  let len = map(copy(a:items[0]), {k -> 0})
+  for item in a:items
+    for [k, v] in items(item)
+      let l = strchars(v)
+      let len[k] = len[k] > l ? len[k] : l
+    endfor
+  endfor
+  return len
+endfunction
+
+function! gh#gh#dict_format(items, keys) abort
+  let dict = s:dict_value_len(a:items)
+  if empty(dict)
+    return ''
+  endif
+  let format = map(copy(a:keys), {_, k -> printf("%%-%ss", dict[k])})
+  return join(format, "\t")
+endfunction

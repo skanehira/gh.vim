@@ -28,9 +28,18 @@ function! s:issue_list(resp) abort
   let lines = []
   let url = printf('https://github.com/%s/%s/issues/', s:issue_list.repo.owner, s:issue_list.repo.name)
 
+  let dict = map(copy(a:resp.body), {_, v -> #{
+        \ number: v.number,
+        \ state: v.state,
+        \ user: v.user.login,
+        \ title: v.title,
+        \ }})
+  let format = gh#gh#dict_format(dict, ['number', 'state', 'user', 'title'])
+
   for issue in a:resp.body
     if !has_key(issue, 'pull_request')
-      call add(lines, printf("%s\t%s\t%s\t%s", issue.number, issue.state, issue.title, issue.user.login))
+      call add(lines, printf(format,
+            \ printf('#%d', issue.number), issue.state, printf('@%s', issue.user.login), issue.title))
       call add(s:issues, #{
             \ number: issue.number,
             \ body: split(issue.body, '\r\?\n'),
@@ -38,6 +47,7 @@ function! s:issue_list(resp) abort
             \ })
     endif
   endfor
+
   call setbufline(t:gh_issues_list_bufid, 1, lines)
 
   nnoremap <buffer> <silent> <Plug>(gh_issue_open_browser) :<C-u>call <SID>issue_open_browser()<CR>
@@ -356,8 +366,14 @@ function! s:set_issue_comments_body(resp) abort
   let s:issue_comments = []
   let lines = []
 
+  let dict = map(copy(a:resp.body), {_, v -> #{
+        \ id: v.id,
+        \ user: v.user.login,
+        \ }})
+  let format = gh#gh#dict_format(dict, ['id', 'user'])
+
   for comment in a:resp.body
-    call add(lines, printf("%s\t%s", comment.id, comment.user.login))
+    call add(lines, printf(format, comment.id, printf('@%s', comment.user.login)))
     call add(s:issue_comments, #{
           \ id: comment.id,
           \ user: comment.user.login,

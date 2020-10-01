@@ -17,8 +17,17 @@ function! s:pull_list(resp) abort
   let s:pulls = []
   let url = printf('https://github.com/%s/%s/pull/', s:pull_list.repo.owner, s:pull_list.repo.name)
 
+  let dict = map(copy(a:resp.body), {_, v -> #{
+        \ number: v.number,
+        \ state: v.state,
+        \ user: v.user.login,
+        \ title: v.title,
+        \ }})
+  let format = gh#gh#dict_format(dict, ['number', 'state', 'user', 'title'])
+
   for pr in a:resp.body
-    call add(lines, printf("%s\t%s\t%s\t%s", pr.number, pr.state, pr.title, pr.user.login))
+    call add(lines, printf(format,
+          \ printf('#%s', pr.number), pr.state, printf('@%s', pr.user.login), pr.title))
     call add(s:pulls, #{
           \ number: pr.number,
           \ url: url . pr.number,
