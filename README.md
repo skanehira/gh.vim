@@ -33,41 +33,6 @@ Plug 'skanehira/gh.vim'
 call plug#end()
 ```
 
-### Vundle
-
-Using [Vundle](https://github.com/VundleVim/Vundle.vim), add the following to your vimrc:
-
-```vim
-set nocompatible
-filetype off
-
-set rtp+=~/.vim/bundle/Vundle.vim
-
-call vundle#begin()
-Plugin 'VundleVim/Vundle.vim'
-Plugin 'skanehira/gh.vim'
-call vundle#end()
-
-filetype plugin indent on
-```
-
-### pathogen
-
-Using [pathogen](https://github.com/tpope/vim-pathogen) add the following to your vimrc:
-
-```vim
-execute pathogen#infect()
-syntax on
-filetype plugin indent on
-```
-
-And install the plugin like this:
-
-```sh
-cd ~/.vim/bundle && \
-git clone https://github.com/skanehira/gh.vim
-```
-
 ## Usage
 Set your personal access token.
 
