@@ -12,9 +12,25 @@ Vim plugin for GitHub
 ## Installation
 Please install `curl` before installtion.
 
+After you have installed `curl`, you can add this repo using your favorite plugin manager.
+
+### dein.vim
+
+Using [dein.vim](https://github.com/Shougo/dein.vim) add this to your config:
+
 ```toml
 [[plugin]]
 repo = 'skanehira/gh.vim'
+```
+
+### vim-plug
+
+Using [vim-plug](https://github.com/junegunn/vim-plug/blob/master/README.md), add the following to your vimrc:
+
+```vim
+call plug#begin('~/.vim/plugged')
+Plug 'skanehira/gh.vim'
+call plug#end()
 ```
 
 ## Usage
