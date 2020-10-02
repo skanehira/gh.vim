@@ -121,5 +121,5 @@ function! gh#gh#dict_format(items, keys) abort
     return ''
   endif
   let format = map(copy(a:keys), {_, k -> printf("%%-%ss", dict[k])})
-  return join(format, "\t")
+  return join(format)
 endfunction

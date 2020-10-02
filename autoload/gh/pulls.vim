@@ -18,9 +18,9 @@ function! s:pull_list(resp) abort
   let url = printf('https://github.com/%s/%s/pull/', s:pull_list.repo.owner, s:pull_list.repo.name)
 
   let dict = map(copy(a:resp.body), {_, v -> #{
-        \ number: v.number,
+        \ number: printf('#%s', v.number),
         \ state: v.state,
-        \ user: v.user.login,
+        \ user: printf('@%s', v.user.login),
         \ title: v.title,
         \ }})
   let format = gh#gh#dict_format(dict, ['number', 'state', 'user', 'title'])

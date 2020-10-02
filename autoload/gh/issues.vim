@@ -29,9 +29,9 @@ function! s:issue_list(resp) abort
   let url = printf('https://github.com/%s/%s/issues/', s:issue_list.repo.owner, s:issue_list.repo.name)
 
   let dict = map(copy(a:resp.body), {_, v -> #{
-        \ number: v.number,
+        \ number: printf('#%d', v.number),
         \ state: v.state,
-        \ user: v.user.login,
+        \ user: printf('@%s', v.user.login),
         \ title: v.title,
         \ }})
   let format = gh#gh#dict_format(dict, ['number', 'state', 'user', 'title'])
@@ -369,8 +369,8 @@ function! s:set_issue_comments_body(resp) abort
   let lines = []
 
   let dict = map(copy(a:resp.body), {_, v -> #{
-        \ id: v.id,
-        \ user: v.user.login,
+        \ id: printf('#%s', v.id),
+        \ user: printf('@%s', v.user.login),
         \ }})
   let format = gh#gh#dict_format(dict, ['id', 'user'])
 
