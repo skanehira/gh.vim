@@ -34,7 +34,7 @@ call plug#end()
 ```
 
 ## Usage
-Set your personal access token.
+Set your [personal access token](https://github.com/settings/tokens).
 
 ```vim
 let g:gh_token = 'xxxxxxxxxxxxxxxxxxxx'
