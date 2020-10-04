@@ -40,15 +40,13 @@ function! s:issue_list(resp) abort
   let format = gh#gh#dict_format(dict, ['number', 'state', 'user', 'title'])
 
   for issue in a:resp.body
-    if !has_key(issue, 'pull_request')
-      call add(lines, printf(format,
-            \ printf('#%d', issue.number), issue.state, printf('@%s', issue.user.login), issue.title))
-      call add(s:issues, #{
-            \ number: issue.number,
-            \ body: split(issue.body, '\r\?\n'),
-            \ url: url . issue.number,
-            \ })
-    endif
+    call add(lines, printf(format,
+          \ printf('#%d', issue.number), issue.state, printf('@%s', issue.user.login), issue.title))
+    call add(s:issues, #{
+          \ number: issue.number,
+          \ body: split(issue.body, '\r\?\n'),
+          \ url: url . issue.number,
+          \ })
   endfor
 
   call setbufline(t:gh_issues_list_bufid, 1, lines)
