@@ -19,6 +19,9 @@ function! s:issue_list(resp) abort
   nmap <buffer> <silent> <C-l> <Plug>(gh_issue_list_next)
   nmap <buffer> <silent> <C-h> <Plug>(gh_issue_list_prev)
 
+  " NOTE: issue may contain pull request
+  call filter(a:resp.body, '!has_key(v:val, "pull_request")')
+
   if empty(a:resp.body)
     call gh#gh#set_message_buf('not found issues')
     return
