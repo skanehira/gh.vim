@@ -87,6 +87,9 @@ gh://:owner/:repo/issues/:number/comments[?page=1&...]	*gh-buffer-issue-comment-
 gh://:owner/:repo/issues/:number/comments/new		*gh-buffer-issue-comment-new*
 	create new issue comment.
 
+gh://:owner/:repo/issues/:number/comments/edit		*gh-buffer-issue-comment-edit*
+	edit issue comment.
+
 gh://:owner/:repo/pulls[?state=open&...]		*gh-buffer-pull-list*
 	show :owner/:repo pull reuqests.
 	you can use query parameters(https://git.io/JUzl5)
@@ -98,8 +101,7 @@ gh://:owner/repos[?sort=created&...]			*gh-buffer-repo-list*
 	show :owner repositories.
 	you can use query parameters(https://git.io/JUzlo)
 
-gh://user/repos[?type=all&...]				*gh-buffer-user-repo-list*
-	show authenticated user repositories.
+	when :owner is `user`, show authenticated user repositories.
 	this can show your private/orgnization repositories.
 	you can use query parameters(https://git.io/JUzli)
 
@@ -115,6 +117,21 @@ gh://:owner/:repo/readme				*gh-buffer-repo-readme*
 ------------------------------------------------------------------------------
 KEY-MAPPINGS					*gh-key-mappings*
 
+you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
+{buffer} can specific |gh-buffer|.
+{mode} can specific |map-modes|.
+>
+  function! s:gh_map_add() abort
+    call gh#map#add('gh-buffer-issue-list', 'nnoremap', 'x', ':bw!<CR>')
+    call gh#map#add('gh-buffer-issue-list', 'm', 'l', '<Plug>(gh_issue_list_prev)')
+    call gh#map#add('gh-buffer-issue-list', 'm', 'l', '<Plug>(gh_issue_list_next)')
+  endfunction
+
+  augroup gh-maps
+    au!
+    au VimEnter * call <SID>gh_map_add()
+  augroup END
+<
 <Plug>(gh_repo_list_next)			*<Plug>(gh_repo_list_next)*
 	show next page of repository list
 	default mappings: <C-l>
@@ -218,7 +235,7 @@ default mappings
 							<C-l>		<Plug>(gh_pull_list_next)
 							<C-o>		<Plug>(gh_pull_open_browser)
 							ghd		<Plug>(gh_pull_diff)
-|gh-buffer-user-repo-list| or |gh-buffer-repo-list|	<C-l>		<Plug>(gh_repo_list_next)
+|gh-buffer-repo-list|					<C-l>		<Plug>(gh_repo_list_next)
 							<C-o>		<Plug>(gh_repo_open_browser)
 							gho		<Plug>(gh_repo_show_readme)
 							ghd		<Plug>(gh_repo_delete)
