@@ -284,11 +284,20 @@ function! s:update_issue() abort
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
 endfunction
 
+function! s:comments_open_on_issue() abort
+  let cmd = printf('new gh://%s/%s/issues/%s/comments',
+        \ s:issue.repo.owner, s:issue.repo.name, s:issue.number)
+  call execute(cmd)
+endfunction
+
 function! s:set_issues_body(resp) abort
   let s:issue['title'] = a:resp.body.title
   call setbufline(t:gh_issues_edit_bufid, 1, split(a:resp.body.body, '\r\?\n'))
   setlocal nomodified buftype=acwrite ft=markdown
 
+  nnoremap <buffer> <silent> <Plug>(gh_issue_comment_open_on_issue) :<C-u>call <SID>comments_open_on_issue()<CR>
+
+  nmap <buffer> <silent> ghm <Plug>(gh_issue_comment_open_on_issue)
   nnoremap <buffer> <silent> q :bw<CR>
 
   augroup gh-update-issue
