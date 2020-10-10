@@ -291,6 +291,10 @@ function! s:comments_open_on_issue() abort
 endfunction
 
 function! s:set_issues_body(resp) abort
+  if empty(a:resp.body.body)
+    call gh#gh#set_message_buf('no description provided')
+    return
+  endif
   let s:issue['title'] = a:resp.body.title
   call setbufline(t:gh_issues_edit_bufid, 1, split(a:resp.body.body, '\r\?\n'))
   setlocal nomodified buftype=acwrite ft=markdown
