@@ -118,6 +118,7 @@ function! gh#repos#list() abort
 
   call gh#github#repos#list(s:repo_list.owner, s:repo_list.param)
         \.then(function('s:repo_list'))
+        \.then({-> execute("call gh#map#apply('gh-buffer-repo-list')")})
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
@@ -138,6 +139,7 @@ function! gh#repos#readme() abort
 
   call gh#github#repos#readme(m[1], m[2])
         \.then(function('s:set_readme_body'))
+        \.then({-> execute("call gh#map#apply('gh-buffer-repo-readme')")})
         \.catch({err -> execute('call gh#gh#set_message_buf(err.body)', '')})
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
@@ -166,6 +168,8 @@ function! gh#repos#new() abort
     au!
     au BufWriteCmd <buffer> call s:repo_create()
   augroup END
+
+  call gh#map#apply('gh-buffer-repo-new')
 endfunction
 
 function! s:repo_create() abort

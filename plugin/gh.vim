@@ -24,3 +24,4 @@ augroup gh
 augroup END
 
 call gh#gh#def_highlight()
+call gh#map#init()
