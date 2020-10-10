@@ -185,13 +185,17 @@ KEY-MAPPINGS					*gh-key-mappings*
 	show previous page of issue comment list
 	default mappings: <C-h>
 	
-<Plug>(gh_issue_comment_open_browser)           *<Plug>(gh_issue_comment_open_browser)*
+<Plug>(gh_issue_comment_open_browser)		*<Plug>(gh_issue_comment_open_browser)*
 	open issue on browser
 	default mappings: <C-o>
 
-<Plug>(gh_issue_comment_new)                    *<Plug>(gh_issue_comment_new)*
+<Plug>(gh_issue_comment_new)			*<Plug>(gh_issue_comment_new)*
 	create new issue comment.
 	default mappings: ghn
+
+<Plug>(gh_issue_comment_open_on_issue)		*<Plug>(gh_issue_comment_open_on_issue)*
+	open issue comments on |gh-buffer-issue-edit|.
+	defualt mappings: ghm
 
 						*gh-default-key-mappings*
 
@@ -205,6 +209,7 @@ default mappings
 							ghc		<Plug>(gh_issue_close)
 							gho		<Plug>(gh_issue_open)
 							ghm		<Plug>(gh_issue_open_comment)
+|gh-buffer-issue-edit|					ghm		<Plug>(gh_issue_comment_open_on_issue)
 |gh-buffer-issue-comment-list|				<C-h>		<Plug>(gh_issue_comment_list_prev)
 							<C-l>		<Plug>(gh_issue_comment_list_next)
 							<C-o>		<Plug>(gh_issue_comment_open_browser)
