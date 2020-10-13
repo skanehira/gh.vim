@@ -7,7 +7,6 @@ function! s:issue_open_browser() abort
 endfunction
 
 function! s:edit_issue() abort
-  call gh#gh#delete_tabpage_buffer('gh_issues_edit_bufid')
   let number = s:issues[line('.')-1].number
   call execute(printf('belowright vnew gh://%s/%s/issues/%s',
         \ s:issue_list.repo.owner, s:issue_list.repo.name, number))
@@ -49,7 +48,7 @@ function! s:issue_list(resp) abort
           \ })
   endfor
 
-  call setbufline(t:gh_issues_list_bufid, 1, lines)
+  call setbufline(s:gh_issues_list_bufid, 1, lines)
 
   nnoremap <buffer> <silent> <Plug>(gh_issue_open_browser) :<C-u>call <SID>issue_open_browser()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_issue_edit) :<C-u>call <SID>edit_issue()<CR>
@@ -97,7 +96,7 @@ function! s:issue_open_success(resp) abort
 endfunction
 
 function! s:issue_list_refresh() abort
-  call gh#gh#delete_tabpage_buffer('gh_issues_list_bufid')
+  call gh#gh#delete_tabpage_buffer(s:, 'gh_issues_list_bufid')
   let cmd = printf('e gh://%s/%s/issues?%s',
         \ s:issue_list.repo.owner, s:issue_list.repo.name, gh#http#encode_param(s:issue_list.param))
   call execute(cmd)
@@ -122,8 +121,8 @@ function! gh#issues#list() abort
   setlocal ft=gh-issues
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues?*\(.*\)')
 
-  call gh#gh#delete_tabpage_buffer('gh_issues_list_bufid')
-  let t:gh_issues_list_bufid = bufnr()
+  call gh#gh#delete_tabpage_buffer(s:, 'gh_issues_list_bufid')
+  let s:gh_issues_list_bufid = bufnr()
 
   let param = gh#http#decode_param(m[3])
   if !has_key(param, 'page')
@@ -158,7 +157,7 @@ function! gh#issues#new() abort
     return
   endif
 
-  let t:gh_issues_new_bufid = bufnr()
+  let s:gh_issues_new_bufid = bufnr()
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
 
@@ -232,7 +231,7 @@ function! s:open_template_list(files) abort
     return
   endif
   let s:files = a:files
-  call setbufline(t:gh_issues_new_bufid, 1, map(copy(a:files), {_, v -> v.file}))
+  call setbufline(s:gh_issues_new_bufid, 1, map(copy(a:files), {_, v -> v.file}))
   nnoremap <buffer> <silent> <CR> :call <SID>get_template()<CR>
 endfunction
 
@@ -298,7 +297,7 @@ function! s:set_issues_body(resp) abort
     return
   endif
   let s:issue['title'] = a:resp.body.title
-  call setbufline(t:gh_issues_edit_bufid, 1, split(a:resp.body.body, '\r\?\n'))
+  call setbufline(s:gh_issues_edit_bufid, 1, split(a:resp.body.body, '\r\?\n'))
   setlocal nomodified buftype=acwrite ft=markdown
 
   nnoremap <buffer> <silent> <Plug>(gh_issue_comment_open_on_issue) :<C-u>call <SID>comments_open_on_issue()<CR>
@@ -315,8 +314,8 @@ endfunction
 function! gh#issues#issue() abort
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/\(.*\)$')
 
-  call gh#gh#delete_tabpage_buffer('gh_issues_edit_bufid')
-  let t:gh_issues_edit_bufid = bufnr()
+  call gh#gh#delete_tabpage_buffer(s:, 'gh_issues_edit_bufid')
+  let s:gh_issues_edit_bufid = bufnr()
 
   let s:issue = #{
         \ repo: #{
@@ -340,10 +339,10 @@ function! gh#issues#comments() abort
   setlocal ft=gh-issue-comments
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/\(.*\)/comments?*\(.*\)')
 
-  call gh#gh#delete_tabpage_buffer('gh_issues_comments_bufid')
-  call gh#gh#delete_tabpage_buffer('gh_issues_comment_edit_bufid')
+  call gh#gh#delete_tabpage_buffer(s:, 'gh_issues_comments_bufid')
+  call gh#gh#delete_tabpage_buffer(s:, 'gh_issues_comment_edit_bufid')
 
-  let t:gh_issues_comments_bufid = bufnr()
+  let s:gh_issues_comments_bufid = bufnr()
 
   let param = gh#http#decode_param(m[4])
   if !has_key(param, 'page')
@@ -401,7 +400,7 @@ function! s:set_issue_comments_body(resp) abort
           \ url: comment.html_url,
           \ })
   endfor
-  call setbufline(t:gh_issues_comments_bufid, 1, lines)
+  call setbufline(s:gh_issues_comments_bufid, 1, lines)
 
   nnoremap <buffer> <silent> <Plug>(gh_issue_comment_open_browser) :<C-u>call <SID>issue_comment_open_browser()<CR>
   nmap <buffer> <silent> <C-o> <Plug>(gh_issue_comment_open_browser)
@@ -418,7 +417,6 @@ function! s:set_issue_comments_body(resp) abort
 endfunction
 
 function! s:issue_comment_open() abort
-  call gh#gh#delete_tabpage_buffer('gh_issues_comment_edit_bufid')
   call execute(printf('belowright vnew gh://%s/%s/issues/%s/comments/edit',
         \ s:comment_list.repo.owner, s:comment_list.repo.name, s:comment_list.number))
   call gh#gh#init_buffer()
@@ -428,8 +426,8 @@ function! s:issue_comment_open() abort
   setlocal buftype=acwrite
   nnoremap <buffer> <silent> q :bw<CR>
 
-  let t:gh_issues_comment_edit_bufid = bufnr()
-  let t:gh_issues_comment_edit_winid = win_getid()
+  let s:gh_issues_comment_edit_bufid = bufnr()
+  let s:gh_issues_comment_edit_winid = win_getid()
 
   call s:issue_comment_edit()
 
@@ -445,9 +443,9 @@ function! s:issue_comment_new() abort
 endfunction
 
 function! s:issue_comment_edit() abort
-  call win_execute(t:gh_issues_comment_edit_winid, '%d_')
-  call setbufline(t:gh_issues_comment_edit_bufid, 1, s:issue_comments[line('.')-1].body)
-  call win_execute(t:gh_issues_comment_edit_winid, 'setlocal nomodified')
+  call win_execute(s:gh_issues_comment_edit_winid, '%d_')
+  call setbufline(s:gh_issues_comment_edit_bufid, 1, s:issue_comments[line('.')-1].body)
+  call win_execute(s:gh_issues_comment_edit_winid, 'setlocal nomodified')
   let s:comment = s:issue_comments[line('.')-1]
 endfunction
 
@@ -472,8 +470,8 @@ endfunction
 function! s:update_issue_comment_success(resp) abort
   bw!
   call gh#gh#message('comment updated')
-  call gh#gh#delete_tabpage_buffer('gh_issues_comments_bufid')
-  call gh#gh#delete_tabpage_buffer('gh_issues_comment_edit_bufid')
+  call gh#gh#delete_tabpage_buffer(s:, 'gh_issues_comments_bufid')
+  call gh#gh#delete_tabpage_buffer(s:, 'gh_issues_comment_edit_bufid')
   call execute(printf('new gh://%s/%s/issues/%s/comments',
         \ s:comment_list.repo.owner, s:comment_list.repo.name, s:comment_list.number))
 endfunction
@@ -498,8 +496,8 @@ function! s:issue_comment_open_browser() abort
 endfunction
 
 function! gh#issues#comment_new() abort
-  call gh#gh#delete_tabpage_buffer('gh_issues_comment_new_bufid')
-  let t:gh_issues_comment_new_bufid = bufnr()
+  call gh#gh#delete_tabpage_buffer(s:, 'gh_issues_comment_new_bufid')
+  let s:gh_issues_comment_new_bufid = bufnr()
   call gh#gh#init_buffer()
   setlocal ft=markdown
 
@@ -538,9 +536,9 @@ function! s:create_issue_comment() abort
 endfunction
 
 function s:create_issue_comment_success(resp) abort
-  call gh#gh#delete_tabpage_buffer('gh_issues_comment_new_bufid')
+  call gh#gh#delete_tabpage_buffer(s:, 'gh_issues_comment_new_bufid')
   call gh#gh#message(printf('new comment: %s', a:resp.body.html_url))
-  call gh#gh#delete_tabpage_buffer('gh_issues_comments_bufid')
+  call gh#gh#delete_tabpage_buffer(s:, 'gh_issues_comments_bufid')
   call execute(printf('new gh://%s/%s/issues/%d/comments',
         \ s:comment_list.repo.owner, s:comment_list.repo.name, s:comment_list.number))
 endfunction

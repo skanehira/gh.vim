@@ -7,7 +7,6 @@ function! s:repo_open() abort
 endfunction
 
 function! s:repo_open_readme() abort
-  call gh#gh#delete_tabpage_buffer('gh_repo_readme_bufid')
   let full_name = s:repos[line('.')-1].full_name
   call execute(printf('belowright vnew gh://%s/readme', full_name))
 endfunction
@@ -52,7 +51,6 @@ function! s:repo_delete_success(timer) abort
 endfunction
 
 function! s:issue_list_refresh() abort
-  call gh#gh#delete_tabpage_buffer('gh_repo_list_bufid')
   let cmd = printf('e gh://%s/repos?%s',
         \ s:repo_list.owner, gh#http#encode_param(s:repo_list.param))
   call execute(cmd)
@@ -83,7 +81,7 @@ function! s:repo_list(resp) abort
     call add(s:repos, repo)
   endfor
 
-  call setbufline(t:gh_repo_list_bufid, 1, lines)
+  call setbufline(s:gh_repo_list_bufid, 1, lines)
 
   nnoremap <buffer> <silent> <Plug>(gh_repo_open_browser) :<C-u>call <SID>repo_open()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_repo_show_readme) :<C-u>call <SID>repo_open_readme()<CR>
@@ -110,8 +108,8 @@ function! gh#repos#list() abort
         \ param: param,
         \ }
 
-  call gh#gh#delete_tabpage_buffer('gh_repo_list_bufid')
-  let t:gh_repo_list_bufid = bufnr()
+  call gh#gh#delete_tabpage_buffer(s:, 'gh_repo_list_bufid')
+  let s:gh_repo_list_bufid = bufnr()
 
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
@@ -125,8 +123,8 @@ endfunction
 
 function! gh#repos#readme() abort
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/readme')
-  call gh#gh#delete_tabpage_buffer('gh_repo_readme_bufid')
-  let t:gh_repo_readme_bufid = bufnr()
+  call gh#gh#delete_tabpage_buffer(s:, 'gh_repo_readme_bufid')
+  let s:gh_repo_readme_bufid = bufnr()
 
   let s:repo_readme = #{
         \ owner: m[1],
@@ -145,7 +143,7 @@ function! gh#repos#readme() abort
 endfunction
 
 function! s:set_readme_body(resp) abort
-  call setbufline(t:gh_repo_readme_bufid, 1, split(a:resp.body, "\r"))
+  call setbufline(s:gh_repo_readme_bufid, 1, split(a:resp.body, "\r"))
   setlocal ft=markdown
 
   nnoremap <buffer> <silent> <Plug>(gh_repo_open_browser_on_readme) :<C-u>call <SID>repo_open_on_readme()<CR>
@@ -157,10 +155,10 @@ function! s:repo_open_on_readme() abort
 endfunction
 
 function! gh#repos#new() abort
-  let t:gh_repo_new_bufid = bufnr()
+  let s:gh_repo_new_bufid = bufnr()
 
   let lines = ['name: ', 'description: ', 'private: false', 'delete_branch_on_merge: true']
-  call setbufline(t:gh_repo_new_bufid, 1, lines)
+  call setbufline(s:gh_repo_new_bufid, 1, lines)
 
   call gh#gh#init_buffer()
   setlocal buftype=acwrite

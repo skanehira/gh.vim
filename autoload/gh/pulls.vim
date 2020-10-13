@@ -34,7 +34,7 @@ function! s:pull_list(resp) abort
           \ })
   endfor
 
-  call setbufline(t:gh_pulls_list_bufid, 1, lines)
+  call setbufline(s:gh_pulls_list_bufid, 1, lines)
 
   nnoremap <buffer> <silent> <Plug>(gh_pull_open_browser) :<C-u>call <SID>pull_open()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_pull_diff) :<C-u>call <SID>open_pull_diff()<CR>
@@ -65,9 +65,9 @@ function! gh#pulls#list() abort
   setlocal ft=gh-pulls
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/pulls?*\(.*\)')
 
-  call gh#gh#delete_tabpage_buffer('gh_pulls_list_bufid')
-  call gh#gh#delete_tabpage_buffer('gh_preview_diff_bufid')
-  let t:gh_pulls_list_bufid = bufnr()
+  call gh#gh#delete_tabpage_buffer(s:, 'gh_pulls_list_bufid')
+  call gh#gh#delete_tabpage_buffer(s:, 'gh_preview_diff_bufid')
+  let s:gh_pulls_list_bufid = bufnr()
 
   let param = gh#http#decode_param(m[3])
   if !has_key(param, 'page')
@@ -93,21 +93,20 @@ function! gh#pulls#list() abort
 endfunction
 
 function! s:open_pull_diff() abort
-  call gh#gh#delete_tabpage_buffer('gh_preview_diff_bufid')
   let number = s:pulls[line('.')-1].number
   call execute(printf('belowright vnew gh://%s/%s/pulls/%s/diff',
         \ s:pull_list.repo.owner, s:pull_list.repo.name, number))
 endfunction
 
 function! s:set_diff_contents(resp) abort
-  call setbufline(t:gh_preview_diff_bufid, 1, split(a:resp.body, "\r"))
+  call setbufline(s:gh_preview_diff_bufid, 1, split(a:resp.body, "\r"))
   setlocal buftype=nofile
   setlocal ft=diff
 endfunction
 
 function! gh#pulls#diff() abort
-  call gh#gh#delete_tabpage_buffer('gh_preview_diff_bufid')
-  let t:gh_preview_diff_bufid = bufnr()
+  call gh#gh#delete_tabpage_buffer(s:, 'gh_preview_diff_bufid')
+  let s:gh_preview_diff_bufid = bufnr()
 
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
