@@ -70,7 +70,7 @@ function! gh#gh#open_url(url) abort
   call system(printf('%s %s', cmd, a:url))
 endfunction
 
-function! gh#gh#delete_tabpage_buffer(s, name) abort
+function! gh#gh#delete_buffer(s, name) abort
   if has_key(a:s, a:name) && bufexists(a:s[a:name])
     call execute('bw! '. a:s[a:name])
   endif

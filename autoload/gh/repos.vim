@@ -108,7 +108,7 @@ function! gh#repos#list() abort
         \ param: param,
         \ }
 
-  call gh#gh#delete_tabpage_buffer(s:, 'gh_repo_list_bufid')
+  call gh#gh#delete_buffer(s:, 'gh_repo_list_bufid')
   let s:gh_repo_list_bufid = bufnr()
 
   call gh#gh#init_buffer()
@@ -123,7 +123,7 @@ endfunction
 
 function! gh#repos#readme() abort
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/readme')
-  call gh#gh#delete_tabpage_buffer(s:, 'gh_repo_readme_bufid')
+  call gh#gh#delete_buffer(s:, 'gh_repo_readme_bufid')
   let s:gh_repo_readme_bufid = bufnr()
 
   let s:repo_readme = #{

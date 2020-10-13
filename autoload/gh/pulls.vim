@@ -65,8 +65,8 @@ function! gh#pulls#list() abort
   setlocal ft=gh-pulls
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/pulls?*\(.*\)')
 
-  call gh#gh#delete_tabpage_buffer(s:, 'gh_pulls_list_bufid')
-  call gh#gh#delete_tabpage_buffer(s:, 'gh_preview_diff_bufid')
+  call gh#gh#delete_buffer(s:, 'gh_pulls_list_bufid')
+  call gh#gh#delete_buffer(s:, 'gh_preview_diff_bufid')
   let s:gh_pulls_list_bufid = bufnr()
 
   let param = gh#http#decode_param(m[3])
@@ -105,7 +105,7 @@ function! s:set_diff_contents(resp) abort
 endfunction
 
 function! gh#pulls#diff() abort
-  call gh#gh#delete_tabpage_buffer(s:, 'gh_preview_diff_bufid')
+  call gh#gh#delete_buffer(s:, 'gh_preview_diff_bufid')
   let s:gh_preview_diff_bufid = bufnr()
 
   call gh#gh#init_buffer()
