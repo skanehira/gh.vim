@@ -38,7 +38,7 @@ CHANGELOG			|gh-changelog|
 ==============================================================================
 INTRODUCTION					*gh-introduction*
 
-*gh* is a Vim plugin 
+*gh* is a Vim plugin
 
 Latest version:
 https://github.com/skanehira/gh.vim
@@ -62,6 +62,9 @@ g:gh_enable_delete_repository			*g:gh_enable_delete_repository*
 g:gh_token					*g:gh_token*
 	GitHub personal access token.
 	please refrence https://git.io/JJyrT
+
+g:gh_open_issue_on_create			*g:gh_open_issue_on_create*
+	open issue in browser on created.
 
 ------------------------------------------------------------------------------
 BUFFER							*gh-buffer*
@@ -110,7 +113,7 @@ gh://user/repos/new					*gh-buffer-repo-new*
 	input contens must be "key: value".
 	requred repository name.
 	also some parameters(https://git.io/JUzlS) can use.
-	
+
 gh://:owner/:repo/readme				*gh-buffer-repo-readme*
 	show repository readme if repository has README.*
 
@@ -201,7 +204,7 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 <Plug>(gh_issue_comment_list_prev)		*<Plug>(gh_issue_comment_list_prev)*
 	show previous page of issue comment list
 	default mappings: <C-h>
-	
+
 <Plug>(gh_issue_comment_open_browser)		*<Plug>(gh_issue_comment_open_browser)*
 	open issue on browser
 	default mappings: <C-o>

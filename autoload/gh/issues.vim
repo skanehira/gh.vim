@@ -198,6 +198,9 @@ endfunction
 function! s:create_issue_success(resp) abort
   bw!
   redraw!
+  if has_key(g:, 'gh_open_issue_on_create') && g:gh_open_issue_on_create is# 1
+    call gh#gh#open_url(a:resp.body.html_url)
+  endif
   call gh#gh#message(printf('new issue: %s', a:resp.body.html_url))
 endfunction
 
