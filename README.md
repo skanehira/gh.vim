@@ -85,6 +85,7 @@ currently `gh.vim` provides buffers is bellow.
 | `<Plug>(gh_issue_edit)`         | `ghe`   | edit issue              |
 | `<Plug>(gh_issue_close)`        | `ghc`   | close issue             |
 | `<Plug>(gh_issue_open)`         | `gho`   | open issue              |
+| `<Plug>(gh_issue_url_yank)`     | `ghy`   | yank issue url          |
 | `<Plug>(gh_issue_open_comment)` | `ghm`   | open issue comment list |
 
 ### issue comment list

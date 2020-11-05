@@ -2,6 +2,11 @@
 " Author: skanehira
 " License: MIT
 
+let s:yank_reg = '*'
+if has('linux')
+  let s:yank_reg = '+'
+endif
+
 function! gh#gh#init() abort
   setlocal nolist
   let bufname = bufname()
@@ -68,6 +73,10 @@ function! gh#gh#open_url(url) abort
     let cmd = 'xdg-open'
   endif
   call system(printf('%s %s', cmd, a:url))
+endfunction
+
+function! gh#gh#yank(url) abort
+  call setreg(s:yank_reg, a:url)
 endfunction
 
 function! gh#gh#delete_buffer(s, name) abort

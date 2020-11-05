@@ -191,6 +191,10 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 	open issue
 	default mappings: gho
 
+<Plug>(gh_issue_url_yank)			*<Plug>(gh_issue_url_yank)*
+	yank issue url
+	default mappings: ghy
+
 <Plug>(gh_repo_delete)				*<Plug>(gh_repo_delete)*
 	delete repository.
 	this is disable on default.

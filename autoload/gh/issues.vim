@@ -6,6 +6,12 @@ function! s:issue_open_browser() abort
   call gh#gh#open_url(s:issues[line('.') -1].url)
 endfunction
 
+function! s:issue_url_yank() abort
+  let url = s:issues[line('.') -1].url
+  call gh#gh#yank(url)
+  echom 'copied' url
+endfunction
+
 function! s:edit_issue() abort
   let number = s:issues[line('.')-1].number
   call execute(printf('belowright vnew gh://%s/%s/issues/%s',
@@ -55,12 +61,15 @@ function! s:issue_list(resp) abort
   nnoremap <buffer> <silent> <Plug>(gh_issue_close) :<C-u>call <SID>issue_close()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_issue_open) :<C-u>call <SID>issue_open()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_issue_open_comment) :<C-u>call <SID>issue_open_comment()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_issue_url_yank) :<C-u>call <SID>issue_url_yank()<CR>
 
   nmap <buffer> <silent> <C-o> <Plug>(gh_issue_open_browser)
   nmap <buffer> <silent> ghe   <Plug>(gh_issue_edit)
   nmap <buffer> <silent> ghc   <Plug>(gh_issue_close)
   nmap <buffer> <silent> gho   <Plug>(gh_issue_open)
   nmap <buffer> <silent> ghm   <Plug>(gh_issue_open_comment)
+  nmap <buffer> <silent> ghy   <Plug>(gh_issue_url_yank)
+
 endfunction
 
 function! s:issue_open_comment() abort
