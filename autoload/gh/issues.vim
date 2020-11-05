@@ -9,7 +9,7 @@ endfunction
 function! s:issue_url_yank() abort
   let url = s:issues[line('.') -1].url
   call gh#gh#yank(url)
-  echom 'copied' url
+  call gh#gh#message('copied ' .. url)
 endfunction
 
 function! s:edit_issue() abort
