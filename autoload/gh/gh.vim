@@ -2,6 +2,13 @@
 " Author: skanehira
 " License: MIT
 
+let s:cmd = 'open'
+if has('linux')
+  let s:cmd = 'xdg-open'
+elseif has('win64')
+  let s:cmd = 'cmd /c start'
+endif
+
 let s:yank_reg = '*'
 if has('linux')
   let s:yank_reg = '+'
@@ -68,11 +75,7 @@ function! gh#gh#global_buf_settings() abort
 endfunction
 
 function! gh#gh#open_url(url) abort
-  let cmd = 'open'
-  if has('linux')
-    let cmd = 'xdg-open'
-  endif
-  call system(printf('%s %s', cmd, a:url))
+  call system(printf('%s %s', s:cmd, a:url))
 endfunction
 
 function! gh#gh#yank(url) abort
