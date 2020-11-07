@@ -28,7 +28,7 @@ function! gh#gh#init() abort
     call gh#issues#list()
   elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/issues\/[0-9]\+$'
     call gh#issues#issue()
-  elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/issues\/new$'
+  elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/[^/]\+\/issues\/new$'
     call gh#issues#new()
   elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/issues\/\d\+\/comments$'
         \ || bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/issues\/\d\+\/comments?\+'

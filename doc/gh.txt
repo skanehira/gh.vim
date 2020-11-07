@@ -77,7 +77,7 @@ gh://:owner/:repo/issues/:number			*gh-buffer-issue-edit*
 	show issue contents and can edit it.
 	can use |:w| to update contents and title.
 
-gh://:owner/:repo/issues/new				*gh-buffer-issue-new*
+gh://:owner/:repo/:branch/issues/new			*gh-buffer-issue-new*
 	create new issue.
 	at first, you have to input issue title at cmdline.
 	if repository has template, can use it to create issue.

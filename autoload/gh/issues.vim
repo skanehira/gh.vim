@@ -170,13 +170,14 @@ function! gh#issues#new() abort
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
 
-  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/new$')
+  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/\(.*\)/issues/new$')
   let s:issue_new = #{
         \ owner: m[1],
         \ name: m[2],
+        \ branch: m[3],
         \ }
 
-  call gh#github#repos#files(s:issue_new.owner, s:issue_new.name, 'master')
+  call gh#github#repos#files(s:issue_new.owner, s:issue_new.name, s:issue_new.branch)
         \.then(function('s:get_template_files'))
         \.then(function('s:open_template_list'))
         \.then({-> execute("call gh#map#apply('gh-buffer-issue-new')")})
@@ -261,8 +262,8 @@ function! s:get_template_files(resp) abort
         \ {_, v -> v.type is# 'blob' && (matchstr(v.path, '\.github/ISSUE_TEMPLATE.*') is# '' ? 0 : 1)})
 
   let files = map(files, {_, v -> #{file: s:file_basename(v.path),
-        \ url: printf('https://raw.githubusercontent.com/%s/%s/master/%s',
-        \ s:issue_new.owner, s:issue_new.name, v.path)}})
+        \ url: printf('https://raw.githubusercontent.com/%s/%s/%s/%s',
+        \ s:issue_new.owner, s:issue_new.name, s:issue_new.branch, v.path)}})
   return files
 endfunction
 
