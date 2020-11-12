@@ -9,6 +9,8 @@ Vim plugin for GitHub
 - create/delete/list repo
 - diff/list pull request
 
+※currently doesn't work on Neovim
+
 ## Installation
 Please install `curl` before installtion.
 
