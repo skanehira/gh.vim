@@ -38,8 +38,16 @@ function! s:pull_list(resp) abort
 
   nnoremap <buffer> <silent> <Plug>(gh_pull_open_browser) :<C-u>call <SID>pull_open()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_pull_diff) :<C-u>call <SID>open_pull_diff()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_pull_url_yank) :<C-u>call <SID>gh_pull_url_yank()<CR>
   nmap <buffer> <silent> <C-o> <Plug>(gh_pull_open_browser)
   nmap <buffer> <silent> ghd <Plug>(gh_pull_diff)
+  nmap <buffer> <silent> ghy <Plug>(gh_pull_url_yank)
+endfunction
+
+function! s:gh_pull_url_yank() abort
+  let url = s:pulls[line('.') -1].url
+  call gh#gh#yank(url)
+  call gh#gh#message('copied ' .. url)
 endfunction
 
 function! s:pull_list_change_page(op) abort
