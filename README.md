@@ -107,6 +107,7 @@ currently `gh.vim` provides buffers is bellow.
 | `<Plug>(gh_pull_list_prev)`    | `<C-l>` | next page                    |
 | `<Plug>(gh_pull_open_browser)` | `<C-o>` | open pull request on browser |
 | `<Plug>(gh_pull_diff)`         | `ghd`   | show pull request diff       |
+| `<Plug>(gh_pull_url_yank)`     | `ghy`   | yank pull request url        |
 
 ### repository list
 

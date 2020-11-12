@@ -195,6 +195,10 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 	yank issue url
 	default mappings: ghy
 
+<Plug>(gh_pull_url_yank)			*<Plug>(gh_pull_url_yank)*
+	yank pull request url
+	default mappings: ghy
+
 <Plug>(gh_repo_delete)				*<Plug>(gh_repo_delete)*
 	delete repository.
 	this is disable on default.
@@ -233,6 +237,7 @@ default mappings
 							ghc		<Plug>(gh_issue_close)
 							gho		<Plug>(gh_issue_open)
 							ghm		<Plug>(gh_issue_open_comment)
+							ghy		<Plug>(gh_issue_url_yank)
 |gh-buffer-issue-edit|					ghm		<Plug>(gh_issue_comment_open_on_issue)
 |gh-buffer-issue-comment-list|				<C-h>		<Plug>(gh_issue_comment_list_prev)
 							<C-l>		<Plug>(gh_issue_comment_list_next)
@@ -242,6 +247,7 @@ default mappings
 							<C-l>		<Plug>(gh_pull_list_next)
 							<C-o>		<Plug>(gh_pull_open_browser)
 							ghd		<Plug>(gh_pull_diff)
+							ghy		<Plug>(gh_pull_url_yank)
 |gh-buffer-repo-list|					<C-l>		<Plug>(gh_repo_list_next)
 							<C-o>		<Plug>(gh_repo_open_browser)
 							gho		<Plug>(gh_repo_show_readme)
