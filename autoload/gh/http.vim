@@ -46,7 +46,7 @@ function! s:sh(...) abort
         \   'on_stdout': function('s:on_receive', [stdout]),
         \   'on_stderr': function('s:on_receive', [stderr]),
         \   'on_exit': { e ->
-        \     e ? rj(join(stderr, "\n")) : rv(join(stdout, "\n"))
+        \     e ? rj(join(stderr, "\r")) : rv(join(stdout, "\r"))
         \   }
         \ })
         \})

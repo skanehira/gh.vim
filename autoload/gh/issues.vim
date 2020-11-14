@@ -456,10 +456,16 @@ function! s:issue_comment_new() abort
 endfunction
 
 function! s:issue_comment_edit() abort
-  call win_execute(s:gh_issues_comment_edit_winid, '%d_')
-  call setbufline(s:gh_issues_comment_edit_bufid, 1, s:issue_comments[line('.')-1].body)
-  call win_execute(s:gh_issues_comment_edit_winid, 'setlocal nomodified')
+  call deletebufline(s:gh_issues_comment_edit_bufid, 1, '$')
   let s:comment = s:issue_comments[line('.')-1]
+  call setbufline(s:gh_issues_comment_edit_bufid, 1, s:comment.body)
+
+  " neovim not have win_execute()
+  " https://github.com/neovim/neovim/issues/10822
+  let winid = win_getid()
+  call win_gotoid(s:gh_issues_comment_edit_winid)
+  setlocal nomodified
+  call win_gotoid(winid)
 endfunction
 
 function! s:update_issue_comment() abort
