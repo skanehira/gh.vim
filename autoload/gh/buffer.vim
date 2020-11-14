@@ -16,12 +16,12 @@
 " }
 function! gh#buffer#new(name, ...) abort
   " create config
-  let config = #{
-        \ opener: 'new',
-        \ buffer: #{
-        \   type: 'nofile',
-        \   name: a:name,
-        \   options: [
+  let config = {
+        \ 'opener': 'new',
+        \ 'buffer': {
+        \   'type': 'nofile',
+        \   'name': a:name,
+        \   'options': [
         \     'bufhidden=wipe',
         \     'nonumber',
         \     'noswapfile',
@@ -53,18 +53,18 @@ function! gh#buffer#new(name, ...) abort
   endfor
 
   " new manager object
-  let manager = #{
-        \ opener: config.opener,
-        \ buffer: config.buffer,
-        \ open: function('s:_open'),
-        \ close: function('s:_close'),
-        \ delete: function('s:_delete'),
-        \ focus: function('s:_focus'),
-        \ show: function('s:_show'),
-        \ winid: function('s:_winid'),
-        \ get_contents: function('s:_get_contents'),
-        \ set_contents: function('s:_set_contents'),
-        \ execute: function('s:_execute'),
+  let manager = {
+        \ 'opener': config.opener,
+        \ 'buffer': config.buffer,
+        \ 'open': function('s:_open'),
+        \ 'close': function('s:_close'),
+        \ 'delete': function('s:_delete'),
+        \ 'focus': function('s:_focus'),
+        \ 'show': function('s:_show'),
+        \ 'winid': function('s:_winid'),
+        \ 'get_contents': function('s:_get_contents'),
+        \ 'set_contents': function('s:_set_contents'),
+        \ 'execute': function('s:_execute'),
         \ }
 
   return manager

@@ -9,19 +9,19 @@ function! gh#github#repos#list(owner, param) abort
   if a:owner is# 'user'
     let url = 'https://api.github.com/user/repos'
   endif
-  let settings = #{
-        \ method: 'GET',
-        \ url: url,
-        \ param: a:param,
+  let settings = {
+        \ 'method': 'GET',
+        \ 'url': url,
+        \ 'param': a:param,
         \ }
   return gh#http#request(settings)
 endfunction
 
 function! gh#github#repos#files(owner, repo, branch) abort
-  let settings = #{
-        \ url: printf('https://api.github.com/repos/%s/%s/git/trees/%s', a:owner, a:repo, a:branch),
-        \ param: #{
-        \   recursive: 1,
+  let settings = {
+        \ 'url': printf('https://api.github.com/repos/%s/%s/git/trees/%s', a:owner, a:repo, a:branch),
+        \ 'param': {
+        \   'recursive': 1,
         \ },
         \ }
   return gh#http#request(settings)
@@ -38,8 +38,8 @@ endfunction
 
 function! s:get_readme(owner, repo, resp) abort
   if !has_key(a:resp.body, 'tree')
-    return s:Promise.reject(#{
-        \ body: 'not found readme',
+    return s:Promise.reject({
+        \ 'body': 'not found readme',
         \ })
   endif
 
@@ -47,8 +47,8 @@ function! s:get_readme(owner, repo, resp) abort
         \ {_, v -> v.type is# 'blob' && (matchstr(v.path, '^README.*') is# '' ? 0 : 1)})
 
   if len(files) is# 0
-    return s:Promise.reject(#{
-        \ body: 'not found readme',
+    return s:Promise.reject({
+        \ 'body': 'not found readme',
         \ })
   endif
 
@@ -57,18 +57,18 @@ function! s:get_readme(owner, repo, resp) abort
 endfunction
 
 function! gh#github#repos#create(data) abort
-  let settings = #{
-        \ method: 'POST',
-        \ url: 'https://api.github.com/user/repos',
-        \ data: a:data,
+  let settings = {
+        \ 'method': 'POST',
+        \ 'url': 'https://api.github.com/user/repos',
+        \ 'data': a:data,
         \ }
   return gh#http#request(settings)
 endfunction
 
 function! gh#github#repos#delete(full_name) abort
-  let settings = #{
-        \ method: 'DELETE',
-        \ url: printf('https://api.github.com/repos/%s', a:full_name),
+  let settings = {
+        \ 'method': 'DELETE',
+        \ 'url': printf('https://api.github.com/repos/%s', a:full_name),
         \ }
   return gh#http#request(settings)
 endfunction

@@ -36,21 +36,21 @@ function! s:issue_list(resp) abort
   let lines = []
   let url = printf('https://github.com/%s/%s/issues/', s:issue_list.repo.owner, s:issue_list.repo.name)
 
-  let dict = map(copy(a:resp.body), {_, v -> #{
-        \ number: printf('#%d', v.number),
-        \ state: v.state,
-        \ user: printf('@%s', v.user.login),
-        \ title: v.title,
+  let dict = map(copy(a:resp.body), {_, v -> {
+        \ 'number': printf('#%d', v.number),
+        \ 'state': v.state,
+        \ 'user': printf('@%s', v.user.login),
+        \ 'title': v.title,
         \ }})
   let format = gh#gh#dict_format(dict, ['number', 'state', 'user', 'title'])
 
   for issue in a:resp.body
     call add(lines, printf(format,
           \ printf('#%d', issue.number), issue.state, printf('@%s', issue.user.login), issue.title))
-    call add(s:issues, #{
-          \ number: issue.number,
-          \ body: split(issue.body, '\r\?\n'),
-          \ url: url . issue.number,
+    call add(s:issues, {
+          \ 'number': issue.number,
+          \ 'body': split(issue.body, '\r\?\n'),
+          \ 'url': url . issue.number,
           \ })
   endfor
 
@@ -138,12 +138,12 @@ function! gh#issues#list() abort
     let param['page'] = 1
   endif
 
-  let s:issue_list = #{
-        \ repo: #{
-        \   owner: m[1],
-        \   name: m[2],
+  let s:issue_list = {
+        \ 'repo': {
+        \   'owner': m[1],
+        \   'name': m[2],
         \ },
-        \ param: param,
+        \ 'param': param,
         \ }
 
   call gh#gh#init_buffer()
@@ -171,10 +171,10 @@ function! gh#issues#new() abort
   call gh#gh#set_message_buf('loading')
 
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/\(.*\)/issues/new$')
-  let s:issue_new = #{
-        \ owner: m[1],
-        \ name: m[2],
-        \ branch: m[3],
+  let s:issue_new = {
+        \ 'owner': m[1],
+        \ 'name': m[2],
+        \ 'branch': m[3],
         \ }
 
   call gh#github#repos#files(s:issue_new.owner, s:issue_new.name, s:issue_new.branch)
@@ -195,9 +195,9 @@ endfunction
 
 function! s:create_issue() abort
   call gh#gh#message('issue creating...')
-  let data = #{
-        \ title: s:issue_title,
-        \ body: join(getline(1, '$'), "\r\n"),
+  let data = {
+        \ 'title': s:issue_title,
+        \ 'body': join(getline(1, '$'), "\r\n"),
         \ }
 
   call gh#github#issues#new(s:issue_new.owner, s:issue_new.name, data)
@@ -240,7 +240,7 @@ endfunction
 
 function! s:open_template_list(files) abort
   if empty(a:files)
-    call s:set_issue_template_buffer(#{body: ''})
+    call s:set_issue_template_buffer({'body': ''})
     return
   endif
   let s:files = a:files
@@ -261,7 +261,7 @@ function! s:get_template_files(resp) abort
   let files = filter(a:resp.body.tree,
         \ {_, v -> v.type is# 'blob' && (matchstr(v.path, '\.github/ISSUE_TEMPLATE.*') is# '' ? 0 : 1)})
 
-  let files = map(files, {_, v -> #{file: s:file_basename(v.path),
+  let files = map(files, {_, v -> {'file': s:file_basename(v.path),
         \ url: printf('https://raw.githubusercontent.com/%s/%s/%s/%s',
         \ s:issue_new.owner, s:issue_new.name, s:issue_new.branch, v.path)}})
   return files
@@ -288,9 +288,9 @@ function! s:update_issue() abort
   endif
 
   call gh#gh#message('issue updating...')
-  let data = #{
-        \ title: title,
-        \ body: join(getline(1, '$'), "\r\n"),
+  let data = {
+        \ 'title': title,
+        \ 'body': join(getline(1, '$'), "\r\n"),
         \ }
 
   call gh#github#issues#update(s:issue.repo.owner, s:issue.repo.name, s:issue.number, data)
@@ -330,13 +330,13 @@ function! gh#issues#issue() abort
   call gh#gh#delete_buffer(s:, 'gh_issues_edit_bufid')
   let s:gh_issues_edit_bufid = bufnr()
 
-  let s:issue = #{
-        \ repo: #{
-        \   owner: m[1],
-        \   name: m[2],
+  let s:issue = {
+        \ 'repo': {
+        \   'owner': m[1],
+        \   'name': m[2],
         \ },
-        \ number:  m[3],
-        \ url: printf('https://github.com/%s/%s/issues/%s', m[1], m[2], m[3]),
+        \ 'number':  m[3],
+        \ 'url': printf('https://github.com/%s/%s/issues/%s', m[1], m[2], m[3]),
         \ }
 
   call gh#gh#init_buffer()
@@ -362,13 +362,13 @@ function! gh#issues#comments() abort
     let param['page'] = 1
   endif
 
-  let s:comment_list = #{
-        \ repo: #{
-        \   owner: m[1],
-        \   name: m[2],
+  let s:comment_list = {
+        \ 'repo': {
+        \   'owner': m[1],
+        \   'name': m[2],
         \ },
-        \ number:  m[3],
-        \ param: param,
+        \ 'number':  m[3],
+        \ 'param': param,
         \ }
 
   call gh#gh#init_buffer()
@@ -398,19 +398,19 @@ function! s:set_issue_comments_body(resp) abort
   let s:issue_comments = []
   let lines = []
 
-  let dict = map(copy(a:resp.body), {_, v -> #{
-        \ id: printf('#%s', v.id),
-        \ user: printf('@%s', v.user.login),
+  let dict = map(copy(a:resp.body), {_, v -> {
+        \ 'id': printf('#%s', v.id),
+        \ 'user': printf('@%s', v.user.login),
         \ }})
   let format = gh#gh#dict_format(dict, ['id', 'user'])
 
   for comment in a:resp.body
     call add(lines, printf(format, printf('#%s', comment.id), printf('@%s', comment.user.login)))
-    call add(s:issue_comments, #{
-          \ id: comment.id,
-          \ user: comment.user.login,
-          \ body: split(comment.body, '\r\?\n'),
-          \ url: comment.html_url,
+    call add(s:issue_comments, {
+          \ 'id': comment.id,
+          \ 'user': comment.user.login,
+          \ 'body': split(comment.body, '\r\?\n'),
+          \ 'url': comment.html_url,
           \ })
   endfor
   call setbufline(s:gh_issues_comments_bufid, 1, lines)
@@ -456,10 +456,16 @@ function! s:issue_comment_new() abort
 endfunction
 
 function! s:issue_comment_edit() abort
-  call win_execute(s:gh_issues_comment_edit_winid, '%d_')
-  call setbufline(s:gh_issues_comment_edit_bufid, 1, s:issue_comments[line('.')-1].body)
-  call win_execute(s:gh_issues_comment_edit_winid, 'setlocal nomodified')
+  call deletebufline(s:gh_issues_comment_edit_bufid, 1, '$')
   let s:comment = s:issue_comments[line('.')-1]
+  call setbufline(s:gh_issues_comment_edit_bufid, 1, s:comment.body)
+
+  " neovim not have win_execute()
+  " https://github.com/neovim/neovim/issues/10822
+  let winid = win_getid()
+  call win_gotoid(s:gh_issues_comment_edit_winid)
+  setlocal nomodified
+  call win_gotoid(winid)
 endfunction
 
 function! s:update_issue_comment() abort
@@ -469,8 +475,8 @@ function! s:update_issue_comment() abort
     return
   endif
 
-  let data = #{
-        \ body: join(body, "\r\n"),
+  let data = {
+        \ 'body': join(body, "\r\n"),
         \ }
 
   call gh#gh#message('comment updating...')
@@ -515,11 +521,11 @@ function! gh#issues#comment_new() abort
   setlocal ft=markdown
 
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/\(.*\)/comments/new$')
-  let s:comment_new = #{
-        \ owner: m[1],
-        \ name: m[2],
-        \ issue: #{
-        \   number: m[3],
+  let s:comment_new = {
+        \ 'owner': m[1],
+        \ 'name': m[2],
+        \ 'issue': {
+        \   'number': m[3],
         \ },
         \ }
 
@@ -535,8 +541,8 @@ endfunction
 
 function! s:create_issue_comment() abort
   call gh#gh#message('comment creating...')
-  let data = #{
-        \ body: join(getline(1, '$'), "\r\n"),
+  let data = {
+        \ 'body': join(getline(1, '$'), "\r\n"),
         \ }
   if empty(data.body)
     call gh#gh#error_message('required body')

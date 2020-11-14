@@ -68,7 +68,6 @@ endfunction
 function! gh#gh#global_buf_settings() abort
   setlocal nomodifiable
   setlocal cursorline
-  setlocal cursorlineopt=line
   setlocal nowrap
 
   nnoremap <buffer> <silent> q :bw!<CR>

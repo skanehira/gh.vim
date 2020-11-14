@@ -1,4 +1,4 @@
-*gh.txt*	Vim plugin for GitHub
+*gh.txt*	Vim/Neovim plugin for GitHub
 
 Author: skanehira <sho19921005@gmail.com>
 License : MIT license  {{{
@@ -38,7 +38,7 @@ CHANGELOG			|gh-changelog|
 ==============================================================================
 INTRODUCTION					*gh-introduction*
 
-*gh* is a Vim plugin
+*gh* is a Vim/Neovim plugin for GitHub
 
 Latest version:
 https://github.com/skanehira/gh.vim
@@ -61,7 +61,7 @@ g:gh_enable_delete_repository			*g:gh_enable_delete_repository*
 
 g:gh_token					*g:gh_token*
 	GitHub personal access token.
-	please refrence https://git.io/JJyrT
+	please reference https://git.io/JJyrT
 
 g:gh_open_issue_on_create			*g:gh_open_issue_on_create*
 	open issue in browser on created.
@@ -125,6 +125,9 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 {mode} can specific |map-modes|.
 >
   function! s:gh_map_add() abort
+    if !exists('g:loaded_gh')
+      return
+    endif
     call gh#map#add('gh-buffer-issue-list', 'nnoremap', 'x', ':bw!<CR>')
     call gh#map#add('gh-buffer-issue-list', 'm', 'l', '<Plug>(gh_issue_list_prev)')
     call gh#map#add('gh-buffer-issue-list', 'm', 'l', '<Plug>(gh_issue_list_next)')
