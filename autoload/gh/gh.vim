@@ -10,7 +10,7 @@ elseif has('win64')
 endif
 
 let s:yank_reg = '*'
-if has('linux')
+if has('linux') || has('unix')
   let s:yank_reg = '+'
 endif
 
