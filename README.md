@@ -1,5 +1,5 @@
 # gh.vim
-Vim plugin for GitHub
+Vim/Neovim plugin for GitHub
 
 ![](https://i.imgur.com/tTTSZs6.gif)
 
@@ -8,8 +8,6 @@ Vim plugin for GitHub
 - create/edit/list issue comments
 - create/delete/list repo
 - diff/list pull request
-
-※currently doesn't work on Neovim
 
 ## Installation
 Please install `curl` before installtion.
