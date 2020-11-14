@@ -64,11 +64,3 @@ function! gh#github#repos#create(data) abort
         \ }
   return gh#http#request(settings)
 endfunction
-
-function! gh#github#repos#delete(full_name) abort
-  let settings = {
-        \ 'method': 'DELETE',
-        \ 'url': printf('https://api.github.com/repos/%s', a:full_name),
-        \ }
-  return gh#http#request(settings)
-endfunction
