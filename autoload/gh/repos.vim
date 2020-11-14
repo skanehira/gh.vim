@@ -70,9 +70,9 @@ function! s:repo_list(resp) abort
   let s:repos = []
   let lines = []
 
-  let dict = map(copy(a:resp.body), {_, v -> #{
-        \ full_name: v.full_name,
-        \ stargazers_count: v.stargazers_count,
+  let dict = map(copy(a:resp.body), {_, v -> {
+        \ 'full_name': v.full_name,
+        \ 'stargazers_count': v.stargazers_count,
         \ }})
   let format = gh#gh#dict_format(dict, ['full_name', 'stargazers_count'])
 
@@ -103,9 +103,9 @@ function! gh#repos#list() abort
     let param['page'] = 1
   endif
 
-  let s:repo_list = #{
-        \ owner: m[1],
-        \ param: param,
+  let s:repo_list = {
+        \ 'owner': m[1],
+        \ 'param': param,
         \ }
 
   call gh#gh#delete_buffer(s:, 'gh_repo_list_bufid')
@@ -126,10 +126,10 @@ function! gh#repos#readme() abort
   call gh#gh#delete_buffer(s:, 'gh_repo_readme_bufid')
   let s:gh_repo_readme_bufid = bufnr()
 
-  let s:repo_readme = #{
-        \ owner: m[1],
-        \ name: m[2],
-        \ url: printf('https://github.com/%s/%s', m[1], m[2]),
+  let s:repo_readme = {
+        \ 'owner': m[1],
+        \ 'name': m[2],
+        \ 'url': printf('https://github.com/%s/%s', m[1], m[2]),
         \ }
 
   call gh#gh#init_buffer()
@@ -171,11 +171,11 @@ function! gh#repos#new() abort
 endfunction
 
 function! s:repo_create() abort
-  let param = #{
-        \ name: '',
-        \ description: '',
-        \ private: v:false,
-        \ delete_branch_on_merge: v:true,
+  let param = {
+        \ 'name': '',
+        \ 'description': '',
+        \ 'private': v:false,
+        \ 'delete_branch_on_merge': v:true,
         \ }
 
   let contents = {}

@@ -58,7 +58,7 @@ function! s:make_response(body) abort
   endif
 
   if empty(headerstr)
-    return s:Promise.reject(#{status: '999', body: 'response header is empty'})
+    return s:Promise.reject({'status': '999', 'body': 'response header is empty'})
   endif
 
   let header_chunks = split(headerstr, "\r\n\r\n")
@@ -77,10 +77,10 @@ function! s:make_response(body) abort
     endif
   endif
 
-  let resp = #{
-        \ status: status,
-        \ header: header,
-        \ body: body,
+  let resp = {
+        \ 'status': status,
+        \ 'header': header,
+        \ 'body': body,
         \ }
 
   if status is# '200' || status is# '201' || status is# '204' || status is# '100'
@@ -90,8 +90,8 @@ function! s:make_response(body) abort
 endfunction
 
 function! gh#http#get(url) abort
-  let settings = #{
-        \ url: a:url,
+  let settings = {
+        \ 'url': a:url,
         \ }
   return gh#http#request(settings)
 endfunction
@@ -104,8 +104,8 @@ function! gh#http#request(settings) abort
 
   let method = has_key(a:settings, 'method') ? a:settings.method : 'GET'
 
-  let s:tmp_file = #{
-        \ header: s:_tempname(),
+  let s:tmp_file = {
+        \ 'header': s:_tempname(),
         \ }
 
   let cmd = ['curl', '-s', '-X', method, printf('--dump-header "%s"', s:tmp_file.header),
@@ -138,17 +138,17 @@ endfunction
 
 function! s:make_error_responsee(err) abort
   if has_key(a:err, 'throwpoint')
-    return s:Promise.reject(#{
-          \ status: '999',
-          \ body: printf('%s %s', a:err.throwpoint, a:err.exception),
+    return s:Promise.reject({
+          \ 'status': '999',
+          \ 'body': printf('%s %s', a:err.throwpoint, a:err.exception),
           \ })
   elseif type(a:err) is# type({})
     return s:Promise.reject(a:err)
   endif
 
-  return s:Promise.reject(#{
-        \ status: '999',
-        \ body: 'unknown error',
+  return s:Promise.reject({
+        \ 'status': '999',
+        \ 'body': 'unknown error',
         \ })
 endfunction
 
