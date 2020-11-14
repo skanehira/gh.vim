@@ -4,10 +4,14 @@ Vim/Neovim plugin for GitHub
 ![](https://i.imgur.com/tTTSZs6.gif)
 
 ## Features
-- create/edit/close/open/list issues
-- create/edit/list issue comments
-- create/delete/list repo
-- diff/list pull request
+- issues
+  - create/edit/close/open/list issues
+- issue comments
+  - create/edit/list
+- pull request
+  - diff/list
+- repository
+  - create/list/show README
 
 ## Installation
 Please install `curl` before installtion.
@@ -21,16 +25,6 @@ Using [dein.vim](https://github.com/Shougo/dein.vim) add this to your config:
 ```toml
 [[plugin]]
 repo = 'skanehira/gh.vim'
-```
-
-### vim-plug
-
-Using [vim-plug](https://github.com/junegunn/vim-plug/blob/master/README.md), add the following to your vimrc:
-
-```vim
-call plug#begin('~/.vim/plugged')
-Plug 'skanehira/gh.vim'
-call plug#end()
 ```
 
 ## Usage
@@ -115,7 +109,6 @@ currently `gh.vim` provides buffers is bellow.
 | `<Plug>(gh_repo_list_prev)`    | `<C-l>` | next page                                                           |
 | `<Plug>(gh_repo_open_browser)` | `<C-o>` | open repository on browser                                          |
 | `<Plug>(gh_repo_show_readme)`  | `gho`   | show repository readme                                              |
-| `<Plug>(gh_repo_delete)`       | `ghd`   | delete repository(if `gh_enable_delete_repository` options is true) |
 
 ## Roadmap
 - issues
@@ -139,6 +132,5 @@ currently `gh.vim` provides buffers is bellow.
   - [x] list
     - [x] paging
   - [x] create
-  - [x] delete
   - [ ] transfer
   - [ ] make public/private
