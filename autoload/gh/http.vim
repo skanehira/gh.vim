@@ -6,7 +6,7 @@
 " from Vital.Async.Promise-example-job help
 let s:Promise = vital#gh#import('Async.Promise')
 let s:HTTP = vital#gh#import('Web.HTTP')
-let s:Job = vital#vital#import('System.Job')
+let s:Job = vital#gh#import('System.Job')
 
 function! s:_readfile(file) abort
   if filereadable(a:file)
