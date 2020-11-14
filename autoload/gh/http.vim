@@ -6,6 +6,7 @@
 " from Vital.Async.Promise-example-job help
 let s:Promise = vital#gh#import('Async.Promise')
 let s:HTTP = vital#gh#import('Web.HTTP')
+let s:Job = vital#vital#import('System.Job')
 
 function! s:_readfile(file) abort
   if filereadable(a:file)
@@ -30,24 +31,25 @@ function! s:_tempname() abort
   return tr(tempname(), '\', '/')
 endfunction
 
-function! s:read(chan, part) abort
-  let out = []
-  while ch_status(a:chan, {'part' : a:part}) =~# 'open\|buffered'
-    call add(out, ch_read(a:chan, {'part' : a:part}))
-  endwhile
-  return join(out, "\r")
+function! s:on_receive(buffer, data) abort dict
+  let a:buffer[-1] .= a:data[0]
+  call extend(a:buffer, a:data[1:])
 endfunction
 
 function! s:sh(...) abort
-  let cmd = join(a:000, ' ')
+  let cmd = a:000
+  let stdout = ['']
+  let stderr = ['']
 
-  return s:Promise.new({resolve, reject -> job_start(cmd, {
-        \   'drop' : 'never',
-        \   'close_cb' : {ch -> 'do nothing'},
-        \   'exit_cb' : {ch, code ->
-        \     code ? reject(s:read(ch, 'err')) : resolve(s:read(ch, 'out'))
-        \   },
-        \ })})
+  return s:Promise.new({
+        \ rv, rj -> s:Job.start(cmd, {
+        \   'on_stdout': function('s:on_receive', [stdout]),
+        \   'on_stderr': function('s:on_receive', [stderr]),
+        \   'on_exit': { e ->
+        \     e ? rj(join(stderr, "\n")) : rv(join(stdout, "\n"))
+        \   }
+        \ })
+        \})
 endfunction
 
 function! s:make_response(body) abort
@@ -68,7 +70,7 @@ function! s:make_response(body) abort
   let body = a:body
 
   if has_key(header, 'Content-Type') &&
-        \ header["Content-Type"] is# 'application/json; charset=utf-8'
+        \ header['Content-Type'] is# 'application/json; charset=utf-8'
     if body isnot# ''
       let body = json_decode(a:body)
       if status isnot# '200' && has_key(body, 'message')
@@ -108,25 +110,25 @@ function! gh#http#request(settings) abort
         \ 'header': s:_tempname(),
         \ }
 
-  let cmd = ['curl', '-s', '-X', method, printf('--dump-header "%s"', s:tmp_file.header),
-        \ '-H', printf('"Authorization: token %s"', token),
+  let cmd = ['curl', '-s', '-X', method, '--dump-header', s:tmp_file.header,
+        \ '-H', printf('Authorization: token %s', token),
         \ '-H', 'Accept: application/vnd.github.v3+json']
 
   if method is# 'POST' || method is# 'PUT' || method is# 'PATCH'
     let tmp = s:_tempname()
     call writefile([json_encode(a:settings.data)], tmp)
     let s:tmp_file['body'] = tmp
-    let cmd += ['-H', '"Content-Type: application/json"', '-d', '@' . s:tmp_file.body]
+    let cmd += ['-H', 'Content-Type: application/json', '-d', '@' .. s:tmp_file.body]
   endif
 
   if has_key(a:settings, 'headers')
     for k in keys(a:settings.headers)
-      let cmd += ['-H', printf('"%s: %s"', k, a:settings.headers[k])]
+      let cmd += ['-H', printf('%s: %s', k, a:settings.headers[k])]
     endfor
   endif
 
   if has_key(a:settings, 'param')
-    let cmd += [printf('"%s?%s"', a:settings.url, s:HTTP.encodeURI(a:settings.param))]
+    let cmd += [printf('%s?%s', a:settings.url, s:HTTP.encodeURI(a:settings.param))]
   else
     let cmd += [a:settings.url]
   endif
