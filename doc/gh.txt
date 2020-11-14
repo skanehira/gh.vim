@@ -55,10 +55,6 @@ INTERFACE					*gh-interface*
 ------------------------------------------------------------------------------
 VARIABLES					*gh-variables*
 
-g:gh_enable_delete_repository			*g:gh_enable_delete_repository*
-	enable delete repository using by key mapping.
-	default is disable.
-
 g:gh_token					*g:gh_token*
 	GitHub personal access token.
 	please reference https://git.io/JJyrT
@@ -202,12 +198,6 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 	yank pull request url
 	default mappings: ghy
 
-<Plug>(gh_repo_delete)				*<Plug>(gh_repo_delete)*
-	delete repository.
-	this is disable on default.
-	if use this keymapping, please set 1 to |gh_enable_delete_repository|
-	default mappings: ghd
-
 <Plug>(gh_issue_comment_list_next)              *<Plug>(gh_issue_comment_list_next)*
 	show next page of issue comment list
 	default mappings: <C-l>
@@ -254,7 +244,6 @@ default mappings
 |gh-buffer-repo-list|					<C-l>		<Plug>(gh_repo_list_next)
 							<C-o>		<Plug>(gh_repo_open_browser)
 							gho		<Plug>(gh_repo_show_readme)
-							ghd		<Plug>(gh_repo_delete)
 
 
 ------------------------------------------------------------------------------
