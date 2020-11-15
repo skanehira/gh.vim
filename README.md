@@ -49,7 +49,6 @@ So if you want see issue list, please open buffer likes bellow
 | option                        | default | description                        |
 |-------------------------------|---------|------------------------------------|
 | `gh_token`                    | ''      | GitHub personal access token       |
-| `gh_enable_delete_repository` | false   | enable delete repository operation |
 
 ## Buffer list
 currently `gh.vim` provides buffers is bellow.
