@@ -4,3 +4,4 @@ gh
 Web.HTTP
 Async.Promise
 System.Job
+Data.Base64

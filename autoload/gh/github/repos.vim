@@ -3,6 +3,7 @@
 " License: MIT
 
 let s:Promise = vital#gh#import('Async.Promise')
+let s:base64 = vital#gh#import('Data.Base64')
 
 function! gh#github#repos#list(owner, param) abort
   let url = printf('https://api.github.com/users/%s/repos', a:owner)
@@ -32,28 +33,14 @@ function! gh#github#repos#get_file(url) abort
 endfunction
 
 function! gh#github#repos#readme(owner, repo) abort
-  return gh#github#repos#files(a:owner, a:repo, 'master')
-        \.then(function('s:get_readme', [a:owner, a:repo]))
+  let url = printf('https://api.github.com/repos/%s/%s/readme', a:owner, a:repo)
+  return gh#http#get(url)
+        \.then(function('s:decode_content'))
 endfunction
 
-function! s:get_readme(owner, repo, resp) abort
-  if !has_key(a:resp.body, 'tree')
-    return s:Promise.reject({
-        \ 'body': 'not found readme',
-        \ })
-  endif
-
-  let files = filter(a:resp.body.tree,
-        \ {_, v -> v.type is# 'blob' && (matchstr(v.path, '^README.*') is# '' ? 0 : 1)})
-
-  if len(files) is# 0
-    return s:Promise.reject({
-        \ 'body': 'not found readme',
-        \ })
-  endif
-
-  let url = printf('https://raw.githubusercontent.com/%s/%s/master/%s', a:owner, a:repo, files[0].path)
-  return gh#http#get(url)
+function! s:decode_content(resp) abort
+  let body = s:base64.decode(join(split(a:resp.body.content, "\n"), ''))
+  return split(body, "\n")
 endfunction
 
 function! gh#github#repos#create(data) abort

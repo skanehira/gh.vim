@@ -113,14 +113,14 @@ function! gh#repos#readme() abort
   call gh#gh#set_message_buf('loading')
 
   call gh#github#repos#readme(m[1], m[2])
-        \.then(function('s:set_readme_body'))
+        \.then(function('s:set_readme_content'))
         \.then({-> execute("call gh#map#apply('gh-buffer-repo-readme')")})
         \.catch({err -> execute('call gh#gh#set_message_buf(err.body)', '')})
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
 
-function! s:set_readme_body(resp) abort
-  call setbufline(s:gh_repo_readme_bufid, 1, split(a:resp.body, "\r"))
+function! s:set_readme_content(body) abort
+  call setbufline(s:gh_repo_readme_bufid, 1, a:body)
   setlocal ft=markdown
 
   nnoremap <buffer> <silent> <Plug>(gh_repo_open_browser_on_readme) :<C-u>call <SID>repo_open_on_readme()<CR>
