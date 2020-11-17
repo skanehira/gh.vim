@@ -384,6 +384,12 @@ function! gh#issues#comments() abort
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
 
+function! s:issue_comment_url_yank() abort
+  let url = s:issue_comments[line('.') -1].url
+  call gh#gh#yank(url)
+  call gh#gh#message('copied ' .. url)
+endfunction
+
 function! s:set_issue_comments_body(resp) abort
   nnoremap <buffer> <silent> <Plug>(gh_issue_comment_list_next) :<C-u>call <SID>issue_comment_list_change_page('+')<CR>
   nnoremap <buffer> <silent> <Plug>(gh_issue_comment_list_prev) :<C-u>call <SID>issue_comment_list_change_page('-')<CR>
@@ -416,7 +422,9 @@ function! s:set_issue_comments_body(resp) abort
   call setbufline(s:gh_issues_comments_bufid, 1, lines)
 
   nnoremap <buffer> <silent> <Plug>(gh_issue_comment_open_browser) :<C-u>call <SID>issue_comment_open_browser()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_issue_comment_url_yank) :<C-u>call <SID>issue_comment_url_yank()<CR>
   nmap <buffer> <silent> <C-o> <Plug>(gh_issue_comment_open_browser)
+  nmap <buffer> <silent> ghy <Plug>(gh_issue_comment_url_yank)
 
   " open preview/edit window
   let winid = win_getid()
