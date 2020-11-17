@@ -2,47 +2,36 @@
 " Author: skanehira
 " License: MIT
 
-
-function! gh#projects#user() abort
+function! gh#projects#list() abort
+  setlocal ft=gh-projects
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/projects?*\(.*\)')
+
   let param = gh#http#decode_param(m[3])
   if !has_key(param, 'page')
     let param['page'] = 1
   endif
 
-  let auth = {'owner': m[1], 'repo': m[2]}
-
-  call s:get_project_list('user', auth, param)
-endfunction
-
-function! gh#projects#org() abort
-  let m = matchlist(bufname(), 'gh://orgs/\(.*\)/projects?*\(.*\)')
-  let param = gh#http#decode_param(m[2])
-  if !has_key(param, 'page')
-    let param['page'] = 1
+  if m[1] is# 'orgs'
+    let type = 'org'
+    let user_info = {'org': m[2]}
+  else
+    let type = 'user'
+    let user_info = {'owner': m[1], 'repo': m[2]}
   endif
-
-  let auth = {'org': m[1]}
-
-  call s:get_project_list('org', auth, param)
-endfunction
-
-function! s:get_project_list(type, auth, param) abort
-  setlocal ft=gh-projects
 
   call gh#gh#delete_buffer(s:, 'gh_project_list_bufid')
   let s:gh_project_list_bufid = bufnr()
 
   let s:project_list = {
-        \ 'type': a:type,
-        \ 'auth': a:auth,
-        \ 'param': a:param,
+        \ 'type': type,
+        \ 'user_info': user_info,
+        \ 'param': param,
         \ }
 
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
 
-  call gh#github#projects#list(a:type, a:auth, a:param)
+  call gh#github#projects#list(type, user_info, param)
         \.then(function('s:set_project_list_result'))
         \.then({-> execute("call gh#map#apply('gh-buffer-project-list')")})
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
