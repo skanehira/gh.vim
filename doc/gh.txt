@@ -134,37 +134,29 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
     au VimEnter * call <SID>gh_map_add()
   augroup END
 <
-<Plug>(gh_repo_list_next)			*<Plug>(gh_repo_list_next)*
-	show next page of repository list
-	default mappings: <C-l>
-
-<Plug>(gh_pull_list_next)			*<Plug>(gh_pull_list_next)*
-	show next page of pull reuqest list
-	default mappings: <C-l>
-
-<Plug>(gh_issue_list_next)			*<Plug>(gh_issue_list_next)*
-	show next page of issue list
-	default mappings: <C-l>
-
 <Plug>(gh_repo_list_prev)			*<Plug>(gh_repo_list_prev)*
 	show previous page of repository list
 	default mappings: <C-h>
 
-<Plug>(gh_pull_list_prev)			*<Plug>(gh_pull_list_prev)*
-	show previous page of pull reuqest list
-	default mappings: <C-h>
-
-<Plug>(gh_issue_list_prev)			*<Plug>(gh_issue_list_prev)*
-	show previous page of issue list
-	default mappings: <C-h>
+<Plug>(gh_repo_list_next)			*<Plug>(gh_repo_list_next)*
+	show next page of repository list
+	default mappings: <C-l>
 
 <Plug>(gh_repo_open_browser)			*<Plug>(gh_repo_open_browser)*
 	open repository on browser
 	default mappings: <C-o>
 
-<Plug>(gh_issue_open_browser)			*<Plug>(gh_issue_open_browser)*
-	open issue on browser
-	default mappings: <C-o>
+<Plug>(gh_repo_show_readme)			*<Plug>(gh_repo_show_readme)*
+	show radme of repository
+	default mappings: gho
+
+<Plug>(gh_pull_list_prev)			*<Plug>(gh_pull_list_prev)*
+	show previous page of pull reuqest list
+	default mappings: <C-h>
+
+<Plug>(gh_pull_list_next)			*<Plug>(gh_pull_list_next)*
+	show next page of pull reuqest list
+	default mappings: <C-l>
 
 <Plug>(gh_pull_open_browser)			*<Plug>(gh_pull_open_browser)*
 	open pull request on browser
@@ -174,9 +166,21 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 	show diff of pull request
 	default mappings: ghd
 
-<Plug>(gh_repo_show_readme)			*<Plug>(gh_repo_show_readme)*
-	show radme of repository
-	default mappings: gho
+<Plug>(gh_pull_url_yank)			*<Plug>(gh_pull_url_yank)*
+	yank pull request url
+	default mappings: ghy
+
+<Plug>(gh_issue_list_prev)			*<Plug>(gh_issue_list_prev)*
+	show previous page of issue list
+	default mappings: <C-h>
+
+<Plug>(gh_issue_list_next)			*<Plug>(gh_issue_list_next)*
+	show next page of issue list
+	default mappings: <C-l>
+
+<Plug>(gh_issue_open_browser)			*<Plug>(gh_issue_open_browser)*
+	open issue on browser
+	default mappings: <C-o>
 
 <Plug>(gh_issue_edit)				*<Plug>(gh_issue_edit)*
 	edit issue
@@ -194,10 +198,6 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 	yank issue url
 	default mappings: ghy
 
-<Plug>(gh_pull_url_yank)			*<Plug>(gh_pull_url_yank)*
-	yank pull request url
-	default mappings: ghy
-
 <Plug>(gh_issue_comment_list_next)              *<Plug>(gh_issue_comment_list_next)*
 	show next page of issue comment list
 	default mappings: <C-l>
@@ -213,6 +213,10 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 <Plug>(gh_issue_comment_new)			*<Plug>(gh_issue_comment_new)*
 	create new issue comment.
 	default mappings: ghn
+
+<Plug>(gh_issue_comment_url_yank)		*<Plug>(gh_issue_comment_url_yank)*
+	yank issue comment url
+	default mappings: ghy
 
 <Plug>(gh_issue_comment_open_on_issue)		*<Plug>(gh_issue_comment_open_on_issue)*
 	open issue comments on |gh-buffer-issue-edit|.
@@ -236,6 +240,7 @@ default mappings
 							<C-l>		<Plug>(gh_issue_comment_list_next)
 							<C-o>		<Plug>(gh_issue_comment_open_browser)
 							ghn		<Plug>(gh_issue_comment_new)
+							ghy		<Plug>(gh_issue_comment_url_yank)
 |gh-buffer-pull-list|					<C-h>		<Plug>(gh_pull_list_prev)
 							<C-l>		<Plug>(gh_pull_list_next)
 							<C-o>		<Plug>(gh_pull_open_browser)

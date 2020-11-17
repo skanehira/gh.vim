@@ -89,6 +89,7 @@ currently `gh.vim` provides buffers is bellow.
 | `<Plug>(gh_issue_comment_list_next)`    | `<C-l>` | next page                     |
 | `<Plug>(gh_issue_comment_open_browser)` | `<C-o>` | open issue comment on browser |
 | `<Plug>(gh_issue_comment_new)`          | `ghn`   | new issue comment             |
+| `<Plug>(gh_issue_comment_url_yank)`     | `ghn`   | yank issue comment            |
 
 ### pull request list
 
