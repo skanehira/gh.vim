@@ -112,7 +112,9 @@ function! gh#http#request(settings) abort
 
   let cmd = ['curl', '-s', '-X', method, '--dump-header', s:tmp_file.header,
         \ '-H', printf('Authorization: token %s', token),
-        \ '-H', 'Accept: application/vnd.github.v3+json']
+        \ '-H', 'Accept: application/vnd.github.v3+json',
+        \ '-H', 'Accept: application/vnd.github.inertia-preview+json']
+
 
   if method is# 'POST' || method is# 'PUT' || method is# 'PATCH'
     let tmp = s:_tempname()

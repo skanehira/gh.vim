@@ -40,6 +40,12 @@ function! gh#gh#init() abort
     call gh#pulls#list()
   elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/pulls\/\d\+\/diff$'
     call gh#pulls#diff()
+  elseif bufname =~# '^gh:\/\/orgs/[^/]\+\/projects$'
+        \ || bufname =~# '^gh:\/\/orgs/[^/]\+\/projects?\+'
+    call gh#projects#org()
+  elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/projects$'
+        \ || bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/projects?\+'
+    call gh#projects#user()
   endif
 endfunction
 
@@ -109,6 +115,10 @@ function! gh#gh#def_highlight() abort
 
   hi! link gh_repo_name gh_blue
   hi! link gh_repo_star gh_orange
+
+  hi! link gh_project_number gh_blue
+  hi! link gh_project_open gh_green
+  hi! link gh_project_closed gh_red
 endfunction
 
 function! s:dict_value_len(items) abort

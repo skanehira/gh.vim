@@ -17,6 +17,7 @@ function! gh#map#init() abort
       \ 'gh-buffer-repo-list': [],
       \ 'gh-buffer-repo-new': [],
       \ 'gh-buffer-repo-readme': [],
+      \ 'gh-buffer-project-list': [],
       \ }
 endfunction
 
