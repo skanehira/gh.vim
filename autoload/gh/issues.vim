@@ -262,7 +262,7 @@ function! s:get_template_files(resp) abort
         \ {_, v -> v.type is# 'blob' && (matchstr(v.path, '\.github/ISSUE_TEMPLATE.*') is# '' ? 0 : 1)})
 
   let files = map(files, {_, v -> {'file': s:file_basename(v.path),
-        \ url: printf('https://raw.githubusercontent.com/%s/%s/%s/%s',
+        \ 'url': printf('https://raw.githubusercontent.com/%s/%s/%s/%s',
         \ s:issue_new.owner, s:issue_new.name, s:issue_new.branch, v.path)}})
   return files
 endfunction
