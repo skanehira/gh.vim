@@ -42,6 +42,12 @@ function! s:project_open_browser() abort
   call gh#gh#open_url(s:projects[line('.') -1].url)
 endfunction
 
+function! s:project_url_yank() abort
+  let url = s:projects[line('.') -1].url
+  call gh#gh#yank(url)
+  call gh#gh#message('copied ' .. url)
+endfunction
+
 function! s:set_project_list_result(resp) abort
   if empty(a:resp.body)
     call gh#gh#set_message_buf('not found projects')
@@ -70,7 +76,10 @@ function! s:set_project_list_result(resp) abort
   endfor
 
   nnoremap <buffer> <silent> <Plug>(gh_project_open_browser) :<C-u>call <SID>project_open_browser()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_project_url_yank) :<C-u>call <SID>project_url_yank()<CR>
+
   nmap <buffer> <silent> <C-o> <Plug>(gh_project_open_browser)
+  nmap <buffer> <silent> ghy <Plug>(gh_project_url_yank)
 
   call setbufline(s:gh_project_list_bufid, 1, lines)
 endfunction
