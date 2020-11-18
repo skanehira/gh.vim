@@ -38,6 +38,10 @@ function! gh#projects#list() abort
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
 
+function! s:project_open_browser() abort
+  call gh#gh#open_url(s:projects[line('.') -1].url)
+endfunction
+
 function! s:set_project_list_result(resp) abort
   if empty(a:resp.body)
     call gh#gh#set_message_buf('not found projects')
@@ -51,7 +55,6 @@ function! s:set_project_list_result(resp) abort
         \ 'number': printf('#%d', v.number),
         \ 'state': v.state,
         \ 'name': v.name,
-        \ 'url': v.html_url,
         \ }})
   let format = gh#gh#dict_format(dict, ['number', 'state', 'name'])
 
@@ -62,9 +65,12 @@ function! s:set_project_list_result(resp) abort
           \ 'number': project.number,
           \ 'state': project.state,
           \ 'name': project.name,
-          \ 'url': project.url,
+          \ 'url': project.html_url,
           \ })
   endfor
+
+  nnoremap <buffer> <silent> <Plug>(gh_project_open_browser) :<C-u>call <SID>project_open_browser()<CR>
+  nmap <buffer> <silent> <C-o> <Plug>(gh_project_open_browser)
 
   call setbufline(s:gh_project_list_bufid, 1, lines)
 endfunction
