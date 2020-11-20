@@ -85,7 +85,7 @@ endfunc
 func! s:re_draw() abort
   setlocal modifiable
   let save_cursor = getcurpos()
-  %d_
+  silent %d_
   let s:nodes = s:flatten([], {}, s:tree)
   call s:draw(s:nodes)
   call setpos('.', save_cursor)
