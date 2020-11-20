@@ -92,7 +92,7 @@ func! s:node_open() abort
   endif
 endfunc
 
-func! s:get_node_move_dest() abort
+func! s:find_node_parent() abort
   let current = s:get_current_node()
   if empty(current)
     return {}
@@ -117,7 +117,7 @@ func! s:node_move() abort
     return
   endif
 
-  let dest = s:get_node_move_dest()
+  let dest = s:find_node_parent()
   if empty(dest)
     return
   endif
