@@ -13,12 +13,14 @@ func! s:flatten(nodes, parent, current) abort
   endif
 
   let node = {
-        \ 'name': a:current.name,
         \ 'path': a:current.path,
         \ 'indent': indent,
         \ 'parent': a:parent,
         \ }
 
+  if exists('a:current.name')
+    let node['name'] = a:current.name
+  endif
   let node['selected'] = exists('s:node_selected[a:current.path]')
 
   call add(nodes, node)
@@ -191,6 +193,9 @@ func! s:draw(nodes) abort
   let i = 1
   for node in a:nodes
     let prefix = s:make_prefix(node)
+    if !exists('node.name')
+      continue
+    endif
     let line = prefix .. node.name
     if node.selected
       let line .= '*'
