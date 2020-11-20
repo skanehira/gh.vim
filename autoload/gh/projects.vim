@@ -98,7 +98,6 @@ function! s:set_card_info(child, resp) abort
 endfunction
 
 function! s:add_cards(node, resp) abort
-  try
   if empty(a:resp.body)
     return
   endif
@@ -122,10 +121,7 @@ function! s:add_cards(node, resp) abort
 
     call add(node.children, child)
   endfor
-    call gh#tree#update(s:tree)
-  catch
-    echom v:exception
-  endtry
+  call gh#tree#update(s:tree)
 endfunction
 
 function! s:make_tree(tree, columns) abort
