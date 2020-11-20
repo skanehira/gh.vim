@@ -74,6 +74,8 @@ func! s:change_state(state) abort
   let node.state = a:state
   if a:state is# 'close'
     call setpos('.', [0, s:get_node_pos(node), 1])
+  else
+    normal! j
   endif
   setlocal modifiable
   call s:re_draw()
