@@ -52,19 +52,32 @@ func! s:find_node(node, target) abort
   return {}
 endfunc
 
+func! s:get_node_pos(node) abort
+  let pos = 1
+  for n in s:nodes
+    if n.path is# a:node.path
+      return pos
+    endif
+    let pos += 1
+  endfor
+  return pos
+endfunc
+
 func! s:change_state(state) abort
-  let target = s:get_current_node()
-  if empty(target)
-    return 0
-  endif
-  let node = s:find_node(s:tree, target)
+  let node = s:find_node_parent()
   if empty(node)
-    return 0
+    return
   endif
-  if exists('node.state')
-    let node.state = a:state
+  if !exists('node.state')
+    return
   endif
-  return 1
+  let node.state = a:state
+  if a:state is# 'close'
+    call setpos('.', [0, s:get_node_pos(node), 1])
+  endif
+  setlocal modifiable
+  call s:re_draw()
+  setlocal nomodifiable
 endfunc
 
 func! s:re_draw() abort
@@ -74,24 +87,6 @@ func! s:re_draw() abort
   let s:nodes = s:flatten([], {}, s:tree)
   call s:draw(s:nodes)
   call setpos('.', save_cursor)
-endfunc
-
-func! s:node_close() abort
-  let changed = s:change_state('close')
-  if changed
-    setlocal modifiable
-    call s:re_draw()
-    setlocal nomodifiable
-  endif
-endfunc
-
-func! s:node_open() abort
-  let changed = s:change_state('open')
-  if changed
-    setlocal modifiable
-    call s:re_draw()
-    setlocal nomodifiable
-  endif
 endfunc
 
 func! s:find_node_parent() abort
@@ -208,6 +203,7 @@ endfunc
 func! gh#tree#update(tree) abort
   let s:tree = a:tree
   call s:re_draw()
+  redraw!
 endfunc
 
 func! gh#tree#open(tree) abort
@@ -217,8 +213,8 @@ func! gh#tree#open(tree) abort
 
   call s:draw(s:nodes)
 
-  nnoremap <buffer> <silent> h :<C-u>call <SID>node_close()<CR>
-  nnoremap <buffer> <silent> l :<C-u>call <SID>node_open()<CR>
+  nnoremap <buffer> <silent> h :<C-u>call <SID>change_state('close')<CR>
+  nnoremap <buffer> <silent> l :<C-u>call <SID>change_state('open')<CR>
   nnoremap <buffer> <silent> p :<C-u>call <SID>node_move()<CR>
   nnoremap <buffer> <silent> <C-j> :<C-u>call <SID>node_select_down()<CR>
   nnoremap <buffer> <silent> <C-k> :<C-u>call <SID>node_select_up()<CR>
