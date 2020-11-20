@@ -44,7 +44,7 @@ endfunction
 
 function! s:project_open() abort
   let s:project = s:projects[line('.') -1]
-  call execute(printf('new gh://projects/%d/columns', s:project.id))
+  call execute(printf('vnew gh://projects/%d/columns', s:project.id))
 endfunction
 
 function! s:project_url_yank() abort
