@@ -119,7 +119,7 @@ function! s:add_cards(node, resp) abort
           \ }
 
     if card.note isnot# v:null
-      let child['name'] = card.note
+      let child['name'] = split(card.note, "\r\n")[0] .. '...'
     else
       call gh#http#get(card.content_url)
             \.then(function('s:set_card_info', [child]))
