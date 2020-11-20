@@ -152,7 +152,6 @@ function! s:make_tree(tree, columns) abort
 endfunction
 
 function! s:set_project_column_list_result(resp) abort
-  try
   if empty(a:resp.body)
     call gh#gh#set_message_buf('not found project columns')
     return
@@ -167,9 +166,6 @@ function! s:set_project_column_list_result(resp) abort
         \ }
 
   call s:make_tree(s:tree, a:resp.body)
-  catch
-    echom v:exception
-  endtry
   call gh#tree#open(s:tree)
 endfunction
 
