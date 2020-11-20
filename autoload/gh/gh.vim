@@ -97,8 +97,8 @@ function! gh#gh#def_highlight() abort
   hi! gh_blue ctermfg=110 guifg=#84a0c6
   hi! gh_green ctermfg=150 guifg=#b4be82
   hi! gh_orange ctermfg=216 guifg=#e2a478
+  hi! gh_red cterm=bold ctermfg=203
   hi! link gh_purple Constant
-  hi! link gh_red WarningMsg
 
   hi! link gh_issue_number gh_blue
   hi! link gh_issue_open gh_green
@@ -119,6 +119,9 @@ function! gh#gh#def_highlight() abort
   hi! link gh_project_number gh_blue
   hi! link gh_project_open gh_green
   hi! link gh_project_closed gh_red
+
+  hi! link gh_project_column gh_green
+  hi! link gh_project_column_selected gh_red
 endfunction
 
 function! s:dict_value_len(items) abort
