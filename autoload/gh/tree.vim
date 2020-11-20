@@ -66,7 +66,7 @@ func! s:change_state(state) abort
 endfunc
 
 func! s:re_draw() abort
-  set modifiable
+  setlocal modifiable
   let save_cursor = getcurpos()
   %d_
   let s:nodes = s:flatten([], {}, s:tree)
@@ -77,18 +77,18 @@ endfunc
 func! s:node_close() abort
   let changed = s:change_state('close')
   if changed
-    set modifiable
+    setlocal modifiable
     call s:re_draw()
-    set nomodifiable
+    setlocal nomodifiable
   endif
 endfunc
 
 func! s:node_open() abort
   let changed = s:change_state('open')
   if changed
-    set modifiable
+    setlocal modifiable
     call s:re_draw()
-    set nomodifiable
+    setlocal nomodifiable
   endif
 endfunc
 
