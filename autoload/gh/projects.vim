@@ -179,8 +179,6 @@ function! gh#projects#columns() abort
   endif
 
   call gh#gh#delete_buffer(s:, 'gh_project_column_list_bufid')
-  if exists('s:gh_project_column_list_bufid')
-  endif
   let s:gh_project_column_list_bufid = bufnr()
 
   let s:project_column_list = {
