@@ -52,11 +52,11 @@ function! s:sh(...) abort
         \})
 endfunction
 
-function! s:make_response(body) abort
-  let headerstr = s:_readfile(s:tmp_file.header)
-  call delete(s:tmp_file.header)
-  if has_key(s:tmp_file, 'body')
-    call delete(s:tmp_file.body)
+function! s:make_response(tmp_file, body) abort
+  let headerstr = s:_readfile(a:tmp_file.header)
+  call delete(a:tmp_file.header)
+  if has_key(a:tmp_file, 'body')
+    call delete(a:tmp_file.body)
   endif
 
   if empty(headerstr)
@@ -106,11 +106,11 @@ function! gh#http#request(settings) abort
 
   let method = has_key(a:settings, 'method') ? a:settings.method : 'GET'
 
-  let s:tmp_file = {
+  let tmp_file = {
         \ 'header': s:_tempname(),
         \ }
 
-  let cmd = ['curl', '-s', '-X', method, '--dump-header', s:tmp_file.header,
+  let cmd = ['curl', '-s', '-X', method, '--dump-header', tmp_file.header,
         \ '-H', printf('Authorization: token %s', token),
         \ '-H', 'Accept: application/vnd.github.v3+json',
         \ '-H', 'Accept: application/vnd.github.inertia-preview+json']
@@ -119,8 +119,8 @@ function! gh#http#request(settings) abort
   if method is# 'POST' || method is# 'PUT' || method is# 'PATCH'
     let tmp = s:_tempname()
     call writefile([json_encode(a:settings.data)], tmp)
-    let s:tmp_file['body'] = tmp
-    let cmd += ['-H', 'Content-Type: application/json', '-d', '@' .. s:tmp_file.body]
+    let tmp_file['body'] = tmp
+    let cmd += ['-H', 'Content-Type: application/json', '-d', '@' .. tmp_file.body]
   endif
 
   if has_key(a:settings, 'headers')
@@ -136,7 +136,7 @@ function! gh#http#request(settings) abort
   endif
 
   return call('s:sh', cmd)
-        \.then(function('s:make_response'))
+        \.then(function('s:make_response', [tmp_file]))
         \.catch(function('s:make_error_responsee'))
 endfunction
 
