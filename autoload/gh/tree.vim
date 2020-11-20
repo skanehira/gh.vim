@@ -77,9 +77,7 @@ func! s:change_state(state) abort
   else
     normal! j
   endif
-  setlocal modifiable
   call s:re_draw()
-  setlocal nomodifiable
 endfunc
 
 func! s:re_draw() abort
@@ -89,6 +87,7 @@ func! s:re_draw() abort
   let s:nodes = s:flatten([], {}, s:tree)
   call s:draw(s:nodes)
   call setpos('.', save_cursor)
+  setlocal nomodifiable
 endfunc
 
 func! s:find_node_parent() abort
