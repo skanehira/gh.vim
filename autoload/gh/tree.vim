@@ -9,7 +9,7 @@ func! s:flatten(nodes, parent, current) abort
   if exists('a:parent.indent')
     let indent = a:parent.indent + 1
   else
-    let indent = 0
+    let indent = 1
   endif
 
   let node = {
