@@ -2,7 +2,7 @@
 " Author: skanehira
 " License: MIT
 
-let s:node_selected = {}
+let s:marked_nodes = {}
 
 func! s:flatten(nodes, parent, current) abort
   let nodes = a:nodes
@@ -21,7 +21,7 @@ func! s:flatten(nodes, parent, current) abort
   if exists('a:current.name')
     let node['name'] = a:current.name
   endif
-  let node['selected'] = exists('s:node_selected[a:current.path]')
+  let node['selected'] = exists('s:marked_nodes[a:current.path]')
 
   call add(nodes, node)
 
@@ -133,11 +133,11 @@ func! s:node_select_toggle() abort
   if empty(current)
     return
   endif
-  if exists('s:node_selected[current.path]')
-    call remove(s:node_selected, current.path)
+  if exists('s:marked_nodes[current.path]')
+    call remove(s:marked_nodes, current.path)
   else
     let node = s:find_node(s:tree, current)
-    let s:node_selected[current.path] = node
+    let s:marked_nodes[current.path] = node
   endif
   call s:re_draw()
 endfunc
