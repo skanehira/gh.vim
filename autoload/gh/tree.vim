@@ -211,6 +211,7 @@ func! gh#tree#open(tree) abort
   let s:bufid = bufnr()
   let s:tree = a:tree
   let s:nodes = s:flatten([], {}, a:tree)
+  let s:marked_nodes = {}
 
   call s:draw(s:nodes)
 
