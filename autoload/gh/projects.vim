@@ -152,7 +152,7 @@ function! s:make_tree(tree, columns) abort
   endfor
 endfunction
 
-function! s:card_open() abort
+function! s:card_open_browser() abort
   let marked_nodes = gh#tree#marked_nodes()
   if empty(marked_nodes)
     let node = gh#tree#current_node()
@@ -184,7 +184,7 @@ function! s:set_project_column_list_result(resp) abort
 
   call s:make_tree(s:tree, a:resp.body)
   call gh#tree#open(s:tree)
-  nnoremap <buffer> <silent> <Plug>(gh_projects_card_open_browser) :call <SID>card_open()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_projects_card_open_browser) :call <SID>card_open_browser()<CR>
   nmap <buffer> <silent> <C-o> <Plug>(gh_projects_card_open_browser)
 endfunction
 
