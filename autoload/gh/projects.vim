@@ -152,6 +152,22 @@ function! s:make_tree(tree, columns) abort
   endfor
 endfunction
 
+function! s:card_open() abort
+  let marked_nodes = gh#tree#marked_nodes()
+  if empty(marked_nodes)
+    let node = gh#tree#current_node()
+    if exists('node.info.html_url')
+      call gh#gh#open_url(node.info.html_url)
+    endif
+  else
+    for node in values(marked_nodes)
+      if exists('node.info.html_url')
+        call gh#gh#open_url(node.info.html_url)
+      endif
+    endfor
+  endif
+endfunction
+
 function! s:set_project_column_list_result(resp) abort
   if empty(a:resp.body)
     call gh#gh#set_message_buf('not found project columns')
@@ -168,6 +184,8 @@ function! s:set_project_column_list_result(resp) abort
 
   call s:make_tree(s:tree, a:resp.body)
   call gh#tree#open(s:tree)
+  nnoremap <buffer> <silent> <Plug>(gh_projects_card_open_browser) :call <SID>card_open()<CR>
+  nmap <buffer> <silent> <C-o> <Plug>(gh_projects_card_open_browser)
 endfunction
 
 function! gh#projects#columns() abort
