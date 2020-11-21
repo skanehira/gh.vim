@@ -219,7 +219,3 @@ func! gh#tree#open(tree) abort
   nnoremap <buffer> <silent> <C-j> :<C-u>call <SID>node_select_down()<CR>
   nnoremap <buffer> <silent> <C-k> :<C-u>call <SID>node_select_up()<CR>
 endfunc
-
-func! gh#tree#add_move_hook(f) abort
-  let s:tree_move_hook = a:f
-endfunc
