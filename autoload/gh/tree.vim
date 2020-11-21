@@ -194,6 +194,10 @@ func! gh#tree#redraw() abort
   redraw!
 endfunc
 
+func! gh#tree#marked_nodes() abort
+  return s:marked_nodes
+endfunc
+
 func! gh#tree#current_node() abort
   let current = s:get_current_node()
   return s:find_node(s:tree, current)
