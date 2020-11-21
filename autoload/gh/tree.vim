@@ -67,7 +67,8 @@ func! s:get_node_pos(node) abort
 endfunc
 
 func! s:change_state(state) abort
-  let node = s:find_node_parent()
+  let current = s:get_current_node()
+  let node = s:find_node_parent(current)
   if empty(node)
     return
   endif
@@ -94,15 +95,12 @@ func! s:re_draw() abort
   setlocal nomodifiable
 endfunc
 
-func! s:find_node_parent() abort
-  let current = s:get_current_node()
-  if empty(current)
-    return {}
-  endif
-  if exists('current.has_children')
-    let target = current
-  elseif exists('current.parent')
-    let target = current.parent
+func! s:find_node_parent(target) abort
+  let target = a:target
+  if exists('target.has_children')
+    let target = target
+  elseif exists('target.parent')
+    let target = target.parent
   else
     let target = {}
   endif
@@ -185,6 +183,48 @@ func! s:draw(nodes) abort
     call setbufline(s:bufid, i, line)
     let i += 1
   endfor
+endfunc
+
+func! s:remove_node(parent, target) abort
+  let idx = 0
+  for node in a:parent.children
+    if node.path is# a:target.path
+      break
+    endif
+    let idx += 1
+  endfor
+  call remove(a:parent.children, idx)
+endfunc
+
+func! s:add_node(parent, target) abort
+  let has = 0
+  for node in a:parent.children
+    if node.path is# a:target.path
+      let has = 1
+    endif
+  endfor
+  if !has
+    call add(a:parent.children, a:target)
+  endif
+  return !has
+endfunc
+
+func! gh#tree#root() abort
+  return s:tree
+endfunc
+
+func! gh#tree#move_node(dest, parent, src) abort
+  let dest = a:dest
+  if !exists('dest.children')
+    let dest['children'] = []
+    let dest['state'] = 'open'
+  endif
+  let added = s:add_node(dest, a:src)
+  if added
+    call s:remove_node(a:parent, a:src)
+  endif
+  let s:marked_nodes = {}
+  call s:re_draw()
 endfunc
 
 func! gh#tree#update(tree) abort

@@ -2,6 +2,8 @@
 " Author: skanehira
 " License: MIT
 
+let s:Promise = vital#gh#import('Async.Promise')
+
 function! gh#projects#list() abort
   setlocal ft=gh-projects
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/projects?*\(.*\)')
@@ -136,6 +138,7 @@ function! s:make_tree(tree, columns) abort
   if empty(a:columns)
     return a:tree
   endif
+  let s:project_columns = []
   let tree = a:tree
 
   for c in a:columns
@@ -144,6 +147,7 @@ function! s:make_tree(tree, columns) abort
           \ 'name': c.name,
           \ 'path': printf('%s/%s', tree.id, c.id)
           \ }
+    call add(s:project_columns, column)
     call gh#github#projects#cards(column.id)
           \.then(function('s:add_cards', [column]))
           \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
@@ -175,6 +179,44 @@ function! s:card_open() abort
   endif
 endfunction
 
+function! s:find_column(node) abort
+  let column = a:node
+  for col in s:project_columns
+    if !exists('col.children')
+      continue
+    endif
+    for c in col.children
+      if c.id is# a:node.id
+        return col
+      endif
+    endfor
+  endfor
+  return column
+endfunction
+
+function! s:move_card() abort
+  let column = s:find_column(gh#tree#current_node())
+  let nodes = values(gh#tree#marked_nodes())
+  let promises = []
+  for node in nodes
+    call add(promises, gh#github#projects#card_moves(column.id, node.id))
+  endfor
+
+  function! s:move() abort closure
+    for node in nodes
+      let parent = s:find_column(node)
+      call gh#tree#move_node(column, parent, node)
+    endfor
+  endfunction
+
+  call gh#gh#message('moving...')
+  call s:Promise.all(promises)
+        \.then({-> s:move()})
+        \.then({-> gh#tree#redraw()})
+        \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
+        \.finally({-> execute('echom "" | redraw')})
+endfunction
+
 function! s:set_project_column_list(resp) abort
   if empty(a:resp.body)
     call gh#gh#set_message_buf('not found project columns')
@@ -194,8 +236,10 @@ function! s:set_project_column_list(resp) abort
 
   nnoremap <buffer> <silent> <Plug>(gh_projects_card_open_browser) :call <SID>card_open_browser()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_projects_card_open) :call <SID>card_open()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_projects_move_card) :call <SID>move_card()<CR>
   nmap <buffer> <silent> <C-o> <Plug>(gh_projects_card_open_browser)
   nmap <buffer> <silent> gho <Plug>(gh_projects_card_open)
+  nmap <buffer> <silent> ghm <Plug>(gh_projects_move_card)
 endfunction
 
 function! gh#projects#columns() abort
