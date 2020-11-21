@@ -83,7 +83,7 @@ endfunc
 func! s:re_draw() abort
   setlocal modifiable
   let save_cursor = getcurpos()
-  silent %d_
+  silent call deletebufline(s:bufid, 1, '$')
   let s:nodes = s:flatten([], {}, s:tree)
   call s:draw(s:nodes)
   call setpos('.', save_cursor)
