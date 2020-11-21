@@ -194,6 +194,11 @@ func! gh#tree#redraw() abort
   redraw!
 endfunc
 
+func! gh#tree#current_node() abort
+  let current = s:get_current_node()
+  return s:find_node(s:tree, current)
+endfunc
+
 func! gh#tree#open(tree) abort
   let s:bufid = bufnr()
   let s:tree = a:tree
