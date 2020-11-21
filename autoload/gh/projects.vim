@@ -128,7 +128,7 @@ function! s:add_cards(node, resp) abort
 
     call add(node.children, child)
   endfor
-  call gh#tree#update(s:tree)
+  call gh#tree#redraw()
 endfunction
 
 function! s:make_tree(tree, columns) abort

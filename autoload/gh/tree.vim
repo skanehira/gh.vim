@@ -189,6 +189,11 @@ func! gh#tree#update(tree) abort
   redraw!
 endfunc
 
+func! gh#tree#redraw() abort
+  call s:re_draw()
+  redraw!
+endfunc
+
 func! gh#tree#open(tree) abort
   let s:bufid = bufnr()
   let s:tree = a:tree
