@@ -3,6 +3,9 @@
 " License: MIT
 
 let s:marked_nodes = {}
+let s:nodes = []
+let s:tree = []
+let s:bufid = -1
 
 func! s:flatten(nodes, parent, current) abort
   let nodes = a:nodes
