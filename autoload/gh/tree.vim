@@ -110,24 +110,6 @@ func! s:find_node_parent() abort
   return node
 endfunc
 
-func! s:node_move() abort
-  if empty(s:node_selected)
-    return
-  endif
-
-  let dest = s:find_node_parent()
-  if empty(dest)
-    return
-  endif
-  if !exists('s:tree_move_hook')
-    echom 'not found move hook function'
-    return
-  endif
-  let new_tree = s:tree_move_hook(dest, s:node_selected)
-  let s:node_selected = {}
-  call tree#update(new_tree)
-endfunc
-
 func! s:node_select_toggle() abort
   let current = s:get_current_node()
   if empty(current)
@@ -216,7 +198,6 @@ func! gh#tree#open(tree) abort
 
   nnoremap <buffer> <silent> h :<C-u>call <SID>change_state('close')<CR>
   nnoremap <buffer> <silent> l :<C-u>call <SID>change_state('open')<CR>
-  nnoremap <buffer> <silent> p :<C-u>call <SID>node_move()<CR>
   nnoremap <buffer> <silent> <C-j> :<C-u>call <SID>node_select_down()<CR>
   nnoremap <buffer> <silent> <C-k> :<C-u>call <SID>node_select_up()<CR>
 endfunc
