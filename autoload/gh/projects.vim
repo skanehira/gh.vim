@@ -94,15 +94,15 @@ endfunction
 
 function! s:set_card_info(child, resp) abort
   let child = a:child
-  let issue = {
+  let info = {
         \ 'number': printf('#%s', a:resp.body.number),
         \ 'state': a:resp.body.state,
         \ 'user': printf('@%s', a:resp.body.user.login),
         \ 'title': a:resp.body.title
         \ }
 
-  let child['name'] = printf('%s %s %s %s', issue.number, issue.state, issue.user, issue.title)
-  let child['issue'] = a:resp.body
+  let child['name'] = printf('%s %s %s %s', info.number, info.state, info.user, info.title)
+  let child['info'] = a:resp.body
 endfunction
 
 function! s:add_cards(node, resp) abort
