@@ -75,7 +75,8 @@ func! s:change_state(state) abort
   if a:state is# 'close'
     call setpos('.', [0, s:get_node_pos(node), 1])
   else
-    normal! j
+    " use feedkeys send key after draw
+    call feedkeys('j')
   endif
   call s:re_draw()
 endfunc
