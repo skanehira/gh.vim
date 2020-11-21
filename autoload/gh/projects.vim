@@ -168,6 +168,13 @@ function! s:card_open_browser() abort
   endif
 endfunction
 
+function! s:card_open() abort
+  let node = gh#tree#current_node()
+  if exists('node.info')
+    call execute('new ' .. substitute(gh#tree#current_node().info.html_url, 'https://github.com/','gh://',''))
+  endif
+endfunction
+
 function! s:set_project_column_list_result(resp) abort
   if empty(a:resp.body)
     call gh#gh#set_message_buf('not found project columns')
@@ -184,8 +191,11 @@ function! s:set_project_column_list_result(resp) abort
 
   call s:make_tree(s:tree, a:resp.body)
   call gh#tree#open(s:tree)
+
   nnoremap <buffer> <silent> <Plug>(gh_projects_card_open_browser) :call <SID>card_open_browser()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_projects_card_open) :call <SID>card_open()<CR>
   nmap <buffer> <silent> <C-o> <Plug>(gh_projects_card_open_browser)
+  nmap <buffer> <silent> gho <Plug>(gh_projects_card_open)
 endfunction
 
 function! gh#projects#columns() abort
