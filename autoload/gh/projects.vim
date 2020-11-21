@@ -102,6 +102,7 @@ function! s:set_card_info(child, resp) abort
         \ }
 
   let child['name'] = printf('%s %s %s %s', issue.number, issue.state, issue.user, issue.title)
+  let child['issue'] = a:resp.body
 endfunction
 
 function! s:add_cards(node, resp) abort
