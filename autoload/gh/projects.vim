@@ -175,7 +175,7 @@ function! s:card_open() abort
   endif
 endfunction
 
-function! s:set_project_column_list_result(resp) abort
+function! s:set_project_column_list(resp) abort
   if empty(a:resp.body)
     call gh#gh#set_message_buf('not found project columns')
     return
@@ -218,7 +218,7 @@ function! gh#projects#columns() abort
   call gh#gh#set_message_buf('loading')
 
   call gh#github#projects#columns(s:project_column_list.id)
-        \.then(function('s:set_project_column_list_result'))
+        \.then(function('s:set_project_column_list'))
         \.then({-> execute("call gh#map#apply('gh-buffer-project-column-list')")})
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
         \.finally(function('gh#gh#global_buf_settings'))
