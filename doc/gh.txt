@@ -113,6 +113,14 @@ gh://user/repos/new					*gh-buffer-repo-new*
 gh://:owner/:repo/readme				*gh-buffer-repo-readme*
 	show repository readme if repository has README.*
 
+gh://:owner/:repo/projects				*gh-buffer-project-list*
+	show :owner/:repo projects.
+	if :owner is 'orgs', :repo must be specific organization name
+
+gh://projects/:id/columns				*gh-buffer-project-column-list*
+	show project columns.
+	:id is project id, not project number.
+
 ------------------------------------------------------------------------------
 KEY-MAPPINGS					*gh-key-mappings*
 
@@ -136,91 +144,91 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 <
 <Plug>(gh_repo_list_prev)			*<Plug>(gh_repo_list_prev)*
 	show previous page of repository list
-	default mappings: <C-h>
 
 <Plug>(gh_repo_list_next)			*<Plug>(gh_repo_list_next)*
 	show next page of repository list
-	default mappings: <C-l>
 
 <Plug>(gh_repo_open_browser)			*<Plug>(gh_repo_open_browser)*
 	open repository on browser
-	default mappings: <C-o>
 
 <Plug>(gh_repo_show_readme)			*<Plug>(gh_repo_show_readme)*
 	show radme of repository
-	default mappings: gho
 
 <Plug>(gh_pull_list_prev)			*<Plug>(gh_pull_list_prev)*
 	show previous page of pull reuqest list
-	default mappings: <C-h>
 
 <Plug>(gh_pull_list_next)			*<Plug>(gh_pull_list_next)*
 	show next page of pull reuqest list
-	default mappings: <C-l>
 
 <Plug>(gh_pull_open_browser)			*<Plug>(gh_pull_open_browser)*
 	open pull request on browser
-	default mappings: <C-o>
 
 <Plug>(gh_pull_diff)				*<Plug>(gh_pull_diff)*
 	show diff of pull request
-	default mappings: ghd
 
 <Plug>(gh_pull_url_yank)			*<Plug>(gh_pull_url_yank)*
 	yank pull request url
-	default mappings: ghy
 
 <Plug>(gh_issue_list_prev)			*<Plug>(gh_issue_list_prev)*
 	show previous page of issue list
-	default mappings: <C-h>
 
 <Plug>(gh_issue_list_next)			*<Plug>(gh_issue_list_next)*
 	show next page of issue list
-	default mappings: <C-l>
 
 <Plug>(gh_issue_open_browser)			*<Plug>(gh_issue_open_browser)*
 	open issue on browser
-	default mappings: <C-o>
 
 <Plug>(gh_issue_edit)				*<Plug>(gh_issue_edit)*
 	edit issue
-	default mappings: ghe
 
 <Plug>(gh_issue_close)				*<Plug>(gh_issue_close)*
 	close issue
-	default mappings: ghc
 
 <Plug>(gh_issue_open)				*<Plug>(gh_issue_open)*
 	open issue
-	default mappings: gho
 
 <Plug>(gh_issue_url_yank)			*<Plug>(gh_issue_url_yank)*
 	yank issue url
-	default mappings: ghy
 
 <Plug>(gh_issue_comment_list_next)              *<Plug>(gh_issue_comment_list_next)*
 	show next page of issue comment list
-	default mappings: <C-l>
 
 <Plug>(gh_issue_comment_list_prev)		*<Plug>(gh_issue_comment_list_prev)*
 	show previous page of issue comment list
-	default mappings: <C-h>
 
 <Plug>(gh_issue_comment_open_browser)		*<Plug>(gh_issue_comment_open_browser)*
 	open issue on browser
-	default mappings: <C-o>
 
 <Plug>(gh_issue_comment_new)			*<Plug>(gh_issue_comment_new)*
-	create new issue comment.
-	default mappings: ghn
+	create new issue comment
 
 <Plug>(gh_issue_comment_url_yank)		*<Plug>(gh_issue_comment_url_yank)*
 	yank issue comment url
-	default mappings: ghy
 
 <Plug>(gh_issue_comment_open_on_issue)		*<Plug>(gh_issue_comment_open_on_issue)*
-	open issue comments on |gh-buffer-issue-edit|.
-	defualt mappings: ghm
+	open issue comments on |gh-buffer-issue-edit|
+
+<Plug>(gh_project_open_browser)			*<Plug>(gh_project_open_browser)*
+	open project on browser
+
+<Plug>(gh_project_open)				*<Plug>(gh_project_open)*
+	show project columns
+
+<Plug>(gh_project_url_yank)			*<Plug>(gh_project_url_yank)*
+	yank project url
+
+<Plug>(gh_projects_card_open_browser)		*<Plug>(gh_projects_card_open_browser)*
+	open project card on browser
+
+<Plug>(gh_projects_card_open)			*<Plug>(gh_projects_card_open)*
+	open project card
+	current only support content type 'Issue'
+
+<Plug>(gh_projects_card_move)			*<Plug>(gh_projects_card_move)*
+	move project card to current column
+
+<Plug>(gh_projects_card_url_yank)		*<Plug>(gh_projects_card_url_yank)*
+	yank cards url
 
 						*gh-default-key-mappings*
 
@@ -249,7 +257,13 @@ default mappings
 |gh-buffer-repo-list|					<C-l>		<Plug>(gh_repo_list_next)
 							<C-o>		<Plug>(gh_repo_open_browser)
 							gho		<Plug>(gh_repo_show_readme)
-
+|gh-buffer-project-list|				<CR>		<Plug>(gh_project_open)
+							<C-o>		<Plug>(gh_project_open_browser)
+							ghy		<Plug>(gh_project_url_yank)
+|gh-buffer-project-column-list|				<C-o>		<Plug>(gh_projects_card_open_browser)
+							gho		<Plug>(gh_projects_card_open)
+							ghm		<Plug>(gh_projects_card_move)
+							ghy		<Plug>(gh_projects_card_url_yank)
 
 ------------------------------------------------------------------------------
 FUNCTIONS					*gh-functions*
