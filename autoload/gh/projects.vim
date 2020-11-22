@@ -35,7 +35,7 @@ function! gh#projects#list() abort
 
   call gh#github#projects#list(type, user_info, param)
         \.then(function('s:set_project_list_result'))
-        \.then({-> execute("call gh#map#apply('gh-buffer-project-list')")})
+        \.then({-> gh#map#apply('gh-buffer-project-list', s:gh_project_list_bufid)})
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
@@ -298,7 +298,7 @@ function! gh#projects#columns() abort
 
   call gh#github#projects#columns(s:project_column_list.id)
         \.then(function('s:set_project_column_list'))
-        \.then({-> execute("call gh#map#apply('gh-buffer-project-column-list')")})
+        \.then({-> gh#map#apply('gh-buffer-project-column-list', s:gh_project_column_list_bufid)})
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
