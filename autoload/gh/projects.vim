@@ -277,6 +277,19 @@ function! s:set_project_column_list(resp) abort
   nmap <buffer> <silent> ghy <Plug>(gh_projects_card_url_yank)
 endfunction
 
+function! s:opne_project_columns(resp) abort
+  let s:project = {
+        \ 'id': a:resp.body.id,
+        \ 'name': a:resp.body.name,
+        \ }
+
+  call gh#github#projects#columns(s:project_column_list.id)
+        \.then(function('s:set_project_column_list'))
+        \.then({-> gh#map#apply('gh-buffer-project-column-list', s:gh_project_column_list_bufid)})
+        \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
+        \.finally(function('gh#gh#global_buf_settings'))
+endfunction
+
 function! gh#projects#columns() abort
   setlocal ft=gh-projects-columns
   let m = matchlist(bufname(), 'gh://projects/\(.*\)/columns?*\(.*\)')
@@ -296,9 +309,7 @@ function! gh#projects#columns() abort
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
 
-  call gh#github#projects#columns(s:project_column_list.id)
-        \.then(function('s:set_project_column_list'))
-        \.then({-> gh#map#apply('gh-buffer-project-column-list', s:gh_project_column_list_bufid)})
+  call gh#github#projects#info(s:project_column_list.id)
+        \.then(function('s:opne_project_columns'))
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
-        \.finally(function('gh#gh#global_buf_settings'))
 endfunction

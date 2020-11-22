@@ -38,3 +38,8 @@ function! gh#github#projects#card_moves(column_id, card_id) abort
         \ }
   return gh#http#request(settings)
 endfunction
+
+function! gh#github#projects#info(id) abort
+  let url = printf('https://api.github.com/projects/%d', a:id)
+  return gh#http#get(url)
+endfunction
