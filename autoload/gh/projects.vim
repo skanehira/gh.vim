@@ -105,6 +105,8 @@ function! s:set_card_info(child, resp) abort
 
   let child['name'] = printf('%s %s %s %s', info.number, info.state, info.user, info.title)
   let child['info'] = a:resp.body
+
+  call gh#tree#redraw()
 endfunction
 
 function! s:add_cards(node, resp) abort
@@ -131,7 +133,6 @@ function! s:add_cards(node, resp) abort
 
     call add(node.children, child)
   endfor
-  call gh#tree#redraw()
 endfunction
 
 function! s:make_tree(tree, columns) abort
