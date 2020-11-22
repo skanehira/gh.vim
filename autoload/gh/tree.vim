@@ -113,6 +113,10 @@ func! s:find_node_parent(target) abort
 endfunc
 
 func! s:node_select_toggle() abort
+  " do nothing for tree root
+  if line('.') is# 1
+    return
+  endif
   let current = s:get_current_node()
   if empty(current)
     return
