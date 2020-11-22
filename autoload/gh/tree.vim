@@ -118,9 +118,10 @@ func! s:node_select_toggle() abort
     return
   endif
   let current = s:get_current_node()
-  if empty(current)
+  if exists('current.has_children')
     return
   endif
+
   if exists('s:marked_nodes[current.path]')
     call remove(s:marked_nodes, current.path)
   else
