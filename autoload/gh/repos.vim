@@ -93,7 +93,7 @@ function! gh#repos#list() abort
 
   call gh#github#repos#list(s:repo_list.owner, s:repo_list.param)
         \.then(function('s:repo_list'))
-        \.then({-> execute("call gh#map#apply('gh-buffer-repo-list')")})
+        \.then({-> gh#map#apply('gh-buffer-repo-list', s:gh_repo_list_bufid)})
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
@@ -114,7 +114,7 @@ function! gh#repos#readme() abort
 
   call gh#github#repos#readme(m[1], m[2])
         \.then(function('s:set_readme_content'))
-        \.then({-> execute("call gh#map#apply('gh-buffer-repo-readme')")})
+        \.then({-> gh#map#apply('gh-buffer-repo-readme', s:gh_repo_readme_bufid)})
         \.catch({err -> execute('call gh#gh#set_message_buf(err.body)', '')})
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
@@ -133,6 +133,7 @@ endfunction
 
 function! gh#repos#new() abort
   let s:gh_repo_new_bufid = bufnr()
+  call gh#map#apply('gh-buffer-repo-new', s:gh_repo_new_bufid)
 
   let lines = ['name: ', 'description: ', 'private: false', 'delete_branch_on_merge: true']
   call setbufline(s:gh_repo_new_bufid, 1, lines)
@@ -143,8 +144,6 @@ function! gh#repos#new() abort
     au!
     au BufWriteCmd <buffer> call s:repo_create()
   augroup END
-
-  call gh#map#apply('gh-buffer-repo-new')
 endfunction
 
 function! s:repo_create() abort

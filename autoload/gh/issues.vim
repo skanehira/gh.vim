@@ -151,7 +151,7 @@ function! gh#issues#list() abort
 
   call gh#github#issues#list(s:issue_list.repo.owner, s:issue_list.repo.name, s:issue_list.param)
         \.then(function('s:issue_list'))
-        \.then({-> execute("call gh#map#apply('gh-buffer-issue-list')")})
+        \.then({-> gh#map#apply('gh-buffer-issue-list', s:gh_issues_list_bufid)})
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
@@ -180,7 +180,6 @@ function! gh#issues#new() abort
   call gh#github#repos#files(s:issue_new.owner, s:issue_new.name, s:issue_new.branch)
         \.then(function('s:get_template_files'))
         \.then(function('s:open_template_list'))
-        \.then({-> execute("call gh#map#apply('gh-buffer-issue-new')")})
         \.catch(function('s:get_template_error'))
 endfunction
 
@@ -216,6 +215,7 @@ endfunction
 
 function! s:set_issue_template_buffer(resp) abort
   call execute(printf('e gh://%s/%s/issues/%s', s:issue_new.owner, s:issue_new.name, s:issue_title))
+  call gh#map#apply('gh-buffer-issue-new', bufnr())
   setlocal buftype=acwrite
   setlocal ft=markdown
 
@@ -344,7 +344,7 @@ function! gh#issues#issue() abort
 
   call gh#github#issues#issue(s:issue.repo.owner, s:issue.repo.name, s:issue.number)
         \.then(function('s:set_issues_body'))
-        \.then({-> execute("call gh#map#apply('gh-buffer-issue-edit')")})
+        \.then({-> gh#map#apply('gh-buffer-issue-edit', s:gh_issues_edit_bufid)})
         \.catch({err -> execute('call gh#gh#set_message_buf(err.body)', '')})
 endfunction
 
@@ -379,7 +379,7 @@ function! gh#issues#comments() abort
 
   call gh#github#issues#comments(s:comment_list.repo.owner, s:comment_list.repo.name, s:comment_list.number, s:comment_list.param)
         \.then(function('s:set_issue_comments_body'))
-        \.then({-> execute("call gh#map#apply('gh-buffer-issue-comment-list')")})
+        \.then({-> gh#map#apply('gh-buffer-issue-comment-list', s:gh_issues_comments_bufid)})
         \.catch({err -> execute('call gh#gh#set_message_buf(has_key(err, "body") ? err.body : err)', '')})
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
@@ -441,7 +441,6 @@ function! s:issue_comment_open() abort
   call execute(printf('belowright vnew gh://%s/%s/issues/%s/comments/edit',
         \ s:comment_list.repo.owner, s:comment_list.repo.name, s:comment_list.number))
   call gh#gh#init_buffer()
-  call gh#map#apply('gh-buffer-issue-comment-edit')
 
   setlocal ft=markdown
   setlocal buftype=acwrite
@@ -449,6 +448,8 @@ function! s:issue_comment_open() abort
 
   let s:gh_issues_comment_edit_bufid = bufnr()
   let s:gh_issues_comment_edit_winid = win_getid()
+
+  call gh#map#apply('gh-buffer-issue-comment-edit', s:gh_issues_comment_edit_bufid)
 
   call s:issue_comment_edit()
 
@@ -544,7 +545,7 @@ function! gh#issues#comment_new() abort
     au!
     au BufWriteCmd <buffer> call s:create_issue_comment()
   augroup END
-  call gh#map#apply('gh-buffer-issue-comment-new')
+  call gh#map#apply('gh-buffer-issue-comment-new', s:gh_issues_comment_new_bufid)
 endfunction
 
 function! s:create_issue_comment() abort

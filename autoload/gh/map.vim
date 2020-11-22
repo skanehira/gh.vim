@@ -21,15 +21,15 @@ function! gh#map#init() abort
       \ }
 endfunction
 
-function! gh#map#apply(buffer) abort
+function! gh#map#apply(buffer, bufid) abort
   for m in s:buffers[a:buffer]
-    exe m
+    exe printf('%dbufdo %s', a:bufid, m)
   endfor
 endfunction
 
 function! gh#map#add(buffer, mode, lhs, rhs) abort
   if !exists('s:buffers[a:buffer]')
-    call gh#gh#error_message('invalid buffer type, please read :h gh-buffer')
+    call gh#gh#error_message(printf('invalid buffer type: %s, please read :h gh-buffer', a:buffer))
     return
   endif
   let s:buffers[a:buffer] += [printf('%s <buffer> <silent> %s %s', a:mode, a:lhs, a:rhs)]
