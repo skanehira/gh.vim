@@ -194,7 +194,7 @@ function! s:find_column(node) abort
   return column
 endfunction
 
-function! s:move_card() abort
+function! s:card_move() abort
   let column = s:find_column(gh#tree#current_node())
   let nodes = values(gh#tree#marked_nodes())
   let promises = []
@@ -236,10 +236,10 @@ function! s:set_project_column_list(resp) abort
 
   nnoremap <buffer> <silent> <Plug>(gh_projects_card_open_browser) :call <SID>card_open_browser()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_projects_card_open) :call <SID>card_open()<CR>
-  nnoremap <buffer> <silent> <Plug>(gh_projects_move_card) :call <SID>move_card()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_projects_card_move) :call <SID>card_move()<CR>
   nmap <buffer> <silent> <C-o> <Plug>(gh_projects_card_open_browser)
   nmap <buffer> <silent> gho <Plug>(gh_projects_card_open)
-  nmap <buffer> <silent> ghm <Plug>(gh_projects_move_card)
+  nmap <buffer> <silent> ghm <Plug>(gh_projects_card_move)
 endfunction
 
 function! gh#projects#columns() abort
