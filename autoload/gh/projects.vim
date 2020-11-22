@@ -156,20 +156,26 @@ function! s:make_tree(tree, columns) abort
   endfor
 endfunction
 
-function! s:card_open_browser() abort
+function! s:get_selected_cards() abort
   let marked_nodes = gh#tree#marked_nodes()
   if empty(marked_nodes)
-    let node = gh#tree#current_node()
-    if exists('node.info.html_url')
-      call gh#gh#open_url(node.info.html_url)
-    endif
-  else
-    for node in values(marked_nodes)
-      if exists('node.info.html_url')
-        call gh#gh#open_url(node.info.html_url)
-      endif
-    endfor
+    return [gh#tree#current_node()]
   endif
+  let nodes = []
+  for node in values(marked_nodes)
+    if exists('node.info.html_url')
+      call add(nodes, node)
+    endif
+  endfor
+  return nodes
+endfunction
+
+function! s:card_open_browser() abort
+  for card in s:get_selected_cards()
+    if exists('card.info.html_url')
+      call gh#gh#open_url(card.info.html_url)
+    endif
+  endfor
 endfunction
 
 function! s:card_open() abort
@@ -217,6 +223,31 @@ function! s:card_move() abort
         \.finally({-> execute('echom "" | redraw!')})
 endfunction
 
+function! s:card_url_yank() abort
+  let urls = []
+  let cards = s:get_selected_cards()
+  if empty(cards)
+    return
+  endif
+
+  for card in cards
+    if exists('card.info.html_url')
+      call add(urls, card.info.html_url)
+    endif
+  endfor
+
+  let ln = "\n"
+  if &ff == "dos"
+    let ln = "\r\n"
+  endif
+
+  call gh#gh#yank(join(urls, ln))
+  call gh#gh#message('copied ' .. urls[0])
+  for url in urls[1:]
+    call gh#gh#message('       ' .. url)
+  endfor
+endfunction
+
 function! s:set_project_column_list(resp) abort
   if empty(a:resp.body)
     call gh#gh#set_message_buf('not found project columns')
@@ -237,9 +268,12 @@ function! s:set_project_column_list(resp) abort
   nnoremap <buffer> <silent> <Plug>(gh_projects_card_open_browser) :call <SID>card_open_browser()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_projects_card_open) :call <SID>card_open()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_projects_card_move) :call <SID>card_move()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_projects_card_url_yank) :call <SID>card_url_yank()<CR>
+
   nmap <buffer> <silent> <C-o> <Plug>(gh_projects_card_open_browser)
   nmap <buffer> <silent> gho <Plug>(gh_projects_card_open)
   nmap <buffer> <silent> ghm <Plug>(gh_projects_card_move)
+  nmap <buffer> <silent> ghy <Plug>(gh_projects_card_url_yank)
 endfunction
 
 function! gh#projects#columns() abort
