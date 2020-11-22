@@ -177,6 +177,8 @@ function! s:card_open_browser() abort
       call gh#gh#open_url(card.info.html_url)
     endif
   endfor
+  call gh#tree#clean_marked_nodes()
+  call gh#tree#redraw()
 endfunction
 
 function! s:card_open() abort
