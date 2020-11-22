@@ -250,6 +250,10 @@ func! gh#tree#marked_nodes() abort
   return s:marked_nodes
 endfunc
 
+func! gh#tree#clean_marked_nodes() abort
+  let s:marked_nodes = {}
+endfunc
+
 func! gh#tree#current_node() abort
   let current = s:get_current_node()
   return s:find_node(s:tree, current)

@@ -231,6 +231,9 @@ function! s:card_url_yank() abort
     return
   endif
 
+  call gh#tree#clean_marked_nodes()
+  call gh#tree#redraw()
+
   for card in cards
     if exists('card.info.html_url')
       call add(urls, card.info.html_url)
@@ -247,6 +250,7 @@ function! s:card_url_yank() abort
   for url in urls[1:]
     call gh#gh#message('       ' .. url)
   endfor
+
 endfunction
 
 function! s:set_project_column_list(resp) abort
