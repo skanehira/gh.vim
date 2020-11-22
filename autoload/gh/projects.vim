@@ -214,7 +214,7 @@ function! s:move_card() abort
         \.then({-> s:move()})
         \.then({-> gh#tree#redraw()})
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
-        \.finally({-> execute('echom "" | redraw')})
+        \.finally({-> execute('echom "" | redraw!')})
 endfunction
 
 function! s:set_project_column_list(resp) abort
