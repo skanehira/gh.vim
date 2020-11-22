@@ -194,6 +194,9 @@ func! s:remove_node(parent, target) abort
     let idx += 1
   endfor
   call remove(a:parent.children, idx)
+  if empty(a:parent.children)
+    call remove(a:parent, 'children')
+  endif
 endfunc
 
 func! s:add_node(parent, target) abort
