@@ -48,7 +48,7 @@ endfunction
 
 function! gh#gh#init_buffer() abort
   setlocal buftype=nofile bufhidden=wipe
-        \ noswapfile nobuflisted nonumber
+        \ noswapfile nonumber
 endfunction
 
 function! gh#gh#set_message_buf(msg) abort
