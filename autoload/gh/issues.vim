@@ -268,7 +268,7 @@ function! s:get_template_files(resp) abort
 endfunction
 
 function! s:update_issue_success(resp) abort
-  bw!
+  set nomodified
   redraw!
   call gh#gh#message('update success')
 endfunction
