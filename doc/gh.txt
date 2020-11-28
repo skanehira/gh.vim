@@ -121,8 +121,9 @@ gh://projects/:id/columns				*gh-buffer-project-column-list*
 	show project columns.
 	:id is project id, not project number.
 
-gh://:owner/:repo/actions				*gh-buffer-action-list*
+gh://:owner/:repo/actions[?status=success&...]		*gh-buffer-action-list*
 	show :owner/:repo GitHub Actions workflows/steps.
+	you can use query parameters(https://git.io/JkNZB)
 
 gh://bookmarks						*gh-buffer-bookmark-list*
 	show your buffer bookmarks.
