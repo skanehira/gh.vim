@@ -68,7 +68,7 @@ endfunc
 
 func! s:change_state(state) abort
   let current = s:get_current_node()
-  let node = s:find_node_parent(current)
+  let node = s:find_node_parent(a:state, current)
   if empty(node)
     return
   endif
@@ -95,12 +95,12 @@ func! s:re_draw() abort
   setlocal nomodifiable
 endfunc
 
-func! s:find_node_parent(target) abort
+func! s:find_node_parent(state, target) abort
   let target = a:target
-  if exists('target.has_children')
-    let target = target
-  elseif exists('target.parent')
+  if exists('target.parent') && a:state is 'close'
     let target = target.parent
+  elseif exists('target.has_children')
+    let target = target
   else
     let target = {}
   endif
