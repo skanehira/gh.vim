@@ -46,9 +46,9 @@ So if you want see issue list, please open buffer likes bellow
 
 ## Options
 
-| option                        | default | description                        |
-|-------------------------------|---------|------------------------------------|
-| `gh_token`                    | ''      | GitHub personal access token       |
+| option     | description                  |
+|------------|------------------------------|
+| `gh_token` | GitHub personal access token |
 
 ## Buffer list
 currently `gh.vim` provides buffers is bellow.
@@ -66,6 +66,10 @@ currently `gh.vim` provides buffers is bellow.
 | `gh://:owner/:repo/readme`                      | get repository readme                  |
 | `gh://:owner/:repo/pulls[?state=open&...]`      | get pull request list                  |
 | `gh://:owner/:repo/pulls/:number/diff`          | show pull request list diff            |
+| `gh://:owner/:repo/projects`                    | show project list                      |
+| `gh://orgs/:org/projects`                       | show organization project list         |
+| `gh://projects/:id/columns`                     | show project column list               |
+| `gh://bookmarks`                                | show your bookmarks                    |
 
 ## Keymap list
 ### issue list
@@ -110,27 +114,20 @@ currently `gh.vim` provides buffers is bellow.
 | `<Plug>(gh_repo_open_browser)` | `<C-o>` | open repository on browser                                          |
 | `<Plug>(gh_repo_show_readme)`  | `gho`   | show repository readme                                              |
 
-## Roadmap
-- issues
-  - [x] list
-    - [x] paging
-  - [x] create
-  - [x] close
-  - [x] reopen
-  - [x] update
-    - [x] update title
-  - [x] comment list
-    - [x] create
-    - [x] update
-- pull request
-  - [x] list
-    - [x] paging
-  - [x] diff
-  - [ ] create
-  - [ ] merge
-- repositories
-  - [x] list
-    - [x] paging
-  - [x] create
-  - [ ] transfer
-  - [ ] make public/private
+### bookmark list
+
+| keymap                     | default | description |
+|----------------------------|---------|-------------|
+| `<Plug>(gh_bookmark_open)` | `gho`   | open buffer |
+
+### project column list
+
+| keymap                                  | default | description                   |
+|-----------------------------------------|---------|-------------------------------|
+| `<Plug>(gh_projects_card_open_browser)` | `<C-o>` | open card on browser          |
+| `<Plug>(gh_projects_card_open)`         | `gho`   | open card                     |
+| `<Plug>(gh_projects_card_move)`         | `ghm`   | move card into current column |
+| `<Plug>(gh_projects_card_url_yank)`     | `ghy`   | yank card url                 |
+
+## Author
+skanehira
