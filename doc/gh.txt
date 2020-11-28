@@ -111,7 +111,7 @@ gh://user/repos/new					*gh-buffer-repo-new*
 	also some parameters(https://git.io/JUzlS) can use.
 
 gh://:owner/:repo/readme				*gh-buffer-repo-readme*
-	show repository readme if repository has README.*
+	show repository readme.
 
 gh://:owner/:repo/projects				*gh-buffer-project-list*
 	show :owner/:repo projects.
@@ -120,6 +120,9 @@ gh://:owner/:repo/projects				*gh-buffer-project-list*
 gh://projects/:id/columns				*gh-buffer-project-column-list*
 	show project columns.
 	:id is project id, not project number.
+
+gh://:owner/:repo/actions				*gh-buffer-action-list*
+	show :owner/:repo GitHub Actions workflows/steps.
 
 gh://bookmarks						*gh-buffer-bookmark-list*
 	show your buffer bookmarks.
@@ -237,6 +240,12 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 <Plug>(gh_bookmark_open)			*<Plug>(gh_bookmark_open)*
 	open buffer
 
+<Plug>(gh_actions_open_browser)			*<Plug>(gh_actions_open_browser)*
+	open action's workflow/step on browser
+
+<Plug>(gh_actions_yank_url)			*<Plug>(gh_actions_yank_url)*
+	yank action's workflow/stop
+
 						*gh-default-key-mappings*
 
 default mappings
@@ -272,6 +281,8 @@ default mappings
 							ghm		<Plug>(gh_projects_card_move)
 							ghy		<Plug>(gh_projects_card_url_yank)
 |gh-buffer-bookmark-list|				gho		<Plug>(gh_bookmark_open)
+|gh-buffer-action-list|					<C-o>		<Plug>(gh_actions_open_browser)
+							ghy		<Plug>(gh_actions_yank_url)
 
 ------------------------------------------------------------------------------
 FUNCTIONS					*gh-functions*
