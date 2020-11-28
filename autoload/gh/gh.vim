@@ -85,8 +85,8 @@ function! gh#gh#open_url(url) abort
   call system(printf('%s %s', s:cmd, a:url))
 endfunction
 
-function! gh#gh#yank(url) abort
-  call setreg(s:yank_reg, a:url)
+function! gh#gh#yank(text) abort
+  call setreg(s:yank_reg, a:text)
 endfunction
 
 function! gh#gh#delete_buffer(s, name) abort
