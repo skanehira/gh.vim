@@ -121,6 +121,10 @@ gh://projects/:id/columns				*gh-buffer-project-column-list*
 	show project columns.
 	:id is project id, not project number.
 
+gh://bookmarks						*gh-buffer-bookmark-list*
+	show your buffer bookmarks.
+	you can edit this buffer and use |:w| to save bookmarks.
+
 ------------------------------------------------------------------------------
 KEY-MAPPINGS					*gh-key-mappings*
 
@@ -230,6 +234,9 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 <Plug>(gh_projects_card_url_yank)		*<Plug>(gh_projects_card_url_yank)*
 	yank cards url
 
+<Plug>(gh_bookmark_open)			*<Plug>(gh_bookmark_open)*
+	open buffer
+
 						*gh-default-key-mappings*
 
 default mappings
@@ -264,6 +271,7 @@ default mappings
 							gho		<Plug>(gh_projects_card_open)
 							ghm		<Plug>(gh_projects_card_move)
 							ghy		<Plug>(gh_projects_card_url_yank)
+|gh-buffer-bookmark-list|				gho		<Plug>(gh_bookmark_open)
 
 ------------------------------------------------------------------------------
 FUNCTIONS					*gh-functions*

@@ -46,6 +46,8 @@ function! gh#gh#init() abort
   elseif bufname =~# '^gh:\/\/projects\/[^/]\+\/columns$'
         \ || bufname =~# '^gh:\/\/projects\/[^/]\+\/columns?\+'
     call gh#projects#columns()
+  elseif bufname =~# '^gh:\/\/bookmarks$'
+    call gh#bookmark#list()
   endif
 endfunction
 
