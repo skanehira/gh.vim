@@ -244,7 +244,7 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 	open action's workflow/step on browser
 
 <Plug>(gh_actions_yank_url)			*<Plug>(gh_actions_yank_url)*
-	yank action's workflow/stop
+	yank action's workflow/stop url
 
 						*gh-default-key-mappings*
 
