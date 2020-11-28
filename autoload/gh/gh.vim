@@ -46,6 +46,9 @@ function! gh#gh#init() abort
   elseif bufname =~# '^gh:\/\/projects\/[^/]\+\/columns$'
         \ || bufname =~# '^gh:\/\/projects\/[^/]\+\/columns?\+'
     call gh#projects#columns()
+  elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/actions$'
+        \ || bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/actions?\+'
+    call gh#actions#list()
   elseif bufname =~# '^gh:\/\/bookmarks$'
     call gh#bookmark#list()
   endif
@@ -121,9 +124,16 @@ function! gh#gh#def_highlight() abort
   hi! link gh_project_number gh_blue
   hi! link gh_project_open gh_green
   hi! link gh_project_closed gh_red
-
   hi! link gh_project_column gh_green
   hi! link gh_project_column_selected gh_red
+
+  hi! link gh_actions_number gh_blue
+  hi! link gh_actions_ok gh_green
+  hi! link gh_actions_ng gh_red
+  hi! link gh_actions_running gh_orange
+  hi! link gh_actions_author gh_purple
+  hi! link gh_actions_branch gh_blue
+  hi! link gh_actions_selected gh_red
 endfunction
 
 function! s:dict_value_len(items) abort

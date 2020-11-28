@@ -18,7 +18,8 @@ function! gh#map#init() abort
       \ 'gh-buffer-repo-new': [],
       \ 'gh-buffer-repo-readme': [],
       \ 'gh-buffer-project-list': [],
-      \ 'gh-buffer-project-column-list': []
+      \ 'gh-buffer-project-column-list': [],
+      \ 'gh-buffer-action-list': []
       \ }
 endfunction
 
