@@ -51,9 +51,11 @@ function! s:set_action_list(resp) abort
 
   nnoremap <buffer> <silent> <Plug>(gh_actions_open_browser) :call <SID>open_browser()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_actions_yank_url) :call <SID>yank_url()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_actions_open_logs) :call <SID>open_logs()<CR>
 
   nmap <buffer> <silent> <C-o> <Plug>(gh_actions_open_browser)
   nmap <buffer> <silent> ghy <Plug>(gh_actions_yank_url)
+  nmap <buffer> <silent> gho <Plug>(gh_actions_open_logs)
 endfunction
 
 function! s:get_selected_nodes() abort
@@ -159,6 +161,7 @@ function! s:set_job_list(node, resp) abort
   let node['state'] = 'close'
   for job in a:resp.body.jobs
     let status = s:get_status_annotation(job.status, job.conclusion)
+    let job['log_url'] = job.url .. '/logs'
     let child = {
           \ 'id': job.id,
           \ 'name': printf('%s %s', status, job.name),
@@ -179,5 +182,36 @@ function! s:set_job_list(node, resp) abort
       endfor
     endif
     call add(node.children, child)
+  endfor
+endfunction
+
+function! s:open_logs() abort
+  let nodes = s:get_selected_nodes()
+  if empty(nodes)
+    return
+  endif
+
+  call gh#tree#clean_marked_nodes()
+  call gh#tree#redraw()
+
+  let token = get(g:, 'gh_token', '')
+  if empty(token)
+    call gh#gh#message('g:gh_token is undefined')
+    return
+  endif
+
+  for node in nodes
+    if exists('node.info.log_url')
+      let cmd = [
+            \ 'curl', '-L',
+            \ '-H', 'Accept: application/vnd.github.v3+json',
+            \ '-H', printf('Authorization: token %s', token),
+            \ node.info.log_url
+            \ ]
+      let opt = {
+            \ 'bufname': substitute(node.info.log_url, 'https:\/\/api\.github.com\/repos\/', 'gh:\/\/', 'g')
+            \ }
+      call gh#gh#termopen(cmd, opt)
+    endif
   endfor
 endfunction

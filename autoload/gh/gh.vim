@@ -159,3 +159,14 @@ function! gh#gh#dict_format(items, keys) abort
   let format = map(copy(a:keys), {_, k -> printf("%%-%ss", dict[k])})
   return join(format)
 endfunction
+
+function! gh#gh#termopen(cmd, opt) abort
+  tabnew
+  if has('nvim')
+    call termopen(a:cmd)
+  else
+    call term_start(a:cmd, {'curwin': 1, 'term_name': a:opt.bufname})
+    nnoremap <buffer> <silent> q :bw<CR>
+  endif
+  set ft=gh-actions-logs
+endfunction

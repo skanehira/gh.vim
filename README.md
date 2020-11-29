@@ -15,7 +15,7 @@ Vim/Neovim plugin for GitHub
 - project
   - list/card list/move card
 - github actions
-  - list
+  - list/open job logs
 
 ## Installation
 Please install `curl` before installtion.
@@ -136,10 +136,11 @@ currently `gh.vim` provides buffers is bellow.
 
 ### GitHub Actions list
 
-| keymap                            | default | description                            |
-|-----------------------------------|---------|----------------------------------------|
-| `<Plug>(gh_actions_open_browser)` | `<C-o>` | open action's workflow/step on browser |
-| `<Plug>(gh_actions_yank_url)`     | `ghy`   | yank action's workflow/stop url        |
+| keymap                            | default | description                                      |
+|-----------------------------------|---------|--------------------------------------------------|
+| `<Plug>(gh_actions_open_browser)` | `<C-o>` | open selected action's workflow/step on browser  |
+| `<Plug>(gh_actions_yank_url)`     | `ghy`   | yank selected action's workflow/stop url         |
+| `<Plug>(gh_actions_open_logs)`    | `gho`   | open selected actions's job logs in Vim terminal |
 
 ## Author
 skanehira
