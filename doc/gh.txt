@@ -247,6 +247,9 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 <Plug>(gh_actions_yank_url)			*<Plug>(gh_actions_yank_url)*
 	yank action's workflow/stop url
 
+<Plug>(gh_actions_open_logs)			*<Plug>(gh_actions_open_logs)*
+	open selected actions's job logs in Vim terminal
+
 						*gh-default-key-mappings*
 
 default mappings
@@ -284,6 +287,7 @@ default mappings
 |gh-buffer-bookmark-list|				gho		<Plug>(gh_bookmark_open)
 |gh-buffer-action-list|					<C-o>		<Plug>(gh_actions_open_browser)
 							ghy		<Plug>(gh_actions_yank_url)
+							gho		<Plug>(gh_actions_open_logs)
 
 ------------------------------------------------------------------------------
 FUNCTIONS					*gh-functions*
