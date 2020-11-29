@@ -141,8 +141,8 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
       return
     endif
     call gh#map#add('gh-buffer-issue-list', 'nnoremap', 'x', ':bw!<CR>')
-    call gh#map#add('gh-buffer-issue-list', 'm', 'l', '<Plug>(gh_issue_list_prev)')
-    call gh#map#add('gh-buffer-issue-list', 'm', 'l', '<Plug>(gh_issue_list_next)')
+    call gh#map#add('gh-buffer-issue-list', 'map', 'l', '<Plug>(gh_issue_list_prev)')
+    call gh#map#add('gh-buffer-issue-list', 'map', 'l', '<Plug>(gh_issue_list_next)')
   endfunction
 
   augroup gh-maps
