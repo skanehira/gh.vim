@@ -150,7 +150,6 @@ function! s:make_tree(actions) abort
 endfunction
 
 function! s:set_job_list(node, resp) abort
-  try
   if empty(a:resp.body)
     return
   endif
@@ -181,7 +180,4 @@ function! s:set_job_list(node, resp) abort
     endif
     call add(node.children, child)
   endfor
-  catch
-    echom v:exception
-  endtry
 endfunction
