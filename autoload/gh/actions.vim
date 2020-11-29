@@ -113,12 +113,16 @@ function! s:get_status_annotation(status, conclusion) abort
   if a:conclusion is# v:null
     if a:status is# 'in_progress'
       let status = '◉'
-    elseif w.status is# 'queued'
+    elseif a:status is# 'queued'
       let status = '◎'
     endif
   endif
   if a:conclusion is# 'success'
     let status = '✓'
+  elseif a:conclusion is# 'skipped'
+    let status = '❢'
+  elseif a:conclusion is# 'neutral'
+    let status = '❑'
   endif
   return status
 endfunction
