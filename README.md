@@ -57,24 +57,24 @@ So if you want see issue list, please open buffer likes bellow
 ## Buffer list
 currently `gh.vim` provides buffers is bellow.
 
-| buffer                                           | description                            |
-|--------------------------------------------------|----------------------------------------|
-| `gh://:owner/:repo/issues[?state=open&..]`       | get issue list                         |
-| `gh://:owner/:repo/issues/:number`               | edit issue                             |
-| `gh://:owner/:repo/:branch/issues/new`           | new issue                              |
-| `gh://:owner/:repo/issues/comments[?page=1&..]`  | get issue comment list                 |
-| `gh://:owner/:repo/issues/comments/new`          | new issue comment                      |
-| `gh://:owner/repos`                              | get repository list                    |
-| `gh://user/repos`                                | get authenticated user repository list |
-| `gh://user/repos/new`                            | new repository                         |
-| `gh://:owner/:repo/readme`                       | get repository readme                  |
-| `gh://:owner/:repo/pulls[?state=open&...]`       | get pull request list                  |
-| `gh://:owner/:repo/pulls/:number/diff`           | show pull request list diff            |
-| `gh://:owner/:repo/projects`                     | show project list                      |
-| `gh://orgs/:org/projects`                        | show organization project list         |
-| `gh://projects/:id/columns`                      | show project column list               |
-| `gh://:owner/:repo/actions[?status=success&...]` | show github action's workflows/steps   |
-| `gh://bookmarks`                                 | show your bookmarks                    |
+| buffer                                                  | description                            |
+|---------------------------------------------------------|----------------------------------------|
+| `gh://:owner/:repo/issues[?state=open&..]`              | get issue list                         |
+| `gh://:owner/:repo/issues/:number`                      | edit issue                             |
+| `gh://:owner/:repo/:branch/issues/new`                  | new issue                              |
+| `gh://:owner/:repo/issues/:number/comments[?page=1&..]` | get issue comment list                 |
+| `gh://:owner/:repo/issues/:number/comments/new`         | new issue comment                      |
+| `gh://:owner/repos`                                     | get repository list                    |
+| `gh://user/repos`                                       | get authenticated user repository list |
+| `gh://user/repos/new`                                   | new repository                         |
+| `gh://:owner/:repo/readme`                              | get repository readme                  |
+| `gh://:owner/:repo/pulls[?state=open&...]`              | get pull request list                  |
+| `gh://:owner/:repo/pulls/:number/diff`                  | show pull request list diff            |
+| `gh://:owner/:repo/projects`                            | show project list                      |
+| `gh://orgs/:org/projects`                               | show organization project list         |
+| `gh://projects/:id/columns`                             | show project column list               |
+| `gh://:owner/:repo/actions[?status=success&...]`        | show github action's workflows/steps   |
+| `gh://bookmarks`                                        | show your bookmarks                    |
 
 ## Keymap list
 ### issue list
