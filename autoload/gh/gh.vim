@@ -168,5 +168,4 @@ function! gh#gh#termopen(cmd, opt) abort
     call term_start(a:cmd, {'curwin': 1, 'term_name': a:opt.bufname})
     nnoremap <buffer> <silent> q :bw<CR>
   endif
-  set ft=gh-actions-logs
 endfunction

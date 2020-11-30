@@ -216,6 +216,7 @@ function! s:open_logs() abort
             \ 'bufname': substitute(node.info.log_url, 'https:\/\/api\.github.com\/repos\/', 'gh:\/\/', 'g')
             \ }
       call gh#gh#termopen(cmd, opt)
+      setlocal ft=gh-actions-logs
     endif
   endfor
 endfunction
