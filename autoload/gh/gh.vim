@@ -163,9 +163,16 @@ endfunction
 function! gh#gh#termopen(cmd, opt) abort
   tabnew
   if has('nvim')
+    " NOTE: Neovim can't fold when job finished
     call termopen(a:cmd)
+    setlocal scrollback=50000
   else
-    call term_start(a:cmd, {'curwin': 1, 'term_name': a:opt.bufname})
+    call term_start(a:cmd, {
+          \ 'curwin': 1,
+          \ 'term_name': a:opt.bufname,
+          \ 'exit_cb': { -> execute('setlocal foldmethod=expr foldexpr=gh#actions#fold_logs(v:lnum)') }
+          \ })
+    setlocal termwinscroll=50000
     nnoremap <buffer> <silent> q :bw<CR>
   endif
 endfunction

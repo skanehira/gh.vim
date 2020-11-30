@@ -189,6 +189,16 @@ function! s:set_job_list(node, resp) abort
   endfor
 endfunction
 
+function! gh#actions#fold_logs(lnum) abort
+  let line = getline(a:lnum)
+  if line =~# '.*##\[group\].*' || line =~# '.*##\[section\]Starting'
+    return 'a1'
+  elseif line =~# '.*##\[endgroup\]' || line =~# '.*##\[section\]Finishing'
+    return 's1'
+  endif
+  return '='
+endfunction
+
 function! s:open_logs() abort
   let nodes = s:get_selected_nodes()
   if empty(nodes)
