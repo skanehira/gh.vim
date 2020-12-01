@@ -160,13 +160,7 @@ function! s:get_selected_cards() abort
   if empty(marked_nodes)
     return [gh#tree#current_node()]
   endif
-  let nodes = []
-  for node in values(marked_nodes)
-    if exists('node.info.html_url')
-      call add(nodes, node)
-    endif
-  endfor
-  return nodes
+  return values(marked_nodes)
 endfunction
 
 function! s:card_open_browser() abort
