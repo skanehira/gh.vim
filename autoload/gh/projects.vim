@@ -204,8 +204,11 @@ function! s:find_column(node) abort
 endfunction
 
 function! s:card_move() abort
-  let column = s:find_column(gh#tree#current_node())
   let nodes = values(gh#tree#marked_nodes())
+  if empty(nodes)
+    return
+  endif
+  let column = s:find_column(gh#tree#current_node())
   let promises = []
   for node in nodes
     call add(promises, gh#github#projects#card_moves(column.id, node.id))
