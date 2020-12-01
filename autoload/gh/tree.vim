@@ -255,6 +255,27 @@ func! gh#tree#current_node() abort
   return s:find_node(s:tree, current)
 endfunc
 
+func! s:set_node(tree, node) abort
+  let tree = a:tree
+  if a:tree.path is# a:node.path
+    for k in keys(a:node)
+      let tree[k] = a:node[k]
+    endfor
+    return 1
+  elseif exists('a:tree.children')
+    for n in a:tree.children
+      if s:set_node(n, a:node)
+        return 1
+      endif
+    endfor
+  endif
+  return 0
+endfunc
+
+func! gh#tree#set_node(node) abort
+  return s:set_node(s:tree, a:node)
+endfunc
+
 func! gh#tree#open(tree) abort
   let s:bufid = bufnr()
   let s:tree = a:tree

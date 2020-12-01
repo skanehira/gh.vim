@@ -94,16 +94,20 @@ function! s:set_project_list_result(resp) abort
   call setbufline(s:gh_project_list_bufid, 1, lines)
 endfunction
 
+function! s:update_card_info(card, info) abort
+  let card = a:card
+
+  let number = printf('#%s', a:info.number)
+  let state = a:info.state
+  let user = printf('@%s', a:info.user.login)
+  let title = a:info.title
+
+  let card['name'] = printf('%s %s %s %s', number, state, user, title)
+  let card['info'] = a:info
+endfunction
+
 function! s:set_card_info(child, resp) abort
-  let child = a:child
-  let number = printf('#%s', a:resp.body.number)
-  let state = a:resp.body.state
-  let user = printf('@%s', a:resp.body.user.login)
-  let title = a:resp.body.title
-
-  let child['name'] = printf('%s %s %s %s', number, state, user, title)
-  let child['info'] = a:resp.body
-
+  call s:update_card_info(a:child, a:resp.body)
   call gh#tree#redraw()
 endfunction
 
@@ -178,6 +182,60 @@ function! s:card_edit() abort
   if exists('node.info')
     call execute('new ' .. substitute(gh#tree#current_node().info.html_url, 'https://github.com/','gh://',''))
   endif
+endfunction
+
+function! s:get_repo_info(info) abort
+  " if card is issue
+  " info.url will be `https://api.github.com/repos/:owner/:repo/issues/:number`
+  " TODO make it possible to get `owner/repo` from card of type PR
+  if match(a:info.url, 'issues') is# -1
+    return {}
+  endif
+  let paths = split(a:info.url, '/')
+  return {
+        \ 'owner': paths[-4],
+        \ 'name': paths[-3],
+        \ 'number': paths[-1],
+        \ }
+endfunction
+
+" TODO current only supported card type of issue
+function! s:set_card_state(state) abort
+  let cards = s:get_selected_cards()
+  if empty(cards)
+    return
+  endif
+
+  let promises = []
+  for card in cards
+    let repo = s:get_repo_info(card.info)
+    let action = 'open'
+    if a:state is# 'closed'
+      let action = 'close'
+    endif
+    call add(promises, gh#github#issues#update_state(repo.owner, repo.name, repo.number, action))
+  endfor
+
+  if a:state is# 'closed'
+    call gh#gh#message('closing...')
+  else
+    call gh#gh#message('opening...')
+  endif
+
+  call s:Promise.all(promises)
+        \.then({-> s:card_update(cards, a:state)})
+        \.then({-> gh#tree#clean_marked_nodes()})
+        \.then({-> gh#tree#redraw()})
+        \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
+        \.finally({-> execute('echom ""')})
+endfunction
+
+function! s:card_update(cards, state) abort
+  for card in a:cards
+    let card.info.state = a:state
+    call s:update_card_info(card, card.info)
+    call gh#tree#set_node(card)
+  endfor
 endfunction
 
 function! s:find_column(node) abort
@@ -271,11 +329,15 @@ function! s:set_project_column_list(resp) abort
   nnoremap <buffer> <silent> <Plug>(gh_projects_card_edit) :call <SID>card_edit()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_projects_card_move) :call <SID>card_move()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_projects_card_url_yank) :call <SID>card_url_yank()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_projects_card_close) :call <SID>set_card_state('closed')<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_projects_card_open) :call <SID>set_card_state('open')<CR>
 
   nmap <buffer> <silent> <C-o> <Plug>(gh_projects_card_open_browser)
   nmap <buffer> <silent> ghe <Plug>(gh_projects_card_edit)
   nmap <buffer> <silent> ghm <Plug>(gh_projects_card_move)
   nmap <buffer> <silent> ghy <Plug>(gh_projects_card_url_yank)
+  nmap <buffer> <silent> ghc <Plug>(gh_projects_card_close)
+  nmap <buffer> <silent> gho <Plug>(gh_projects_card_open)
 endfunction
 
 function! s:opne_project_columns(resp) abort

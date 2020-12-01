@@ -132,6 +132,8 @@ currently `gh.vim` provides buffers is bellow.
 | `<Plug>(gh_projects_card_edit)`         | `ghe`   | edit card                     |
 | `<Plug>(gh_projects_card_move)`         | `ghm`   | move card into current column |
 | `<Plug>(gh_projects_card_url_yank)`     | `ghy`   | yank card url                 |
+| `<Plug>(gh_projects_card_close)`        | `ghc`   | close card                    |
+| `<Plug>(gh_projects_card_open)`         | `gho`   | open card                     |
 
 ### GitHub Actions list
 

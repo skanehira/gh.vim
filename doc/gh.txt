@@ -238,6 +238,14 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 <Plug>(gh_projects_card_url_yank)		*<Plug>(gh_projects_card_url_yank)*
 	yank cards url
 
+<Plug>(gh_projects_card_close)			*<Plug>(gh_projects_card_close)*
+	close card
+	current only supported content type 'Issue'
+
+<Plug>(gh_projects_card_open)			*<Plug>(gh_projects_card_open)*
+	open card
+	current only supported content type 'Issue'
+
 <Plug>(gh_bookmark_open)			*<Plug>(gh_bookmark_open)*
 	open buffer
 
@@ -284,6 +292,8 @@ default mappings
 							ghe		<Plug>(gh_projects_card_edit)
 							ghm		<Plug>(gh_projects_card_move)
 							ghy		<Plug>(gh_projects_card_url_yank)
+							ghc		<Plug>(gh_projects_card_close)
+							gho		<Plug>(gh_projects_card_open)
 |gh-buffer-bookmark-list|				gho		<Plug>(gh_bookmark_open)
 |gh-buffer-action-list|					<C-o>		<Plug>(gh_actions_open_browser)
 							ghy		<Plug>(gh_actions_yank_url)
