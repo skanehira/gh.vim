@@ -179,7 +179,7 @@ function! s:card_open_browser() abort
   call gh#tree#redraw()
 endfunction
 
-function! s:card_open() abort
+function! s:card_edit() abort
   let node = gh#tree#current_node()
   if exists('node.info')
     call execute('new ' .. substitute(gh#tree#current_node().info.html_url, 'https://github.com/','gh://',''))
@@ -274,12 +274,12 @@ function! s:set_project_column_list(resp) abort
   call gh#tree#open(s:tree)
 
   nnoremap <buffer> <silent> <Plug>(gh_projects_card_open_browser) :call <SID>card_open_browser()<CR>
-  nnoremap <buffer> <silent> <Plug>(gh_projects_card_open) :call <SID>card_open()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_projects_card_edit) :call <SID>card_edit()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_projects_card_move) :call <SID>card_move()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_projects_card_url_yank) :call <SID>card_url_yank()<CR>
 
   nmap <buffer> <silent> <C-o> <Plug>(gh_projects_card_open_browser)
-  nmap <buffer> <silent> gho <Plug>(gh_projects_card_open)
+  nmap <buffer> <silent> ghe <Plug>(gh_projects_card_edit)
   nmap <buffer> <silent> ghm <Plug>(gh_projects_card_move)
   nmap <buffer> <silent> ghy <Plug>(gh_projects_card_url_yank)
 endfunction

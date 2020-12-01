@@ -129,7 +129,7 @@ currently `gh.vim` provides buffers is bellow.
 | keymap                                  | default | description                   |
 |-----------------------------------------|---------|-------------------------------|
 | `<Plug>(gh_projects_card_open_browser)` | `<C-o>` | open card on browser          |
-| `<Plug>(gh_projects_card_open)`         | `gho`   | open card                     |
+| `<Plug>(gh_projects_card_edit)`         | `ghe`   | edit card                     |
 | `<Plug>(gh_projects_card_move)`         | `ghm`   | move card into current column |
 | `<Plug>(gh_projects_card_url_yank)`     | `ghy`   | yank card url                 |
 

@@ -228,8 +228,8 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 <Plug>(gh_projects_card_open_browser)		*<Plug>(gh_projects_card_open_browser)*
 	open project card on browser
 
-<Plug>(gh_projects_card_open)			*<Plug>(gh_projects_card_open)*
-	open project card
+<Plug>(gh_projects_card_edit)			*<Plug>(gh_projects_card_edit)*
+	edit project card
 	current only support content type 'Issue'
 
 <Plug>(gh_projects_card_move)			*<Plug>(gh_projects_card_move)*
@@ -281,7 +281,7 @@ default mappings
 							<C-o>		<Plug>(gh_project_open_browser)
 							ghy		<Plug>(gh_project_url_yank)
 |gh-buffer-project-column-list|				<C-o>		<Plug>(gh_projects_card_open_browser)
-							gho		<Plug>(gh_projects_card_open)
+							ghe		<Plug>(gh_projects_card_edit)
 							ghm		<Plug>(gh_projects_card_move)
 							ghy		<Plug>(gh_projects_card_url_yank)
 |gh-buffer-bookmark-list|				gho		<Plug>(gh_bookmark_open)
