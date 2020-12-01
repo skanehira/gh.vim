@@ -96,14 +96,12 @@ endfunction
 
 function! s:set_card_info(child, resp) abort
   let child = a:child
-  let info = {
-        \ 'number': printf('#%s', a:resp.body.number),
-        \ 'state': a:resp.body.state,
-        \ 'user': printf('@%s', a:resp.body.user.login),
-        \ 'title': a:resp.body.title
-        \ }
+  let number = printf('#%s', a:resp.body.number)
+  let state = a:resp.body.state
+  let user = printf('@%s', a:resp.body.user.login)
+  let title = a:resp.body.title
 
-  let child['name'] = printf('%s %s %s %s', info.number, info.state, info.user, info.title)
+  let child['name'] = printf('%s %s %s %s', number, state, user, title)
   let child['info'] = a:resp.body
 
   call gh#tree#redraw()
