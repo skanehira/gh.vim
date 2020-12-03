@@ -233,7 +233,7 @@ endfunction
 
 function! s:get_template() abort
   let url = s:files[line('.')-1].url
-  call gh#github#repos#get_file(url)
+  call gh#http#get(url)
         \.then(function('s:set_issue_template_buffer'))
         \.catch({err -> execute('%d_ | call gh#gh#set_message_buf(err.body)', '')})
 endfunction
