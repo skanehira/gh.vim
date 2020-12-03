@@ -2,6 +2,12 @@
 " Author: skanehira
 " License: MIT
 
+let s:Promise = vital#gh#import('Async.Promise')
+" cahce to create tree structure more faster
+let s:tree_node_cache = {}
+" Cache the tree created at the first time
+let s:tree_cache = {}
+
 function! gh#files#tree() abort
   setlocal ft=gh-files
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/\(.*\)\/files')
@@ -14,19 +20,28 @@ function! gh#files#tree() abort
         \   'owner': m[1],
         \   'name': m[2],
         \   'branch': m[3],
-        \ }
+        \ },
+        \ 'cache_key': printf('%s/%s/%s', m[1], m[2], m[3])
         \ }
 
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
 
-  call gh#github#repos#files(m[1], m[2], m[3])
-        \.then({resp -> s:make_tree(resp.body)})
+  call s:files(m[1], m[2], m[3])
         \.then({-> gh#tree#open(s:tree)})
         \.then({-> s:set_keymap()})
         \.then({-> gh#map#apply('gh-buffer-file-list', s:gh_file_list_bufid)})
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
         \.finally(function('gh#gh#global_buf_settings'))
+endfunction
+
+function! s:files(owner, repo, branch) abort
+  if has_key(s:tree_cache, s:file_list.cache_key)
+    let s:tree = s:tree_cache[s:file_list.cache_key]
+    return s:Promise.resolve({})
+  endif
+  return gh#github#repos#files(a:owner, a:repo, a:branch)
+        \.then({resp -> s:make_tree(resp.body)})
 endfunction
 
 function! s:edit_file() abort
@@ -71,6 +86,7 @@ function! s:make_tree(body) abort
     call s:make_node(s:tree, a:body.tree[idx])
     echo printf('[gh.vim] creating tree: %d/%d', idx, files_len-1)
   endfor
+  let s:tree_cache[s:file_list.cache_key] = deepcopy(s:tree, 1)
 endfunction
 
 function! s:make_node(tree, file) abort
@@ -88,6 +104,11 @@ function! s:make_node(tree, file) abort
     let item['state'] = 'close'
   endif
 
+  if has_key(s:tree_node_cache, parent_path)
+    call add(s:tree_node_cache[parent_path], item)
+    return
+  endif
+
   if exists('tree.children')
     for node in tree.children
       call s:make_node(node, a:file)
@@ -99,5 +120,6 @@ function! s:make_node(tree, file) abort
       let item.name .= '/'
     endif
     call add(a:tree.children, item)
+    let s:tree_node_cache[parent_path] = a:tree.children
   endif
 endfunction
