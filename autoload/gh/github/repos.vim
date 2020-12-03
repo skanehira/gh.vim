@@ -30,6 +30,7 @@ endfunction
 
 function! gh#github#repos#get_file(url) abort
   return gh#http#get(a:url)
+        \.then(function('s:decode_content'))
 endfunction
 
 function! gh#github#repos#readme(owner, repo) abort

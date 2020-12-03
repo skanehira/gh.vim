@@ -49,6 +49,8 @@ function! gh#gh#init() abort
   elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/actions$'
         \ || bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/actions?\+'
     call gh#actions#list()
+  elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/[^/]\+\/files$'
+    call gh#files#tree()
   elseif bufname =~# '^gh:\/\/bookmarks$'
     call gh#bookmark#list()
   endif
@@ -134,6 +136,9 @@ function! gh#gh#def_highlight() abort
   hi! link gh_actions_author gh_purple
   hi! link gh_actions_branch gh_blue
   hi! link gh_actions_selected gh_red
+
+  hi! link gh_files_dir gh_green
+  hi! link gh_files_selected gh_red
 endfunction
 
 function! s:dict_value_len(items) abort
