@@ -58,7 +58,7 @@ function! s:set_file_contents(node, body) abort
   call gh#gh#init_buffer()
   exe printf('rightbelow vnew %s', a:node.path)
   call setline(1, a:body)
-  set nomodified
+  setlocal nomodified
 endfunction
 
 function! s:set_keymap() abort
