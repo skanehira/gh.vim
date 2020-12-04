@@ -83,7 +83,8 @@ function! s:make_tree(body) abort
   let files_len = len(a:body.tree)
   for idx in range(files_len)
     call s:make_node(s:tree, a:body.tree[idx])
-    echo printf('[gh.vim] creating tree: %d/%d', idx, files_len-1)
+    call gh#gh#message(printf('creating tree: %d/%d', idx+1, files_len))
+    redraw
   endfor
   let s:tree_cache[s:file_list.cache_key] = deepcopy(s:tree, 1)
 endfunction
