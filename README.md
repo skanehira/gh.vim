@@ -16,6 +16,8 @@ Vim/Neovim plugin for GitHub
   - list/card list/move card
 - github actions
   - list/open job logs
+- file tree
+  - open file
 
 ## Installation
 Please install `curl` before installtion.
@@ -73,10 +75,11 @@ currently `gh.vim` provides buffers is bellow.
 | `gh://orgs/:org/projects`                               | show organization project list         |
 | `gh://projects/:id/columns`                             | show project column list               |
 | `gh://:owner/:repo/actions[?status=success&...]`        | show github action's workflows/steps   |
+| `gh://:owner/:repo/[:branch|:tree_sha]`                 | show repository file tree              |
 | `gh://bookmarks`                                        | show your bookmarks                    |
 
 ## Keymap list
-### issue list
+### Issue list
 
 | keymap                          | default | description             |
 |---------------------------------|---------|-------------------------|
@@ -89,7 +92,7 @@ currently `gh.vim` provides buffers is bellow.
 | `<Plug>(gh_issue_url_yank)`     | `ghy`   | yank issue url          |
 | `<Plug>(gh_issue_open_comment)` | `ghm`   | open issue comment list |
 
-### issue comment list
+### Issue comment list
 
 | keymap                                  | default | description                   |
 |-----------------------------------------|---------|-------------------------------|
@@ -99,7 +102,7 @@ currently `gh.vim` provides buffers is bellow.
 | `<Plug>(gh_issue_comment_new)`          | `ghn`   | new issue comment             |
 | `<Plug>(gh_issue_comment_url_yank)`     | `ghy`   | yank issue comment            |
 
-### pull request list
+### Pull Request list
 
 | keymap                         | default | description                  |
 |--------------------------------|---------|------------------------------|
@@ -109,7 +112,7 @@ currently `gh.vim` provides buffers is bellow.
 | `<Plug>(gh_pull_diff)`         | `ghd`   | show pull request diff       |
 | `<Plug>(gh_pull_url_yank)`     | `ghy`   | yank pull request url        |
 
-### repository list
+### Repository list
 
 | keymap                         | default | description                                                         |
 |--------------------------------|---------|---------------------------------------------------------------------|
@@ -118,13 +121,13 @@ currently `gh.vim` provides buffers is bellow.
 | `<Plug>(gh_repo_open_browser)` | `<C-o>` | open repository on browser                                          |
 | `<Plug>(gh_repo_show_readme)`  | `gho`   | show repository readme                                              |
 
-### bookmark list
+### Bookmark list
 
 | keymap                     | default | description |
 |----------------------------|---------|-------------|
 | `<Plug>(gh_bookmark_open)` | `gho`   | open buffer |
 
-### project column list
+### Project column list
 
 | keymap                                  | default | description                   |
 |-----------------------------------------|---------|-------------------------------|
@@ -142,6 +145,12 @@ currently `gh.vim` provides buffers is bellow.
 | `<Plug>(gh_actions_open_browser)` | `<C-o>` | open selected action's workflow/step on browser  |
 | `<Plug>(gh_actions_yank_url)`     | `ghy`   | yank selected action's workflow/stop url         |
 | `<Plug>(gh_actions_open_logs)`    | `gho`   | open selected actions's job logs in Vim terminal |
+
+### Repository file tree
+
+| keymap                  | default | description        |
+|-------------------------|---------|--------------------|
+| `<Plug>(gh_files_edit)` | `ghe`   | open selected file |
 
 ## Author
 skanehira
