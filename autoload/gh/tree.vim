@@ -82,10 +82,10 @@ func! s:change_state(state) abort
     " use feedkeys send key after draw
     call feedkeys('j')
   endif
-  call s:re_draw()
+  call s:redraw()
 endfunc
 
-func! s:re_draw() abort
+func! s:redraw() abort
   setlocal modifiable
   let save_cursor = getcurpos()
   silent call deletebufline(s:bufid, 1, '$')
@@ -124,7 +124,7 @@ func! s:node_select_toggle() abort
     let node = s:find_node(s:tree, current)
     let s:marked_nodes[current.path] = node
   endif
-  call s:re_draw()
+  call s:redraw()
 endfunc
 
 func! s:node_select_down() abort
@@ -228,17 +228,17 @@ func! gh#tree#move_node(dest, parent, src) abort
     call s:remove_node(a:parent, a:src)
   endif
   let s:marked_nodes = {}
-  call s:re_draw()
+  call s:redraw()
 endfunc
 
 func! gh#tree#update(tree) abort
   let s:tree = a:tree
-  call s:re_draw()
+  call s:redraw()
   redraw!
 endfunc
 
 func! gh#tree#redraw() abort
-  call s:re_draw()
+  call s:redraw()
   redraw!
 endfunc
 
