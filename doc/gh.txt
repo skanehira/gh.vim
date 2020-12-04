@@ -38,7 +38,7 @@ CHANGELOG			|gh-changelog|
 ==============================================================================
 INTRODUCTION					*gh-introduction*
 
-*gh* is a Vim/Neovim plugin for GitHub
+*gh.vim* is a Vim/Neovim plugin for GitHub
 
 Latest version:
 https://github.com/skanehira/gh.vim
@@ -124,6 +124,10 @@ gh://projects/:id/columns				*gh-buffer-project-column-list*
 gh://:owner/:repo/actions[?status=success&...]		*gh-buffer-action-list*
 	show :owner/:repo GitHub Actions workflows/steps.
 	you can use query parameters(https://git.io/JkNZB)
+
+gh://:owner/:repo/[:branch|:tree_sha]			*gh-buffer-file-list*
+	show `:owner/:repo/[:branch|:tree_sha]` file tree.
+	`:tree_sha` is commit hash.
 
 gh://bookmarks						*gh-buffer-bookmark-list*
 	show your buffer bookmarks.
@@ -258,6 +262,8 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 <Plug>(gh_actions_open_logs)			*<Plug>(gh_actions_open_logs)*
 	open selected actions's job logs in Vim terminal
 
+<Plug>(gh_files_edit)				*<Plug>(gh_files_edit)*
+	open selected file
 						*gh-default-key-mappings*
 
 default mappings
@@ -298,6 +304,7 @@ default mappings
 |gh-buffer-action-list|					<C-o>		<Plug>(gh_actions_open_browser)
 							ghy		<Plug>(gh_actions_yank_url)
 							gho		<Plug>(gh_actions_open_logs)
+|gh-buffer-file-list|					ghe		<Plug>(gh_files_edit)
 
 ------------------------------------------------------------------------------
 FUNCTIONS					*gh-functions*
