@@ -2,11 +2,6 @@
 " Author: skanehira
 " License: MIT
 
-let b:marked_nodes = {}
-let b:nodes = []
-let b:tree = []
-let b:bufid = -1
-
 func! s:flatten(nodes, parent, current) abort
   let nodes = a:nodes
   if exists('a:parent.indent')
