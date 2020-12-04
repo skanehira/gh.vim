@@ -3,26 +3,28 @@
 " License: MIT
 
 function! s:repo_open() abort
-  call gh#gh#open_url(s:repos[line('.') - 1].html_url)
+  call gh#gh#open_url(b:repos[line('.') - 1].html_url)
 endfunction
 
 function! s:repo_open_readme() abort
-  let full_name = s:repos[line('.')-1].full_name
+  let full_name = b:repos[line('.')-1].full_name
   call execute(printf('belowright vnew gh://%s/readme', full_name))
 endfunction
 
 function! s:repo_list_change_page(op) abort
   if a:op is# '+'
-    let s:repo_list.param.page += 1
+    let b:repo_list.param.page += 1
   else
-    if s:repo_list.param.page < 2
+    if b:repo_list.param.page < 2
       return
     endif
-    let s:repo_list.param.page -= 1
+    let b:repo_list.param.page -= 1
   endif
 
   let cmd = printf('vnew gh://%s/repos?%s',
-        \ s:repo_list.owner, gh#http#encode_param(s:repo_list.param))
+        \ b:repo_list.owner, gh#http#encode_param(b:repo_list.param))
+
+  call gh#gh#delete_buffer(b:, 'gh_repo_list_bufid')
   call execute(cmd)
 endfunction
 
@@ -35,11 +37,11 @@ endfunction
 
 function! s:issue_list_refresh() abort
   let cmd = printf('e gh://%s/repos?%s',
-        \ s:repo_list.owner, gh#http#encode_param(s:repo_list.param))
+        \ b:repo_list.owner, gh#http#encode_param(b:repo_list.param))
   call execute(cmd)
 endfunction
 
-function! s:repo_list(resp) abort
+function! s:set_repo_list(resp) abort
   nnoremap <buffer> <silent> <Plug>(gh_repo_list_next) :<C-u>call <SID>repo_list_change_page('+')<CR>
   nnoremap <buffer> <silent> <Plug>(gh_repo_list_prev) :<C-u>call <SID>repo_list_change_page('-')<CR>
   nmap <buffer> <silent> <C-l> <Plug>(gh_repo_list_next)
@@ -50,7 +52,7 @@ function! s:repo_list(resp) abort
     return
   endif
 
-  let s:repos = []
+  let b:repos = []
   let lines = []
 
   let dict = map(copy(a:resp.body), {_, v -> {
@@ -61,10 +63,10 @@ function! s:repo_list(resp) abort
 
   for repo in a:resp.body
     call add(lines, printf(format, repo.full_name, repo.stargazers_count))
-    call add(s:repos, repo)
+    call add(b:repos, repo)
   endfor
 
-  call setbufline(s:gh_repo_list_bufid, 1, lines)
+  call setbufline(b:gh_repo_list_bufid, 1, lines)
 
   nnoremap <buffer> <silent> <Plug>(gh_repo_open_browser) :<C-u>call <SID>repo_open()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_repo_show_readme) :<C-u>call <SID>repo_open_readme()<CR>
@@ -80,30 +82,28 @@ function! gh#repos#list() abort
     let param['page'] = 1
   endif
 
-  let s:repo_list = {
+  let b:repo_list = {
         \ 'owner': m[1],
         \ 'param': param,
         \ }
 
-  call gh#gh#delete_buffer(s:, 'gh_repo_list_bufid')
-  let s:gh_repo_list_bufid = bufnr()
+  let b:gh_repo_list_bufid = bufnr()
 
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
 
-  call gh#github#repos#list(s:repo_list.owner, s:repo_list.param)
-        \.then(function('s:repo_list'))
-        \.then({-> gh#map#apply('gh-buffer-repo-list', s:gh_repo_list_bufid)})
+  call gh#github#repos#list(b:repo_list.owner, b:repo_list.param)
+        \.then(function('s:set_repo_list'))
+        \.then({-> gh#map#apply('gh-buffer-repo-list', b:gh_repo_list_bufid)})
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
 
 function! gh#repos#readme() abort
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/readme')
-  call gh#gh#delete_buffer(s:, 'gh_repo_readme_bufid')
-  let s:gh_repo_readme_bufid = bufnr()
+  let b:gh_repo_readme_bufid = bufnr()
 
-  let s:repo_readme = {
+  let b:repo_readme = {
         \ 'owner': m[1],
         \ 'name': m[2],
         \ 'url': printf('https://github.com/%s/%s', m[1], m[2]),
@@ -114,13 +114,13 @@ function! gh#repos#readme() abort
 
   call gh#github#repos#readme(m[1], m[2])
         \.then(function('s:set_readme_content'))
-        \.then({-> gh#map#apply('gh-buffer-repo-readme', s:gh_repo_readme_bufid)})
+        \.then({-> gh#map#apply('gh-buffer-repo-readme', b:gh_repo_readme_bufid)})
         \.catch({err -> execute('call gh#gh#set_message_buf(err.body)', '')})
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
 
 function! s:set_readme_content(body) abort
-  call setbufline(s:gh_repo_readme_bufid, 1, a:body)
+  call setbufline(b:gh_repo_readme_bufid, 1, a:body)
   setlocal ft=markdown
 
   nnoremap <buffer> <silent> <Plug>(gh_repo_open_browser_on_readme) :<C-u>call <SID>repo_open_on_readme()<CR>
@@ -128,7 +128,7 @@ function! s:set_readme_content(body) abort
 endfunction
 
 function! s:repo_open_on_readme() abort
-  call gh#gh#open_url(s:repo_readme.url)
+  call gh#gh#open_url(b:repo_readme.url)
 endfunction
 
 function! gh#repos#new() abort
