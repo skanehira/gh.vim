@@ -42,7 +42,7 @@ function! s:set_action_list(resp) abort
         \ 'id': a:resp.body.total_count,
         \ 'name': s:action_list.repo.name,
         \ 'state': 'open',
-        \ 'path': s:action_list.repo.name,
+        \ 'path': printf('%d', a:resp.body.total_count),
         \ 'children': []
         \ }
 
@@ -169,7 +169,7 @@ function! s:set_job_list(node, resp) abort
     let child = {
           \ 'id': job.id,
           \ 'name': printf('%s %s', status, job.name),
-          \ 'path': printf('%s/%s', a:node.id, job.id),
+          \ 'path': printf('%s/%s', a:node.path, job.id),
           \ 'info': job
           \ }
     if !empty(job.steps)
@@ -180,7 +180,7 @@ function! s:set_job_list(node, resp) abort
         let s = {
               \ 'id': step.number,
               \ 'name': printf('%s #%d %s', status, step.number, step.name),
-              \ 'path': printf('%s/%s', job.id, step.number)
+              \ 'path': printf('%s/%s', child.path, step.number)
               \ }
         call add(child.children, s)
       endfor

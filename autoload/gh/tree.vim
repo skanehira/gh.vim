@@ -2,10 +2,10 @@
 " Author: skanehira
 " License: MIT
 
-let s:marked_nodes = {}
-let s:nodes = []
-let s:tree = []
-let s:bufid = -1
+let b:marked_nodes = {}
+let b:nodes = []
+let b:tree = []
+let b:bufid = -1
 
 func! s:flatten(nodes, parent, current) abort
   let nodes = a:nodes
@@ -24,7 +24,7 @@ func! s:flatten(nodes, parent, current) abort
   if exists('a:current.name')
     let node['name'] = a:current.name
   endif
-  let node['selected'] = exists('s:marked_nodes[a:current.path]')
+  let node['selected'] = exists('b:marked_nodes[a:current.path]')
 
   call add(nodes, node)
 
@@ -57,7 +57,7 @@ endfunc
 
 func! s:get_node_pos(node) abort
   let pos = 1
-  for n in s:nodes
+  for n in b:nodes
     if n.path is# a:node.path
       return pos
     endif
@@ -66,50 +66,56 @@ func! s:get_node_pos(node) abort
   return pos
 endfunc
 
-func! s:change_state(state) abort
-  let current = s:get_current_node()
-  let node = s:find_node_parent(a:state, current)
-  if empty(node)
-    return
+func! s:open_node() abort
+  let node = gh#tree#current_node()
+  if exists('node.state') && node.state is# 'close'
+    let node.state = 'open'
   endif
-  if !exists('node.state')
-    return
-  endif
-  let node.state = a:state
-  if a:state is# 'close'
-    call setpos('.', [0, s:get_node_pos(node), 1])
+  " use feedkeys send key after draw
+  call feedkeys('j')
+  call s:redraw()
+endfunc
+
+func! s:close_node() abort
+  let current_node = gh#tree#current_node()
+  if exists('current_node.state') && current_node.state is# 'open'
+    let current_node.state = 'close'
   else
-    " use feedkeys send key after draw
-    call feedkeys('j')
+    let paths = split(current_node.path, '/')
+    let parent_path = join(paths[:-2], '/')
+    let parent_node = s:find_parent_node(b:tree, parent_path)
+    if !exists('parent_node.state')
+      return
+    endif
+    let parent_node.state = 'close'
+    call setpos('.', [0, s:get_node_pos(parent_node), 1])
   endif
   call s:redraw()
+endfunc
+
+func! s:find_parent_node(node, path) abort
+  if a:node.path is# a:path
+    return a:node
+  endif
+  if exists('a:node.children')
+    for child in a:node.children
+      let p = s:find_parent_node(child, a:path)
+      if !empty(p)
+        return p
+      endif
+    endfor
+  endif
+  return {}
 endfunc
 
 func! s:redraw() abort
   setlocal modifiable
   let save_cursor = getcurpos()
-  silent call deletebufline(s:bufid, 1, '$')
-  let s:nodes = s:flatten([], {}, s:tree)
-  call s:draw(s:nodes)
+  silent call deletebufline(b:bufid, 1, '$')
+  let b:nodes = s:flatten([], {}, b:tree)
+  call s:draw(b:nodes)
   call setpos('.', save_cursor)
   setlocal nomodifiable
-endfunc
-
-func! s:find_node_parent(state, target) abort
-  let target = a:target
-  if exists('target.parent') && a:state is 'close'
-    let target = target.parent
-  elseif exists('target.has_children')
-    let target = target
-  else
-    let target = {}
-  endif
-
-  if empty(target)
-    return {}
-  endif
-  let node = s:find_node(s:tree, target)
-  return node
 endfunc
 
 func! s:node_select_toggle() abort
@@ -118,11 +124,11 @@ func! s:node_select_toggle() abort
     return
   endif
   let current = s:get_current_node()
-  if exists('s:marked_nodes[current.path]')
-    call remove(s:marked_nodes, current.path)
+  if exists('b:marked_nodes[current.path]')
+    call remove(b:marked_nodes, current.path)
   else
-    let node = s:find_node(s:tree, current)
-    let s:marked_nodes[current.path] = node
+    let node = s:find_node(b:tree, current)
+    let b:marked_nodes[current.path] = node
   endif
   call s:redraw()
 endfunc
@@ -139,7 +145,7 @@ endfunc
 
 func! s:get_current_node() abort
   let idx = line('.') - 1
-  return s:nodes[idx]
+  return b:nodes[idx]
 endfunc
 
 func! s:make_prefix(node) abort
@@ -181,7 +187,7 @@ func! s:draw(nodes) abort
     if node.selected
       let line .= '*'
     endif
-    call setbufline(s:bufid, i, line)
+    call setbufline(b:bufid, i, line)
     let i += 1
   endfor
 endfunc
@@ -214,7 +220,7 @@ func! s:add_node(parent, target) abort
 endfunc
 
 func! gh#tree#root() abort
-  return s:tree
+  return b:tree
 endfunc
 
 func! gh#tree#move_node(dest, parent, src) abort
@@ -227,12 +233,12 @@ func! gh#tree#move_node(dest, parent, src) abort
   if added
     call s:remove_node(a:parent, a:src)
   endif
-  let s:marked_nodes = {}
+  let b:marked_nodes = {}
   call s:redraw()
 endfunc
 
 func! gh#tree#update(tree) abort
-  let s:tree = a:tree
+  let b:tree = a:tree
   call s:redraw()
   redraw!
 endfunc
@@ -243,16 +249,16 @@ func! gh#tree#redraw() abort
 endfunc
 
 func! gh#tree#marked_nodes() abort
-  return s:marked_nodes
+  return b:marked_nodes
 endfunc
 
 func! gh#tree#clean_marked_nodes() abort
-  let s:marked_nodes = {}
+  let b:marked_nodes = {}
 endfunc
 
 func! gh#tree#current_node() abort
   let current = s:get_current_node()
-  return s:find_node(s:tree, current)
+  return s:find_node(b:tree, current)
 endfunc
 
 func! s:set_node(tree, node) abort
@@ -273,19 +279,19 @@ func! s:set_node(tree, node) abort
 endfunc
 
 func! gh#tree#set_node(node) abort
-  return s:set_node(s:tree, a:node)
+  return s:set_node(b:tree, a:node)
 endfunc
 
 func! gh#tree#open(tree) abort
-  let s:bufid = bufnr()
-  let s:tree = a:tree
-  let s:nodes = s:flatten([], {}, a:tree)
-  let s:marked_nodes = {}
+  let b:bufid = bufnr()
+  let b:tree = a:tree
+  let b:nodes = s:flatten([], {}, a:tree)
+  let b:marked_nodes = {}
 
-  call s:draw(s:nodes)
+  call s:draw(b:nodes)
 
-  nnoremap <buffer> <silent> h :<C-u>call <SID>change_state('close')<CR>
-  nnoremap <buffer> <silent> l :<C-u>call <SID>change_state('open')<CR>
+  nnoremap <buffer> <silent> h :<C-u>call <SID>close_node()<CR>
+  nnoremap <buffer> <silent> l :<C-u>call <SID>open_node()<CR>
   nnoremap <buffer> <silent> <C-j> :<C-u>call <SID>node_select_down()<CR>
   nnoremap <buffer> <silent> <C-k> :<C-u>call <SID>node_select_up()<CR>
 endfunc
