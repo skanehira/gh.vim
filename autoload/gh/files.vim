@@ -59,7 +59,6 @@ function! s:set_file_contents(node, body) abort
   exe printf('rightbelow vnew %s', a:node.path)
   call setline(1, a:body)
   set nomodified
-  nnoremap <buffer> <silent> q :bw!<CR>
 endfunction
 
 function! s:set_keymap() abort
