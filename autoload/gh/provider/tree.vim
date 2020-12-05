@@ -216,7 +216,7 @@ func! s:add_node(parent, target) abort
     " update target node path
     let target = a:target
     let paths = split(target.path, '/')
-    let target.path = join([a:parent.path, paths[:-2]], '/')
+    let target.path = join([a:parent.path, paths[-1]], '/')
     call add(a:parent.children, a:target)
   endif
   return !has
