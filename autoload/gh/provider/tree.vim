@@ -62,7 +62,7 @@ func! s:get_node_pos(node) abort
 endfunc
 
 func! s:open_node() abort
-  let node = gh#tree#current_node()
+  let node = gh#provider#tree#current_node()
   if exists('node.state') && node.state is# 'close'
     let node.state = 'open'
   endif
@@ -72,7 +72,7 @@ func! s:open_node() abort
 endfunc
 
 func! s:close_node() abort
-  let current_node = gh#tree#current_node()
+  let current_node = gh#provider#tree#current_node()
   if exists('current_node.state') && current_node.state is# 'open'
     let current_node.state = 'close'
   else
@@ -214,11 +214,11 @@ func! s:add_node(parent, target) abort
   return !has
 endfunc
 
-func! gh#tree#root() abort
+func! gh#provider#tree#root() abort
   return b:tree
 endfunc
 
-func! gh#tree#move_node(dest, parent, src) abort
+func! gh#provider#tree#move_node(dest, parent, src) abort
   let dest = a:dest
   if !exists('dest.children')
     let dest['children'] = []
@@ -232,26 +232,26 @@ func! gh#tree#move_node(dest, parent, src) abort
   call s:redraw()
 endfunc
 
-func! gh#tree#update(tree) abort
+func! gh#provider#tree#update(tree) abort
   let b:tree = a:tree
   call s:redraw()
   redraw!
 endfunc
 
-func! gh#tree#redraw() abort
+func! gh#provider#tree#redraw() abort
   call s:redraw()
   redraw!
 endfunc
 
-func! gh#tree#marked_nodes() abort
+func! gh#provider#tree#marked_nodes() abort
   return b:marked_nodes
 endfunc
 
-func! gh#tree#clean_marked_nodes() abort
+func! gh#provider#tree#clean_marked_nodes() abort
   let b:marked_nodes = {}
 endfunc
 
-func! gh#tree#current_node() abort
+func! gh#provider#tree#current_node() abort
   let current = s:get_current_node()
   return s:find_node(b:tree, current)
 endfunc
@@ -273,11 +273,11 @@ func! s:set_node(tree, node) abort
   return 0
 endfunc
 
-func! gh#tree#set_node(node) abort
+func! gh#provider#tree#set_node(node) abort
   return s:set_node(b:tree, a:node)
 endfunc
 
-func! gh#tree#open(tree) abort
+func! gh#provider#tree#open(tree) abort
   let b:bufid = bufnr()
   let b:tree = a:tree
   let b:nodes = s:flatten([], {}, a:tree)

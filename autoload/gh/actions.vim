@@ -47,7 +47,7 @@ function! s:set_action_list(resp) abort
         \ }
 
   call s:make_tree(a:resp.body.workflow_runs)
-  call gh#tree#open(s:tree)
+  call gh#provider#tree#open(s:tree)
 
   nnoremap <buffer> <silent> <Plug>(gh_actions_open_browser) :call <SID>open_browser()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_actions_yank_url) :call <SID>yank_url()<CR>
@@ -60,11 +60,11 @@ endfunction
 
 function! s:get_selected_nodes() abort
   let nodes = []
-  for node in values(gh#tree#marked_nodes())
+  for node in values(gh#provider#tree#marked_nodes())
     call add(nodes, node)
   endfor
   if empty(nodes)
-    let nodes = [gh#tree#current_node()]
+    let nodes = [gh#provider#tree#current_node()]
   endif
   return nodes
 endfunction
@@ -85,8 +85,8 @@ function! s:yank_url() abort
     return
   endif
 
-  call gh#tree#clean_marked_nodes()
-  call gh#tree#redraw()
+  call gh#provider#tree#clean_marked_nodes()
+  call gh#provider#tree#redraw()
 
   let ln = "\n"
   if &ff == "dos"
@@ -104,8 +104,8 @@ function! s:open_browser() abort
   for url in s:get_selected_urls()
     call gh#gh#open_url(url)
   endfor
-  call gh#tree#clean_marked_nodes()
-  call gh#tree#redraw()
+  call gh#provider#tree#clean_marked_nodes()
+  call gh#provider#tree#redraw()
 endfunction
 
 function! s:get_status_annotation(status, conclusion) abort
@@ -151,7 +151,7 @@ function! s:make_tree(actions) abort
     call gh#http#get(action.jobs_url)
           \.then(function('s:set_job_list', [node]))
           \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
-          \.finally({-> gh#tree#redraw()})
+          \.finally({-> gh#provider#tree#redraw()})
   endfor
 endfunction
 
@@ -205,8 +205,8 @@ function! s:open_logs() abort
     return
   endif
 
-  call gh#tree#clean_marked_nodes()
-  call gh#tree#redraw()
+  call gh#provider#tree#clean_marked_nodes()
+  call gh#provider#tree#redraw()
 
   let token = get(g:, 'gh_token', '')
   if empty(token)

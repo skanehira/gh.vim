@@ -27,7 +27,7 @@ function! gh#files#tree() abort
   call gh#gh#set_message_buf('loading')
 
   call s:files(m[1], m[2], m[3])
-        \.then({-> gh#tree#open(b:tree)})
+        \.then({-> gh#provider#tree#open(b:tree)})
         \.then({-> s:set_keymap()})
         \.then({-> gh#map#apply('gh-buffer-file-list', b:gh_file_list_bufid)})
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
@@ -44,7 +44,7 @@ function! s:files(owner, repo, branch) abort
 endfunction
 
 function! s:edit_file() abort
-  let node = gh#tree#current_node()
+  let node = gh#provider#tree#current_node()
   if node.info.type isnot# 'tree'
     call gh#gh#message('opening...')
     call gh#github#repos#get_file(node.info.url)

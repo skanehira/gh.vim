@@ -108,7 +108,7 @@ endfunction
 
 function! s:set_card_info(child, resp) abort
   call s:update_card_info(a:child, a:resp.body)
-  call gh#tree#redraw()
+  call gh#provider#tree#redraw()
 endfunction
 
 function! s:add_cards(node, resp) abort
@@ -160,9 +160,9 @@ function! s:make_tree(tree, columns) abort
 endfunction
 
 function! s:get_selected_cards() abort
-  let marked_nodes = gh#tree#marked_nodes()
+  let marked_nodes = gh#provider#tree#marked_nodes()
   if empty(marked_nodes)
-    return [gh#tree#current_node()]
+    return [gh#provider#tree#current_node()]
   endif
   return values(marked_nodes)
 endfunction
@@ -173,14 +173,14 @@ function! s:card_open_browser() abort
       call gh#gh#open_url(card.info.html_url)
     endif
   endfor
-  call gh#tree#clean_marked_nodes()
-  call gh#tree#redraw()
+  call gh#provider#tree#clean_marked_nodes()
+  call gh#provider#tree#redraw()
 endfunction
 
 function! s:card_edit() abort
-  let node = gh#tree#current_node()
+  let node = gh#provider#tree#current_node()
   if exists('node.info')
-    call execute('new ' .. substitute(gh#tree#current_node().info.html_url, 'https://github.com/','gh://',''))
+    call execute('new ' .. substitute(gh#provider#tree#current_node().info.html_url, 'https://github.com/','gh://',''))
   endif
 endfunction
 
@@ -224,8 +224,8 @@ function! s:set_card_state(state) abort
 
   call s:Promise.all(promises)
         \.then({-> s:card_update(cards, a:state)})
-        \.then({-> gh#tree#clean_marked_nodes()})
-        \.then({-> gh#tree#redraw()})
+        \.then({-> gh#provider#tree#clean_marked_nodes()})
+        \.then({-> gh#provider#tree#redraw()})
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
         \.finally({-> execute('echom ""')})
 endfunction
@@ -234,7 +234,7 @@ function! s:card_update(cards, state) abort
   for card in a:cards
     let card.info.state = a:state
     call s:update_card_info(card, card.info)
-    call gh#tree#set_node(card)
+    call gh#provider#tree#set_node(card)
   endfor
 endfunction
 
@@ -254,11 +254,11 @@ function! s:find_column(node) abort
 endfunction
 
 function! s:card_move() abort
-  let nodes = values(gh#tree#marked_nodes())
+  let nodes = values(gh#provider#tree#marked_nodes())
   if empty(nodes)
     return
   endif
-  let column = s:find_column(gh#tree#current_node())
+  let column = s:find_column(gh#provider#tree#current_node())
   let promises = []
   for node in nodes
     call add(promises, gh#github#projects#card_moves(column.id, node.id))
@@ -267,14 +267,14 @@ function! s:card_move() abort
   function! s:move() abort closure
     for node in nodes
       let parent = s:find_column(node)
-      call gh#tree#move_node(column, parent, node)
+      call gh#provider#tree#move_node(column, parent, node)
     endfor
   endfunction
 
   call gh#gh#message('moving...')
   call s:Promise.all(promises)
         \.then({-> s:move()})
-        \.then({-> gh#tree#redraw()})
+        \.then({-> gh#provider#tree#redraw()})
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
         \.finally({-> execute('echom "" | redraw!')})
 endfunction
@@ -286,8 +286,8 @@ function! s:card_url_yank() abort
     return
   endif
 
-  call gh#tree#clean_marked_nodes()
-  call gh#tree#redraw()
+  call gh#provider#tree#clean_marked_nodes()
+  call gh#provider#tree#redraw()
 
   for card in cards
     if exists('card.info.html_url')
@@ -323,7 +323,7 @@ function! s:set_project_column_list(resp) abort
         \ }
 
   call s:make_tree(s:tree, a:resp.body)
-  call gh#tree#open(s:tree)
+  call gh#provider#tree#open(s:tree)
 
   nnoremap <buffer> <silent> <Plug>(gh_projects_card_open_browser) :call <SID>card_open_browser()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_projects_card_edit) :call <SID>card_edit()<CR>
