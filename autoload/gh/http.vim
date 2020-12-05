@@ -101,7 +101,7 @@ endfunction
 function! gh#http#request(settings) abort
   let token = get(g:, 'gh_token', '')
   if empty(token)
-    return s:Promise.reject('[qh.vim] g:gh_token is undefined')
+    return s:Promise.reject('[gh.vim] g:gh_token is undefined')
   endif
 
   let method = has_key(a:settings, 'method') ? a:settings.method : 'GET'
