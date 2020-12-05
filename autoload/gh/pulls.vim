@@ -1,4 +1,4 @@
-" gh
+" pulls
 " Author: skanehira
 " License: MIT
 

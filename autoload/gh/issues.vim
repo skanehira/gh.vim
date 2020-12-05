@@ -1,4 +1,4 @@
-" gh
+" issues
 " Author: skanehira
 " License: MIT
 

@@ -1,4 +1,4 @@
-" explorer
+" files
 " Author: skanehira
 " License: MIT
 
