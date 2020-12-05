@@ -43,6 +43,7 @@ function! s:set_action_list(resp) abort
         \ 'name': s:action_list.repo.name,
         \ 'state': 'open',
         \ 'path': printf('%d', a:resp.body.total_count),
+        \ 'markable': 0,
         \ 'children': []
         \ }
 
@@ -144,6 +145,7 @@ function! s:make_tree(actions) abort
           \ 'id': action.id,
           \ 'name': printf('%s %s %s %s', status, message, author, printf('[%s]', action.head_branch)),
           \ 'path': printf('%s/%s', s:tree.id, action.id),
+          \ 'markable': 1,
           \ 'info': action
           \ }
     call add(s:actions, action)
@@ -170,6 +172,7 @@ function! s:set_job_list(node, resp) abort
           \ 'id': job.id,
           \ 'name': printf('%s %s', status, job.name),
           \ 'path': printf('%s/%s', a:node.path, job.id),
+          \ 'markable': 1,
           \ 'info': job
           \ }
     if !empty(job.steps)
@@ -180,7 +183,8 @@ function! s:set_job_list(node, resp) abort
         let s = {
               \ 'id': step.number,
               \ 'name': printf('%s #%d %s', status, step.number, step.name),
-              \ 'path': printf('%s/%s', child.path, step.number)
+              \ 'path': printf('%s/%s', child.path, step.number),
+              \ 'markable': 0
               \ }
         call add(child.children, s)
       endfor

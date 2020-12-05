@@ -122,7 +122,8 @@ function! s:add_cards(node, resp) abort
   for card in a:resp.body
     let child = {
           \ 'id': card.id,
-          \ 'path': printf('%s/%s', node.path, card.id)
+          \ 'path': printf('%s/%s', node.path, card.id),
+          \ 'markable': 1,
           \ }
 
     if card.note isnot# v:null
@@ -148,7 +149,8 @@ function! s:make_tree(tree, columns) abort
     let column = {
           \ 'id': c.id,
           \ 'name': c.name,
-          \ 'path': printf('%s/%s', a:tree.path, c.id)
+          \ 'path': printf('%s/%s', a:tree.path, c.id),
+          \ 'markable': 0,
           \ }
     call add(s:project_columns, column)
     call gh#github#projects#cards(column.id)
@@ -319,7 +321,8 @@ function! s:set_project_column_list(resp) abort
         \ 'name': s:project.name,
         \ 'state': 'open',
         \ 'path': printf('%s', s:project.id),
-        \ 'children': []
+        \ 'children': [],
+        \ 'markable': 0,
         \ }
 
   call s:make_tree(s:tree, a:resp.body)

@@ -16,6 +16,10 @@ func! s:flatten(nodes, parent, current) abort
         \ 'parent': a:parent,
         \ }
 
+  if exists('a:current.markable')
+    let node['markable'] = a:current.markable
+  endif
+
   if exists('a:current.name')
     let node['name'] = a:current.name
   endif
@@ -115,11 +119,10 @@ func! s:redraw() abort
 endfunc
 
 func! s:node_select_toggle() abort
-  " do nothing for tree root
-  if line('.') is# 1
+  let current = s:get_current_node()
+  if exists('current.markable') && !current.markable
     return
   endif
-  let current = s:get_current_node()
   if exists('b:marked_nodes[current.path]')
     call remove(b:marked_nodes, current.path)
   else

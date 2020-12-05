@@ -70,7 +70,8 @@ function! s:make_tree(body) abort
         \ 'name': b:file_list.repo.name,
         \ 'path': b:file_list.repo.name,
         \ 'state': 'open',
-        \ 'children': []
+        \ 'children': [],
+        \ 'markable': 0,
         \ }
 
   " add project name to root path
@@ -95,7 +96,8 @@ function! s:make_node(tree, file) abort
   let item = {
         \ 'name': paths[-1],
         \ 'path': a:file.path,
-        \ 'info': a:file
+        \ 'info': a:file,
+        \ 'markable': 1,
         \ }
 
   if a:file.type is# 'tree'
