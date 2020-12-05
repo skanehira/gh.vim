@@ -111,6 +111,7 @@ func! s:redraw() abort
   call s:draw(b:nodes)
   call setpos('.', save_cursor)
   setlocal nomodifiable
+  redraw
 endfunc
 
 func! s:node_select_toggle() abort
@@ -209,6 +210,10 @@ func! s:add_node(parent, target) abort
     endif
   endfor
   if !has
+    " update target node path
+    let target = a:target
+    let paths = split(target.path, '/')
+    let target.path = join([a:parent.path, paths[:-2]], '/')
     call add(a:parent.children, a:target)
   endif
   return !has
@@ -235,12 +240,10 @@ endfunc
 func! gh#provider#tree#update(tree) abort
   let b:tree = a:tree
   call s:redraw()
-  redraw!
 endfunc
 
 func! gh#provider#tree#redraw() abort
   call s:redraw()
-  redraw!
 endfunc
 
 func! gh#provider#tree#marked_nodes() abort

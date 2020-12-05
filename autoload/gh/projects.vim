@@ -227,7 +227,7 @@ function! s:set_card_state(state) abort
         \.then({-> gh#provider#tree#clean_marked_nodes()})
         \.then({-> gh#provider#tree#redraw()})
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
-        \.finally({-> execute('echom ""')})
+        \.finally({-> execute('echom ""', '')})
 endfunction
 
 function! s:card_update(cards, state) abort
@@ -276,7 +276,7 @@ function! s:card_move() abort
         \.then({-> s:move()})
         \.then({-> gh#provider#tree#redraw()})
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
-        \.finally({-> execute('echom "" | redraw!')})
+        \.finally({-> execute('echom ""', '')})
 endfunction
 
 function! s:card_url_yank() abort
