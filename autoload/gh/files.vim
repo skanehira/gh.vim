@@ -3,12 +3,12 @@
 " License: MIT
 
 let s:Promise = vital#gh#import('Async.Promise')
+let s:tree_cache = {}
 
 function! gh#files#tree() abort
   " cahce to create tree structure more faster
   let b:tree_node_cache = {}
   " Cache the tree created at the first time
-  let b:tree_cache = {}
 
   setlocal ft=gh-files
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/\(.*\)\/files')
@@ -35,8 +35,8 @@ function! gh#files#tree() abort
 endfunction
 
 function! s:files(owner, repo, branch) abort
-  if has_key(b:tree_cache, b:file_list.cache_key)
-    let b:tree = b:tree_cache[b:file_list.cache_key]
+  if has_key(s:tree_cache, b:file_list.cache_key)
+    let b:tree = s:tree_cache[b:file_list.cache_key]
     return s:Promise.resolve({})
   endif
   return gh#github#repos#files(a:owner, a:repo, a:branch)
@@ -86,7 +86,7 @@ function! s:make_tree(body) abort
     call gh#gh#message(printf('creating tree: %d/%d', idx+1, files_len))
     redraw
   endfor
-  let b:tree_cache[b:file_list.cache_key] = deepcopy(b:tree, 1)
+  let s:tree_cache[b:file_list.cache_key] = deepcopy(b:tree, 1)
 endfunction
 
 function! s:make_node(tree, file) abort
