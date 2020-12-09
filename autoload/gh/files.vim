@@ -94,7 +94,7 @@ function! s:make_node(tree, file) abort
   let parent_path = join(paths[:-2], "/")
   let tree = a:tree
   let item = {
-        \ 'name': paths[-1],
+        \ 'name': a:file.type is# 'tree' ? paths[-1] .. '/' : paths[-1],
         \ 'path': a:file.path,
         \ 'info': a:file,
         \ 'markable': 1,
@@ -117,9 +117,6 @@ function! s:make_node(tree, file) abort
   endif
 
   if tree.path is# parent_path
-    if a:file.type is# 'tree'
-      let item.name .= '/'
-    endif
     call add(a:tree.children, item)
     let b:tree_node_cache[parent_path] = a:tree.children
   endif
