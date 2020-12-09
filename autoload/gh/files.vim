@@ -11,7 +11,7 @@ function! gh#files#tree() abort
   " Cache the tree created at the first time
 
   setlocal ft=gh-files
-  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/\(.*\)\/files')
+  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/\(.*\)\/files?*\(.*\)')
   let b:gh_file_list_bufid = bufnr()
 
   let b:file_list = {
@@ -22,6 +22,15 @@ function! gh#files#tree() abort
         \ },
         \ 'cache_key': printf('%s/%s/%s', m[1], m[2], m[3])
         \ }
+
+  if !empty(m[4])
+    let kv = split(m[4], '=')
+    if len(kv) > 1 && kv[0] is# 'recache' && kv[1] is# '1'
+      if has_key(s:tree_cache, b:file_list.cache_key)
+        call remove(s:tree_cache, b:file_list.cache_key)
+      endif
+    endif
+  endif
 
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')

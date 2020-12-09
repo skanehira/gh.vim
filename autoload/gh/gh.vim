@@ -50,6 +50,7 @@ function! gh#gh#init() abort
         \ || bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/actions?\+'
     call gh#actions#list()
   elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/[^/]\+\/files$'
+        \ || bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/[^/]\+\/files?\+'
     call gh#files#tree()
   elseif bufname =~# '^gh:\/\/bookmarks$'
     call gh#bookmark#list()

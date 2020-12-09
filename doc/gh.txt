@@ -125,9 +125,10 @@ gh://:owner/:repo/actions[?status=success&...]		*gh-buffer-action-list*
 	show :owner/:repo GitHub Actions workflows/steps.
 	you can use query parameters(https://git.io/JkNZB)
 
-gh://:owner/:repo/[:branch|:tree_sha]			*gh-buffer-file-list*
+gh://:owner/:repo/[:branch|:tree_sha]/files[?recache=1]	*gh-buffer-file-list*
 	show `:owner/:repo/[:branch|:tree_sha]` file tree.
-	`:tree_sha` is commit hash.
+	`:tree_sha` is commit hash and `:branch` is branch name.
+	when `recache` is 1, file tree's cache will be cleard.
 
 gh://bookmarks						*gh-buffer-bookmark-list*
 	show your buffer bookmarks.
