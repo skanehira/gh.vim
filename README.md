@@ -75,7 +75,7 @@ currently `gh.vim` provides buffers is bellow.
 | `gh://orgs/:org/projects`                               | show organization project list         |
 | `gh://projects/:id/columns`                             | show project column list               |
 | `gh://:owner/:repo/actions[?status=success&...]`        | show github action's workflows/steps   |
-| `gh://:owner/:repo/[:branch|:tree_sha]`                 | show repository file tree              |
+| `gh://:owner/:repo/[:branch/:tree_sha]`                 | show repository file tree              |
 | `gh://bookmarks`                                        | show your bookmarks                    |
 
 ## Keymap list
