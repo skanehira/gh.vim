@@ -110,20 +110,19 @@ function! s:open_browser() abort
 endfunction
 
 function! s:get_status_annotation(status, conclusion) abort
-  let status = '✗'
+  let status = '❌'
   if a:conclusion is# v:null
     if a:status is# 'in_progress'
-      let status = '◉'
+      let status = '🔘'
     elseif a:status is# 'queued'
-      let status = '◎'
+      let status = '⭕'
     endif
-  endif
-  if a:conclusion is# 'success'
-    let status = '✓'
+  elseif a:conclusion is# 'success'
+    let status = '✔ '
   elseif a:conclusion is# 'skipped'
-    let status = '❢'
+    let status = '🚫'
   elseif a:conclusion is# 'neutral'
-    let status = '❑'
+    let status = '🔲'
   endif
   return status
 endfunction
