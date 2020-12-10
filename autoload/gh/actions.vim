@@ -6,8 +6,7 @@ function! gh#actions#list() abort
   setlocal ft=gh-actions
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/actions?*\(.*\)')
 
-  call gh#gh#delete_buffer(s:, 'gh_action_list_bufid')
-  let s:gh_action_list_bufid = bufnr()
+  let b:gh_action_list_bufid = bufnr()
 
   let param = gh#http#decode_param(m[3])
   if !has_key(param, 'page')
@@ -27,7 +26,7 @@ function! gh#actions#list() abort
 
   call gh#github#actions#list(s:action_list.repo.owner, s:action_list.repo.name, s:action_list.param)
         \.then(function('s:set_action_list'))
-        \.then({-> gh#map#apply('gh-buffer-action-list', s:gh_action_list_bufid)})
+        \.then({-> gh#map#apply('gh-buffer-action-list', b:gh_action_list_bufid)})
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
@@ -38,7 +37,7 @@ function! s:set_action_list(resp) abort
     return
   endif
 
-  let s:tree = {
+  let b:tree = {
         \ 'id': a:resp.body.total_count,
         \ 'name': s:action_list.repo.name,
         \ 'state': 'open',
@@ -48,7 +47,7 @@ function! s:set_action_list(resp) abort
         \ }
 
   call s:make_tree(a:resp.body.workflow_runs)
-  call gh#provider#tree#open(s:tree)
+  call gh#provider#tree#open(b:tree)
 
   nnoremap <buffer> <silent> <Plug>(gh_actions_open_browser) :call <SID>open_browser()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_actions_yank_url) :call <SID>yank_url()<CR>
@@ -129,7 +128,7 @@ function! s:get_status_annotation(status, conclusion) abort
 endfunction
 
 function! s:make_tree(actions) abort
-  let s:actions = []
+  let b:actions = []
 
   for action in a:actions
     let conclusion = 'running'
@@ -144,12 +143,12 @@ function! s:make_tree(actions) abort
     let node = {
           \ 'id': action.id,
           \ 'name': printf('%s %s %s %s', status, message, author, printf('[%s]', action.head_branch)),
-          \ 'path': printf('%s/%s', s:tree.id, action.id),
+          \ 'path': printf('%s/%s', b:tree.id, action.id),
           \ 'markable': 1,
           \ 'info': action
           \ }
-    call add(s:actions, action)
-    call add(s:tree.children, node)
+    call add(b:actions, action)
+    call add(b:tree.children, node)
     call gh#http#get(action.jobs_url)
           \.then(function('s:set_job_list', [node]))
           \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
