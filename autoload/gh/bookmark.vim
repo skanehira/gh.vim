@@ -44,7 +44,7 @@ function! s:bookmark_file_update() abort
       let lines = getbufline(s:gh_bookmark_list_bufid, 1, '$')
       call writefile(lines, s:bookmark_file)
     endif
-    set nomodified
+    setlocal nomodified
   catch
     call gh#gh#message(v:exception)
     return
