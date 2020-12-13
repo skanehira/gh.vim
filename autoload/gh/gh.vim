@@ -28,7 +28,7 @@ function! gh#gh#init() abort
     call gh#issues#list()
   elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/issues\/[0-9]\+$'
     call gh#issues#issue()
-  elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/[^/]\+\/issues\/new$'
+  elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/.\+\/issues\/new$'
     call gh#issues#new()
   elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/issues\/\d\+\/comments$'
         \ || bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/issues\/\d\+\/comments?\+'
@@ -49,8 +49,8 @@ function! gh#gh#init() abort
   elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/actions$'
         \ || bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/actions?\+'
     call gh#actions#list()
-  elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/[^/]\+\/files$'
-        \ || bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/[^/]\+\/files?\+'
+  elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/.\+\/files$'
+        \ || bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/.\+\/files?\+'
     call gh#files#tree()
   elseif bufname =~# '^gh:\/\/bookmarks$'
     call gh#bookmark#list()

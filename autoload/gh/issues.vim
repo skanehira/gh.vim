@@ -170,7 +170,7 @@ function! gh#issues#new() abort
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
 
-  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/\(.*\)/issues/new$')
+  let m = matchlist(bufname(), 'gh://\(.\{-}\)/\(.\{-}\)/\(.*\)/issues/new$')
   let s:issue_new = {
         \ 'owner': m[1],
         \ 'name': m[2],

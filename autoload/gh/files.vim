@@ -11,7 +11,7 @@ function! gh#files#tree() abort
   " Cache the tree created at the first time
 
   setlocal ft=gh-files
-  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/\(.*\)\/files?*\(.*\)')
+  let m = matchlist(bufname(), 'gh://\(.\{-}\)/\(.\{-}\)/\(.*\)\/files?*\(.*\)')
   let b:gh_file_list_bufid = bufnr()
 
   let b:file_list = {
