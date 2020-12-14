@@ -83,6 +83,8 @@ function! s:set_project_list_result(resp) abort
           \ })
   endfor
 
+  call setbufline(s:gh_project_list_bufid, 1, lines)
+
   nnoremap <buffer> <silent> <Plug>(gh_project_open_browser) :<C-u>call <SID>project_open_browser()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_project_url_yank) :<C-u>call <SID>project_url_yank()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_project_open) :<C-u>call <SID>project_open()<CR>
@@ -90,8 +92,6 @@ function! s:set_project_list_result(resp) abort
   nmap <buffer> <silent> <C-o> <Plug>(gh_project_open_browser)
   nmap <buffer> <silent> <CR> <Plug>(gh_project_open)
   nmap <buffer> <silent> ghy <Plug>(gh_project_url_yank)
-
-  call setbufline(s:gh_project_list_bufid, 1, lines)
 endfunction
 
 function! s:update_card_info(card, info) abort
@@ -305,15 +305,13 @@ function! s:card_url_yank() abort
   call gh#gh#yank(join(urls, ln))
 
   if empty(urls)
-	  call gh#gh#message('your selected is not project card! you can select only project card.')
+    call gh#gh#message('your selected is not project card! you can select only project card.')
   else
-	  call gh#gh#message('copied ' .. urls[0])
-	  for url in urls[1:]
-		call gh#gh#message('       ' .. url)
-	  endfor
+    call gh#gh#message('copied ' .. urls[0])
+    for url in urls[1:]
+      call gh#gh#message('       ' .. url)
+    endfor
   endif
-
-
 endfunction
 
 function! s:set_project_column_list(resp) abort
