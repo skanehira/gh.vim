@@ -31,8 +31,6 @@ function! gh#provider#list#open(list) abort
     let b:list = a:list.data
     let b:list_marked = {}
     let b:list_bufid = bufnr()
-
-    exe 'setlocal ft=' .. a:list.ft
     call s:redraw()
     syntax match gh_files_selected /.*\*$/
   endif

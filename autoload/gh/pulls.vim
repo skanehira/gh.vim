@@ -8,66 +8,82 @@ function! s:set_pull_list(resp) abort
   nmap <buffer> <silent> <C-l> <Plug>(gh_pull_list_next)
   nmap <buffer> <silent> <C-h> <Plug>(gh_pull_list_prev)
 
+  let list = {
+        \ 'bufname': printf('gh://%s/%s/pulls', b:pull_list.repo.owner, b:pull_list.repo.name),
+        \ 'param': b:pull_list.param,
+        \ 'data': []
+        \ }
+
   if empty(a:resp.body)
     call gh#gh#set_message_buf('not found pull requests')
+    call gh#provider#list#open(list)
     return
   endif
 
-  let lines = []
-  let b:pulls = []
   let url = printf('https://github.com/%s/%s/pull/', b:pull_list.repo.owner, b:pull_list.repo.name)
-
-  let dict = map(copy(a:resp.body), {_, v -> {
-        \ 'number': printf('#%s', v.number),
-        \ 'state': v.state,
-        \ 'user': printf('@%s', v.user.login),
-        \ 'title': v.title,
+  let data = map(copy(a:resp.body), {_, pr -> {
+        \ 'id': pr.id,
+        \ 'number': printf('#%s', pr.number),
+        \ 'state': pr.state,
+        \ 'user': printf('@%s', pr.user.login),
+        \ 'title': pr.title,
+        \ 'url': url .. pr.number
         \ }})
-  let format = gh#gh#dict_format(dict, ['number', 'state', 'user', 'title'])
 
-  for pr in a:resp.body
-    call add(lines, printf(format,
-          \ printf('#%s', pr.number), pr.state, printf('@%s', pr.user.login), pr.title))
-    call add(b:pulls, {
-          \ 'number': pr.number,
-          \ 'url': url . pr.number,
-          \ })
-  endfor
+  let header = [
+        \ 'number',
+        \ 'state',
+        \ 'user',
+        \ 'title'
+        \ ]
 
-  call setbufline(b:gh_pulls_list_bufid, 1, lines)
+  let list['header'] = header
+  let list.data = data
+
+  call gh#provider#list#open(list)
 
   nnoremap <buffer> <silent> <Plug>(gh_pull_open_browser) :<C-u>call <SID>pull_open()<CR>
-  nnoremap <buffer> <silent> <Plug>(gh_pull_diff) :<C-u>call <SID>open_pull_diff()<CR>
-  nnoremap <buffer> <silent> <Plug>(gh_pull_url_yank) :<C-u>call <SID>gh_pull_url_yank()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_pull_diff) :<C-u>call <SID>pull_open_diff()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_pull_url_yank) :<C-u>call <SID>pull_url_yank()<CR>
   nmap <buffer> <silent> <C-o> <Plug>(gh_pull_open_browser)
   nmap <buffer> <silent> ghd <Plug>(gh_pull_diff)
   nmap <buffer> <silent> ghy <Plug>(gh_pull_url_yank)
 endfunction
 
-function! s:gh_pull_url_yank() abort
-  let url = b:pulls[line('.') -1].url
-  call gh#gh#yank(url)
-  call gh#gh#message('copied ' .. url)
-endfunction
+function! s:pull_url_yank() abort
+  let urls = []
+  for pull in s:get_selected_pulls()
+    call add(urls, pull.url)
+  endfor
+  call gh#provider#list#clean_marked()
+  call gh#provider#list#redraw()
 
-function! s:pull_list_change_page(op) abort
-  if a:op is# '+'
-    let b:pull_list.param.page += 1
-  else
-    if b:pull_list.param.page < 2
-      return
-    endif
-    let b:pull_list.param.page -= 1
+  let ln = "\n"
+  if &ff == "dos"
+    let ln = "\r\n"
   endif
 
-  let cmd = printf('vnew gh://%s/%s/pulls?%s',
-        \ b:pull_list.repo.owner, b:pull_list.repo.name, gh#http#encode_param(b:pull_list.param))
-  call gh#gh#delete_buffer(b:, 'gh_pulls_list_bufid')
-  call execute(cmd)
+  call gh#gh#yank(join(urls, ln))
+  call gh#gh#message('copied ' .. urls[0])
+  for url in urls[1:]
+    call gh#gh#message('       ' .. url)
+  endfor
 endfunction
 
 function! s:pull_open() abort
-  call gh#gh#open_url(b:pulls[line('.')-1].url)
+  for pull in s:get_selected_pulls()
+    call gh#gh#open_url(pull.url)
+  endfor
+  call gh#provider#list#clean_marked()
+  call gh#provider#list#redraw()
+endfunction
+
+function! s:get_selected_pulls() abort
+  let pulls = gh#provider#list#get_marked()
+  if empty(pulls)
+    return [gh#provider#list#current()]
+  endif
+  return pulls
 endfunction
 
 function! gh#pulls#list() abort
@@ -94,13 +110,13 @@ function! gh#pulls#list() abort
 
   call gh#github#pulls#list(b:pull_list.repo.owner, b:pull_list.repo.name, b:pull_list.param)
         \.then(function('s:set_pull_list'))
-        \.then({-> gh#map#apply('gh-buffer-pull-list', s:gh_pulls_list_bufid)})
+        \.then({-> gh#map#apply('gh-buffer-pull-list', b:gh_pulls_list_bufid)})
         \.catch({err -> execute('call gh#gh#set_message_buf(err.body)', '')})
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
 
-function! s:open_pull_diff() abort
-  let number = b:pulls[line('.')-1].number
+function! s:pull_open_diff() abort
+  let number = gh#provider#list#current().number[1:]
   call execute(printf('belowright vnew gh://%s/%s/pulls/%s/diff',
         \ b:pull_list.repo.owner, b:pull_list.repo.name, number))
 endfunction

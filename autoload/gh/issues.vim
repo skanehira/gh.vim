@@ -61,9 +61,8 @@ function! s:set_issue_list(resp) abort
         \ 'number': printf('#%d', issue.number),
         \ 'state': issue.state,
         \ 'user': printf('@%s', issue.user.login),
-        \ 'title': len(issue.title) < 30 ? issue.title : printf('%s...', issue.title[:30]),
+        \ 'title': issue.title,
         \ 'body': split(issue.body, '\r\?\n'),
-        \ 'labels': len(issue.labels) is# 0 ? '' : printf('(%s)', join(map(copy(issue.labels), {_, v -> v.name}), ',')),
         \ 'url': url .. issue.number
         \ }})
 
@@ -72,12 +71,10 @@ function! s:set_issue_list(resp) abort
         \ 'state',
         \ 'user',
         \ 'title',
-        \ 'labels',
         \ ]
 
   let list['header'] = header
   let list['data'] = data
-  let list['ft'] = 'gh-issues'
 
   call gh#provider#list#open(list)
 
@@ -98,7 +95,7 @@ endfunction
 
 function! s:get_selected_issues() abort
   let issues = gh#provider#list#get_marked()
-  if len(issues) is# 0
+  if empty(issues)
     return [gh#provider#list#current()]
   endif
   return issues

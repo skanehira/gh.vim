@@ -58,7 +58,7 @@ function! gh#gh#init() abort
 endfunction
 
 function! gh#gh#init_buffer() abort
-  setlocal buftype=nofile
+  setlocal buftype=nofile bufhidden=wipe
         \ noswapfile nonumber nowrap
         \ cursorline
 endfunction
