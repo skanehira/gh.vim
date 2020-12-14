@@ -2,64 +2,86 @@
 " Author: skanehira
 " License: MIT
 
+let s:Promise = vital#gh#import('Async.Promise')
+
 function! s:issue_open_browser() abort
-  call gh#gh#open_url(s:issues[line('.') -1].url)
+  let issues = s:get_selected_issues()
+  for issue in issues
+    call gh#gh#open_url(issue.url)
+  endfor
+  call gh#provider#list#clean_marked()
+  call gh#provider#list#redraw()
 endfunction
 
 function! s:issue_url_yank() abort
-  let url = s:issues[line('.') -1].url
-  call gh#gh#yank(url)
-  call gh#gh#message('copied ' .. url)
+  let urls = []
+  for issue in s:get_selected_issues()
+    call add(urls, issue.url)
+  endfor
+  call gh#provider#list#clean_marked()
+  call gh#provider#list#redraw()
+
+  let ln = "\n"
+  if &ff == "dos"
+    let ln = "\r\n"
+  endif
+
+  call gh#gh#yank(join(urls, ln))
+  call gh#gh#message('copied ' .. urls[0])
+  for url in urls[1:]
+    call gh#gh#message('       ' .. url)
+  endfor
 endfunction
 
 function! s:edit_issue() abort
-  let number = s:issues[line('.')-1].number
+  let number = gh#provider#list#current().number[1:]
   call execute(printf('belowright vnew gh://%s/%s/issues/%s',
-        \ s:issue_list.repo.owner, s:issue_list.repo.name, number))
+        \ b:issue_list.repo.owner, b:issue_list.repo.name, number))
 endfunction
 
-function! s:issue_list(resp) abort
-  nnoremap <buffer> <silent> <Plug>(gh_issue_list_next) :<C-u>call <SID>issue_list_change_page('+')<CR>
-  nnoremap <buffer> <silent> <Plug>(gh_issue_list_prev) :<C-u>call <SID>issue_list_change_page('-')<CR>
-  nmap <buffer> <silent> <C-l> <Plug>(gh_issue_list_next)
-  nmap <buffer> <silent> <C-h> <Plug>(gh_issue_list_prev)
-
+function! s:set_issue_list(resp) abort
   " NOTE: issue may contain pull request
   call filter(a:resp.body, '!has_key(v:val, "pull_request")')
 
+  let list = {
+        \ 'bufname': printf('gh://%s/%s/issues', b:issue_list.repo.owner, b:issue_list.repo.name),
+        \ 'param': b:issue_list.param
+        \ }
+
   if empty(a:resp.body)
+    let list['data'] = []
     call gh#gh#set_message_buf('not found issues')
+    call gh#provider#list#open(list)
     return
   endif
 
-  let s:issues = []
-  let lines = []
-  let url = printf('https://github.com/%s/%s/issues/', s:issue_list.repo.owner, s:issue_list.repo.name)
-
-  let dict = map(copy(a:resp.body), {_, v -> {
-        \ 'number': printf('#%d', v.number),
-        \ 'state': v.state,
-        \ 'user': printf('@%s', v.user.login),
-        \ 'title': v.title,
+  let url = printf('https://github.com/%s/%s/issues/', b:issue_list.repo.owner, b:issue_list.repo.name)
+  let data = map(copy(a:resp.body), { _, issue -> {
+        \ 'id': issue.id,
+        \ 'number': printf('#%d', issue.number),
+        \ 'state': issue.state,
+        \ 'user': printf('@%s', issue.user.login),
+        \ 'title': issue.title,
+        \ 'body': split(issue.body, '\r\?\n'),
+        \ 'url': url .. issue.number
         \ }})
-  let format = gh#gh#dict_format(dict, ['number', 'state', 'user', 'title'])
 
-  for issue in a:resp.body
-    call add(lines, printf(format,
-          \ printf('#%d', issue.number), issue.state, printf('@%s', issue.user.login), issue.title))
-    call add(s:issues, {
-          \ 'number': issue.number,
-          \ 'body': split(issue.body, '\r\?\n'),
-          \ 'url': url . issue.number,
-          \ })
-  endfor
+  let header = [
+        \ 'number',
+        \ 'state',
+        \ 'user',
+        \ 'title',
+        \ ]
 
-  call setbufline(s:gh_issues_list_bufid, 1, lines)
+  let list['header'] = header
+  let list['data'] = data
+
+  call gh#provider#list#open(list)
 
   nnoremap <buffer> <silent> <Plug>(gh_issue_open_browser) :<C-u>call <SID>issue_open_browser()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_issue_edit) :<C-u>call <SID>edit_issue()<CR>
-  nnoremap <buffer> <silent> <Plug>(gh_issue_close) :<C-u>call <SID>issue_close()<CR>
-  nnoremap <buffer> <silent> <Plug>(gh_issue_open) :<C-u>call <SID>issue_open()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_issue_close) :<C-u>call <SID>set_issue_state('close')<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_issue_open) :<C-u>call <SID>set_issue_state('open')<CR>
   nnoremap <buffer> <silent> <Plug>(gh_issue_open_comment) :<C-u>call <SID>issue_open_comment()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_issue_url_yank) :<C-u>call <SID>issue_url_yank()<CR>
 
@@ -69,76 +91,64 @@ function! s:issue_list(resp) abort
   nmap <buffer> <silent> gho   <Plug>(gh_issue_open)
   nmap <buffer> <silent> ghm   <Plug>(gh_issue_open_comment)
   nmap <buffer> <silent> ghy   <Plug>(gh_issue_url_yank)
+endfunction
 
+function! s:get_selected_issues() abort
+  let issues = gh#provider#list#get_marked()
+  if empty(issues)
+    return [gh#provider#list#current()]
+  endif
+  return issues
 endfunction
 
 function! s:issue_open_comment() abort
-  let number = s:issues[line('.')-1].number
+  let number = gh#provider#list#current().number[1:]
   call execute(printf('new gh://%s/%s/issues/%d/comments',
-        \ s:issue_list.repo.owner, s:issue_list.repo.name, number))
+        \ b:issue_list.repo.owner, b:issue_list.repo.name, number))
 endfunction
 
-function! s:issue_close() abort
-  let number = s:issues[line('.')-1].number
-  call gh#gh#message("closing issue")
-  call gh#github#issues#update_state(s:issue_list.repo.owner, s:issue_list.repo.name, number, 'close')
-        \.then(function('s:issue_close_success'))
-        \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
-endfunction
-
-function! s:issue_close_success(resp) abort
-  call gh#gh#message("closed issue")
-  call s:issue_list_refresh()
-endfunction
-
-function! s:issue_open() abort
-  let number = s:issues[line('.')-1].number
-  call gh#gh#message("opening issue")
-  call gh#github#issues#update_state(s:issue_list.repo.owner, s:issue_list.repo.name, number, 'open')
-        \.then(function('s:issue_open_success'))
-        \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
-endfunction
-
-function! s:issue_open_success(resp) abort
-  call gh#gh#message("opend issue")
-  call s:issue_list_refresh()
-endfunction
-
-function! s:issue_list_refresh() abort
-  call gh#gh#delete_buffer(s:, 'gh_issues_list_bufid')
-  let cmd = printf('e gh://%s/%s/issues?%s',
-        \ s:issue_list.repo.owner, s:issue_list.repo.name, gh#http#encode_param(s:issue_list.param))
-  call execute(cmd)
-endfunction
-
-function! s:issue_list_change_page(op) abort
-  if a:op is# '+'
-    let s:issue_list.param.page += 1
+function! s:set_issue_state(state) abort
+  if a:state is# 'close'
+    call gh#gh#message('closing...')
   else
-    if s:issue_list.param.page < 2
-      return
-    endif
-    let s:issue_list.param.page -= 1
+    call gh#gh#message('opening...')
   endif
 
-  let cmd = printf('vnew gh://%s/%s/issues?%s',
-        \ s:issue_list.repo.owner, s:issue_list.repo.name, gh#http#encode_param(s:issue_list.param))
-  call execute(cmd)
+  let promises = []
+
+  let issues = s:get_selected_issues()
+  for issue in issues
+    let number = issue.number[1:]
+    call add(promises, gh#github#issues#update_state(b:issue_list.repo.owner, b:issue_list.repo.name, number, a:state))
+  endfor
+
+  let state = a:state is# 'open' ? a:state : 'closed'
+  call s:Promise.all(promises)
+        \.then({-> s:issue_state_update(issues, state)})
+        \.catch({err -> gh#gh#error_message(err.body)})
+        \.finally({-> execute('echom ""', '')})
+endfunction
+
+function! s:issue_state_update(issues, state) abort
+  for issue in a:issues
+    let issue.state = a:state
+  endfor
+  call gh#provider#list#clean_marked()
+  call gh#provider#list#redraw()
 endfunction
 
 function! gh#issues#list() abort
   setlocal ft=gh-issues
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues?*\(.*\)')
 
-  call gh#gh#delete_buffer(s:, 'gh_issues_list_bufid')
-  let s:gh_issues_list_bufid = bufnr()
+  let b:gh_issues_list_bufid = bufnr()
 
   let param = gh#http#decode_param(m[3])
   if !has_key(param, 'page')
     let param['page'] = 1
   endif
 
-  let s:issue_list = {
+  let b:issue_list = {
         \ 'repo': {
         \   'owner': m[1],
         \   'name': m[2],
@@ -149,9 +159,9 @@ function! gh#issues#list() abort
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
 
-  call gh#github#issues#list(s:issue_list.repo.owner, s:issue_list.repo.name, s:issue_list.param)
-        \.then(function('s:issue_list'))
-        \.then({-> gh#map#apply('gh-buffer-issue-list', s:gh_issues_list_bufid)})
+  call gh#github#issues#list(b:issue_list.repo.owner, b:issue_list.repo.name, b:issue_list.param)
+        \.then(function('s:set_issue_list'))
+        \.then({-> gh#map#apply('gh-buffer-issue-list', b:gh_issues_list_bufid)})
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
@@ -268,7 +278,7 @@ function! s:get_template_files(resp) abort
 endfunction
 
 function! s:update_issue_success(resp) abort
-  set nomodified
+  setlocal nomodified
   redraw!
   call gh#gh#message('update success')
 endfunction

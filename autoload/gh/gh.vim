@@ -59,12 +59,13 @@ endfunction
 
 function! gh#gh#init_buffer() abort
   setlocal buftype=nofile bufhidden=wipe
-        \ noswapfile nonumber
+        \ noswapfile nonumber nowrap
+        \ cursorline
 endfunction
 
 function! gh#gh#set_message_buf(msg) abort
+  setlocal modifiable
   call setline(1, printf('-- %s --', a:msg))
-  nnoremap <buffer> <silent> q :bw<CR>
 endfunction
 
 function! gh#gh#error_message(msg) abort
@@ -81,8 +82,6 @@ endfunction
 
 function! gh#gh#global_buf_settings() abort
   setlocal nomodifiable
-  setlocal cursorline
-  setlocal nowrap
 
   nnoremap <buffer> <silent> q :bw!<CR>
 endfunction
@@ -142,27 +141,32 @@ function! gh#gh#def_highlight() abort
   hi! link gh_files_selected gh_red
 endfunction
 
-function! s:dict_value_len(items) abort
+function! s:dict_value_len(items, keys) abort
   if len(a:items) < 1
     return {}
   endif
 
-  let len = map(copy(a:items[0]), {k -> 0})
+  let len_dict = {}
+  for k in a:keys
+    let len_dict[k] = 0
+  endfor
+
   for item in a:items
-    for [k, v] in items(item)
-      let l = strchars(v)
-      let len[k] = len[k] > l ? len[k] : l
+    for k in a:keys
+      let l = strchars(item[k])
+      let len_dict[k] = len_dict[k] > l ? len_dict[k] : l
     endfor
   endfor
-  return len
+  return len_dict
 endfunction
 
 function! gh#gh#dict_format(items, keys) abort
-  let dict = s:dict_value_len(a:items)
+  let dict = s:dict_value_len(a:items, a:keys)
   if empty(dict)
     return ''
   endif
-  let format = map(copy(a:keys), {_, k -> printf("%%-%ss", dict[k])})
+  let format = map(copy(a:keys[:-2]), {_, k -> printf("%%-%ss", dict[k])})
+  let format += ['%s']
   return join(format)
 endfunction
 
