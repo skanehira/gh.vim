@@ -303,10 +303,16 @@ function! s:card_url_yank() abort
   endif
 
   call gh#gh#yank(join(urls, ln))
-  call gh#gh#message('copied ' .. urls[0])
-  for url in urls[1:]
-    call gh#gh#message('       ' .. url)
-  endfor
+
+  if empty(urls)
+	  call gh#gh#message('your selected is not project card! you can select only project card.')
+  else
+	  call gh#gh#message('copied ' .. urls[0])
+	  for url in urls[1:]
+		call gh#gh#message('       ' .. url)
+	  endfor
+  endif
+
 
 endfunction
 
