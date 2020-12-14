@@ -15,7 +15,6 @@
 "     {'id': 32, 'number': '#1', 'title': 'this is a test', 'author': 'gorilla', labels: '(bug, refactor)'},
 "     ...
 "   ],
-"   'ft': 'file-type'
 "   'bufname': 'gh://skanehira/gh.vim'
 "   'param': {
 "     'page': 1,
