@@ -108,7 +108,6 @@ endfunction
 
 function! s:set_card_info(child, resp) abort
   call s:update_card_info(a:child, a:resp.body)
-  call gh#provider#tree#redraw()
 endfunction
 
 function! s:add_cards(node, resp) abort
@@ -144,6 +143,7 @@ function! s:make_tree(tree, columns) abort
   endif
   let b:project_columns = []
   let tree = a:tree
+  let promises = []
 
   for c in a:columns
     let column = {
@@ -153,12 +153,14 @@ function! s:make_tree(tree, columns) abort
           \ 'markable': 0,
           \ }
     call add(b:project_columns, column)
-    call gh#github#projects#cards(column.id)
-          \.then(function('s:add_cards', [column]))
-          \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
-
     call add(tree.children, column)
+
+    call add(promises, gh#github#projects#cards(column.id)
+          \.then(function('s:add_cards', [column])))
   endfor
+  call s:Promise.all(promises)
+        \.catch({err -> gh#gh#error_message(err.body)})
+        \.finally({-> gh#provider#tree#redraw()})
 endfunction
 
 function! s:get_selected_cards() abort
