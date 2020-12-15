@@ -71,9 +71,9 @@ endfunction
 
 function! s:set_keymap() abort
   nnoremap <buffer> <silent> <Plug>(gh_files_edit) :call <SID>edit_file()<CR>
-  nnoremap <buffer> <silent> <Plug>(gh_files_yank) :call <SID>files_yank_url()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_files_yank_url) :call <SID>files_yank_url()<CR>
   nmap <buffer> <silent> ghe <Plug>(gh_files_edit)
-  nmap <buffer> <silent> ghy <Plug>(gh_files_yank)
+  nmap <buffer> <silent> ghy <Plug>(gh_files_yank_url)
 endfunction
 
 function! s:make_tree(body) abort
