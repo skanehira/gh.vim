@@ -266,7 +266,7 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 <Plug>(gh_files_edit)				*<Plug>(gh_files_edit)*
 	open selected file
 
-<Plug>(gh_files_yank)				*<Plug>(gh_files_yank)*
+<Plug>(gh_files_yank_url)			*<Plug>(gh_files_yank_url)*
 	yank selected files.
 						*gh-default-key-mappings*
 
