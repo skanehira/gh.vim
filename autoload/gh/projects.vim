@@ -45,8 +45,8 @@ function! s:project_open_browser() abort
 endfunction
 
 function! s:project_open() abort
-  let s:project = s:projects[line('.') -1]
-  call execute(printf('vnew gh://projects/%d/columns', s:project.id))
+  let id = s:projects[line('.') -1].id
+  call execute(printf('vnew gh://projects/%d/columns', id))
 endfunction
 
 function! s:project_url_yank() abort
@@ -142,7 +142,7 @@ function! s:make_tree(tree, columns) abort
   if empty(a:columns)
     return a:tree
   endif
-  let s:project_columns = []
+  let b:project_columns = []
   let tree = a:tree
 
   for c in a:columns
@@ -152,7 +152,7 @@ function! s:make_tree(tree, columns) abort
           \ 'path': printf('%s/%s', a:tree.path, c.id),
           \ 'markable': 0,
           \ }
-    call add(s:project_columns, column)
+    call add(b:project_columns, column)
     call gh#github#projects#cards(column.id)
           \.then(function('s:add_cards', [column]))
           \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
@@ -242,7 +242,7 @@ endfunction
 
 function! s:find_column(node) abort
   let column = a:node
-  for col in s:project_columns
+  for col in b:project_columns
     if !exists('col.children')
       continue
     endif
@@ -320,17 +320,17 @@ function! s:set_project_column_list(resp) abort
     return
   endif
 
-  let s:tree = {
-        \ 'id': s:project.id,
-        \ 'name': s:project.name,
+  let b:tree = {
+        \ 'id': b:project.id,
+        \ 'name': b:project.name,
         \ 'state': 'open',
-        \ 'path': printf('%s', s:project.id),
+        \ 'path': printf('%s', b:project.id),
         \ 'children': [],
         \ 'markable': 0,
         \ }
 
-  call s:make_tree(s:tree, a:resp.body)
-  call gh#provider#tree#open(s:tree)
+  call s:make_tree(b:tree, a:resp.body)
+  call gh#provider#tree#open(b:tree)
 
   nnoremap <buffer> <silent> <Plug>(gh_projects_card_open_browser) :call <SID>card_open_browser()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_projects_card_edit) :call <SID>card_edit()<CR>
@@ -347,15 +347,15 @@ function! s:set_project_column_list(resp) abort
   nmap <buffer> <silent> gho <Plug>(gh_projects_card_open)
 endfunction
 
-function! s:opne_project_columns(resp) abort
-  let s:project = {
+function! s:open_project_columns(resp) abort
+  let b:project = {
         \ 'id': a:resp.body.id,
         \ 'name': a:resp.body.name,
         \ }
 
-  call gh#github#projects#columns(s:project_column_list.id)
+  call gh#github#projects#columns(b:project_column_list.id)
         \.then(function('s:set_project_column_list'))
-        \.then({-> gh#map#apply('gh-buffer-project-column-list', s:gh_project_column_list_bufid)})
+        \.then({-> gh#map#apply('gh-buffer-project-column-list', b:gh_project_column_list_bufid)})
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
@@ -368,10 +368,9 @@ function! gh#projects#columns() abort
     let param['page'] = 1
   endif
 
-  call gh#gh#delete_buffer(s:, 'gh_project_column_list_bufid')
-  let s:gh_project_column_list_bufid = bufnr()
+  let b:gh_project_column_list_bufid = bufnr()
 
-  let s:project_column_list = {
+  let b:project_column_list = {
         \ 'id': m[1],
         \ 'param': param,
         \ }
@@ -379,7 +378,7 @@ function! gh#projects#columns() abort
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
 
-  call gh#github#projects#info(s:project_column_list.id)
-        \.then(function('s:opne_project_columns'))
+  call gh#github#projects#info(b:project_column_list.id)
+        \.then(function('s:open_project_columns'))
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
 endfunction
