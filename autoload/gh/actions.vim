@@ -2,6 +2,8 @@
 " Author: skanehira
 " License: MIT
 
+let s:Promise = vital#gh#import('Async.Promise')
+
 function! gh#actions#list() abort
   setlocal ft=gh-actions
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/actions?*\(.*\)')
@@ -129,6 +131,7 @@ endfunction
 
 function! s:make_tree(actions) abort
   let b:actions = []
+  let promises = []
 
   for action in a:actions
     let conclusion = 'running'
@@ -149,11 +152,13 @@ function! s:make_tree(actions) abort
           \ }
     call add(b:actions, action)
     call add(b:tree.children, node)
-    call gh#http#get(action.jobs_url)
-          \.then(function('s:set_job_list', [node]))
-          \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
-          \.finally({-> gh#provider#tree#redraw()})
+
+    call add(promises, gh#http#get(action.jobs_url)
+          \.then(function('s:set_job_list', [node])))
   endfor
+  call s:Promise.all(promises)
+        \.catch({err -> gh#gh#error_message(err.body)})
+        \.finally({-> gh#provider#tree#redraw()})
 endfunction
 
 function! s:set_job_list(node, resp) abort
