@@ -71,7 +71,9 @@ endfunction
 
 function! s:set_keymap() abort
   nnoremap <buffer> <silent> <Plug>(gh_files_edit) :call <SID>edit_file()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_files_yank_url) :call <SID>files_yank_url()<CR>
   nmap <buffer> <silent> ghe <Plug>(gh_files_edit)
+  nmap <buffer> <silent> ghy <Plug>(gh_files_yank_url)
 endfunction
 
 function! s:make_tree(body) abort
@@ -109,10 +111,15 @@ function! s:make_node(tree, file) abort
         \ 'markable': 1,
         \ }
 
+  let url_format = 'https://github.com/%s/%s/blob/%s/%s'
   if a:file.type is# 'tree'
     let item['children'] = []
     let item['state'] = 'close'
+    let url_format = 'https://github.com/%s/%s/tree/%s/%s'
   endif
+
+  let item.info['html_url'] = printf(url_format,
+        \ b:file_list.repo.owner, b:file_list.repo.name, b:file_list.repo.branch, join(paths[1:], '/'))
 
   if has_key(b:tree_node_cache, parent_path)
     call add(b:tree_node_cache[parent_path], item)
@@ -129,4 +136,35 @@ function! s:make_node(tree, file) abort
     call add(a:tree.children, item)
     let b:tree_node_cache[parent_path] = a:tree.children
   endif
+endfunction
+
+function! s:get_selected_urls() abort
+  let urls = []
+  for node in values(gh#provider#tree#marked_nodes())
+    call add(urls, node.info.html_url)
+  endfor
+  if empty(urls)
+    return [gh#provider#tree#current_node().info.html_url]
+  endif
+  return urls
+endfunction
+
+function! s:files_yank_url() abort
+  let urls = s:get_selected_urls()
+
+  if len(urls) > 1
+    call gh#provider#tree#clean_marked_nodes()
+    call gh#provider#tree#redraw()
+  endif
+
+  let ln = "\n"
+  if &ff == "dos"
+    let ln = "\r\n"
+  endif
+
+  call gh#gh#yank(join(urls, ln))
+  call gh#gh#message('copied ' .. urls[0])
+  for url in urls[1:]
+    call gh#gh#message('       ' .. url)
+  endfor
 endfunction
