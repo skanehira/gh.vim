@@ -315,32 +315,37 @@ function! s:comments_open_on_issue() abort
 endfunction
 
 function! s:set_issues_body(resp) abort
-  if empty(a:resp.body.body)
-    call gh#gh#set_message_buf('no description provided')
-    return
-  endif
-  let s:issue['title'] = a:resp.body.title
-  call setbufline(s:gh_issues_edit_bufid, 1, split(a:resp.body.body, '\r\?\n'))
-  setlocal nomodified buftype=acwrite ft=markdown
+	try
+		if empty(a:resp.body.body)
+			call gh#gh#set_message_buf('no description provided')
+			return
+		endif
+		let b:issue['title'] = a:resp.body.title
+		call setbufline(b:gh_issues_edit_bufid, 1, split(a:resp.body.body, '\r\?\n'))
+		setlocal nomodified buftype=acwrite ft=markdown
 
-  nnoremap <buffer> <silent> <Plug>(gh_issue_comment_open_on_issue) :<C-u>call <SID>comments_open_on_issue()<CR>
+		nnoremap <buffer> <silent> <Plug>(gh_issue_comment_open_on_issue) :<C-u>call <SID>comments_open_on_issue()<CR>
 
-  nmap <buffer> <silent> ghm <Plug>(gh_issue_comment_open_on_issue)
-  nnoremap <buffer> <silent> q :bw<CR>
+		nmap <buffer> <silent> ghm <Plug>(gh_issue_comment_open_on_issue)
+		nnoremap <buffer> <silent> q :bw<CR>
 
-  augroup gh-update-issue
-    au!
-    au BufWriteCmd <buffer> call s:update_issue()
-  augroup END
+		augroup gh-update-issue
+			au!
+			au BufWriteCmd <buffer> call s:update_issue()
+		augroup END
+	catch
+		echom v:exception
+	endtry
+
 endfunction
 
 function! gh#issues#issue() abort
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/\(.*\)$')
 
   call gh#gh#delete_buffer(s:, 'gh_issues_edit_bufid')
-  let s:gh_issues_edit_bufid = bufnr()
+  let b:gh_issues_edit_bufid = bufnr()
 
-  let s:issue = {
+  let b:issue = {
         \ 'repo': {
         \   'owner': m[1],
         \   'name': m[2],
@@ -352,9 +357,9 @@ function! gh#issues#issue() abort
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
 
-  call gh#github#issues#issue(s:issue.repo.owner, s:issue.repo.name, s:issue.number)
+  call gh#github#issues#issue(b:issue.repo.owner, b:issue.repo.name, b:issue.number)
         \.then(function('s:set_issues_body'))
-        \.then({-> gh#map#apply('gh-buffer-issue-edit', s:gh_issues_edit_bufid)})
+        \.then({-> gh#map#apply('gh-buffer-issue-edit', b:gh_issues_edit_bufid)})
         \.catch({err -> execute('call gh#gh#set_message_buf(err.body)', '')})
 endfunction
 
