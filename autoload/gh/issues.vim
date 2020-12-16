@@ -315,27 +315,23 @@ function! s:comments_open_on_issue() abort
 endfunction
 
 function! s:set_issues_body(resp) abort
-	try
-		if empty(a:resp.body.body)
-			call gh#gh#set_message_buf('no description provided')
-			return
-		endif
-		let b:issue['title'] = a:resp.body.title
-		call setbufline(b:gh_issues_edit_bufid, 1, split(a:resp.body.body, '\r\?\n'))
-		setlocal nomodified buftype=acwrite ft=markdown
+  if empty(a:resp.body.body)
+    call gh#gh#set_message_buf('no description provided')
+    return
+  endif
+  let b:issue['title'] = a:resp.body.title
+  call setbufline(b:gh_issues_edit_bufid, 1, split(a:resp.body.body, '\r\?\n'))
+  setlocal nomodified buftype=acwrite ft=markdown
 
-		nnoremap <buffer> <silent> <Plug>(gh_issue_comment_open_on_issue) :<C-u>call <SID>comments_open_on_issue()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_issue_comment_open_on_issue) :<C-u>call <SID>comments_open_on_issue()<CR>
 
-		nmap <buffer> <silent> ghm <Plug>(gh_issue_comment_open_on_issue)
-		nnoremap <buffer> <silent> q :bw<CR>
+  nmap <buffer> <silent> ghm <Plug>(gh_issue_comment_open_on_issue)
+  nnoremap <buffer> <silent> q :bw<CR>
 
-		augroup gh-update-issue
-			au!
-			au BufWriteCmd <buffer> call s:update_issue()
-		augroup END
-	catch
-		echom v:exception
-	endtry
+  augroup gh-update-issue
+    au!
+    au BufWriteCmd <buffer> call s:update_issue()
+  augroup END
 
 endfunction
 
