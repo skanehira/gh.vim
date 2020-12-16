@@ -104,12 +104,6 @@ gh://:owner/repos[?sort=created&...]			*gh-buffer-repo-list*
 	this can show your private/orgnization repositories.
 	you can use query parameters(https://git.io/JUzli)
 
-gh://user/repos/new					*gh-buffer-repo-new*
-	create new repository.
-	input contens must be "key: value".
-	requred repository name.
-	also some parameters(https://git.io/JUzlS) can use.
-
 gh://:owner/:repo/readme				*gh-buffer-repo-readme*
 	show repository readme.
 
@@ -265,6 +259,7 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 
 <Plug>(gh_files_edit)				*<Plug>(gh_files_edit)*
 	open selected file
+
 						*gh-default-key-mappings*
 
 default mappings
@@ -289,7 +284,8 @@ default mappings
 							<C-o>		<Plug>(gh_pull_open_browser)
 							ghd		<Plug>(gh_pull_diff)
 							ghy		<Plug>(gh_pull_url_yank)
-|gh-buffer-repo-list|					<C-l>		<Plug>(gh_repo_list_next)
+|gh-buffer-repo-list|					<C-h>		<Plug>(gh_repo_list_prev)
+							<C-l>		<Plug>(gh_repo_list_next)
 							<C-o>		<Plug>(gh_repo_open_browser)
 							gho		<Plug>(gh_repo_show_readme)
 |gh-buffer-project-list|				<CR>		<Plug>(gh_project_open)
