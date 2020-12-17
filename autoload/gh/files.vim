@@ -72,8 +72,10 @@ endfunction
 function! s:set_keymap() abort
   nnoremap <buffer> <silent> <Plug>(gh_files_edit) :call <SID>edit_file()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_files_yank_url) :call <SID>files_yank_url()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_files_open_browser) :call <SID>files_open_browser()<CR>
   nmap <buffer> <silent> ghe <Plug>(gh_files_edit)
   nmap <buffer> <silent> ghy <Plug>(gh_files_yank_url)
+  nmap <buffer> <silent> <C-o> <Plug>(gh_files_open_browser)
 endfunction
 
 function! s:make_tree(body) abort
@@ -166,5 +168,18 @@ function! s:files_yank_url() abort
   call gh#gh#message('copied ' .. urls[0])
   for url in urls[1:]
     call gh#gh#message('       ' .. url)
+  endfor
+endfunction
+
+function! s:files_open_browser() abort
+  let urls = s:get_selected_urls()
+
+  if len(urls) > 1
+    call gh#provider#tree#clean_marked_nodes()
+    call gh#provider#tree#redraw()
+  endif
+
+  for url in urls
+    call gh#gh#open_url(url)
   endfor
 endfunction
