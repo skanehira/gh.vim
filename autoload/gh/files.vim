@@ -68,7 +68,7 @@ function! s:set_file_contents(node, body) abort
   call gh#gh#init_buffer()
   exe printf('rightbelow vnew %s', a:node.path)
   call setline(1, a:body)
-  setlocal nomodified ft=gh-file
+  setlocal nomodified
   let b:gh_file_info = a:node.info
   let b:gh_file_bufid = bufnr()
 endfunction
