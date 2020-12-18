@@ -58,6 +58,8 @@ function! s:edit_file() abort
     call gh#gh#message('opening...')
     call gh#github#repos#get_file(node.info.url)
           \.then({body -> s:set_file_contents(node, body)})
+          \.then({-> s:set_edit_keymap()})
+          \.then({-> gh#map#apply('gh-buffer-file', b:gh_file_bufid)})
           \.finally({-> execute('echom ""', '')})
   endif
 endfunction
@@ -66,7 +68,9 @@ function! s:set_file_contents(node, body) abort
   call gh#gh#init_buffer()
   exe printf('rightbelow vnew %s', a:node.path)
   call setline(1, a:body)
-  setlocal nomodified
+  setlocal nomodified ft=gh-file
+  let b:gh_file_info = a:node.info
+  let b:gh_file_bufid = bufnr()
 endfunction
 
 function! s:set_keymap() abort
@@ -182,4 +186,37 @@ function! s:files_open_browser() abort
   for url in urls
     call gh#gh#open_url(url)
   endfor
+endfunction
+
+function! s:set_edit_keymap() abort
+  if &ft isnot# 'markdown' || &ft isnot# 'asciidoc'
+    vnoremap <buffer> <silent> <Plug>(gh_file_yank_url) :<C-u>call <SID>yank_or_open_file_url('yank')<CR>
+    vnoremap <buffer> <silent> <Plug>(gh_file_open_browser) :<C-u>call <SID>yank_or_open_file_url('open')<CR>
+    vmap <buffer> <silent> ghy <Plug>(gh_file_yank_url)
+    vmap <buffer> <silent> <C-o> <Plug>(gh_file_open_browser)
+  endif
+endfunction
+
+function! s:yank_or_open_file_url(op) abort
+  let url = s:get_file_url()
+  if !empty(url)
+    if a:op is# 'open'
+      call gh#gh#open_url(url)
+    else
+      call gh#gh#yank(url)
+      call gh#gh#message('copied ' .. url)
+    endif
+  endif
+endfunction
+
+" yank specified lines url
+function! s:get_file_url() abort
+  let start = line("'<")
+  let end = line("'>")
+
+  let url = b:gh_file_info.html_url
+  if start ==# end
+    return printf('%s#L%d', url, start)
+  endif
+  return printf('%s#L%d-L%d', url, start, end)
 endfunction

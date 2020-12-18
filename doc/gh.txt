@@ -266,50 +266,58 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 <Plug>(gh_files_open_browser)			*<Plug>(gh_files_open_browser)*
 	open selected files in browser.
 
+<Plug>(gh_file_yank_url)			*<Plug>(gh_file_yank_url)*
+	yank selected file's line in browser.
+
+<Plug>(gh_file_open_browser)			*<Plug>(gh_file_open_browser)*
+	open selected file's line in browser.
+
 						*gh-default-key-mappings*
 
 default mappings
-{buffer}						{lhs}		{rhs}
-------------------------------------------------	--------	------------------------
-|gh-buffer-issue-list|					<C-h>		<Plug>(gh_issue_list_prev)
-							<C-l>		<Plug>(gh_issue_list_next)
-							<C-o>		<Plug>(gh_issue_open_browser)
-							ghe		<Plug>(gh_issue_edit)
-							ghc		<Plug>(gh_issue_close)
-							gho		<Plug>(gh_issue_open)
-							ghm		<Plug>(gh_issue_open_comment)
-							ghy		<Plug>(gh_issue_url_yank)
-|gh-buffer-issue-edit|					ghm		<Plug>(gh_issue_comment_open_on_issue)
-|gh-buffer-issue-comment-list|				<C-h>		<Plug>(gh_issue_comment_list_prev)
-							<C-l>		<Plug>(gh_issue_comment_list_next)
-							<C-o>		<Plug>(gh_issue_comment_open_browser)
-							ghn		<Plug>(gh_issue_comment_new)
-							ghy		<Plug>(gh_issue_comment_url_yank)
-|gh-buffer-pull-list|					<C-h>		<Plug>(gh_pull_list_prev)
-							<C-l>		<Plug>(gh_pull_list_next)
-							<C-o>		<Plug>(gh_pull_open_browser)
-							ghd		<Plug>(gh_pull_diff)
-							ghy		<Plug>(gh_pull_url_yank)
-|gh-buffer-repo-list|					<C-h>		<Plug>(gh_repo_list_prev)
-							<C-l>		<Plug>(gh_repo_list_next)
-							<C-o>		<Plug>(gh_repo_open_browser)
-							gho		<Plug>(gh_repo_show_readme)
-|gh-buffer-project-list|				<CR>		<Plug>(gh_project_open)
-							<C-o>		<Plug>(gh_project_open_browser)
-							ghy		<Plug>(gh_project_url_yank)
-|gh-buffer-project-column-list|				<C-o>		<Plug>(gh_projects_card_open_browser)
-							ghe		<Plug>(gh_projects_card_edit)
-							ghm		<Plug>(gh_projects_card_move)
-							ghy		<Plug>(gh_projects_card_url_yank)
-							ghc		<Plug>(gh_projects_card_close)
-							gho		<Plug>(gh_projects_card_open)
-|gh-buffer-bookmark-list|				gho		<Plug>(gh_bookmark_open)
-|gh-buffer-action-list|					<C-o>		<Plug>(gh_actions_open_browser)
-							ghy		<Plug>(gh_actions_yank_url)
-							gho		<Plug>(gh_actions_open_logs)
-|gh-buffer-file-list|					ghe		<Plug>(gh_files_edit)
-							ghy		<Plug>(gh_files_yank_url)
-							<C-o>		<Plug>(gh_files_open_browser)	
+{buffer}			{mode}		{lhs}		{rhs}
+-----------------------------------------------------------------------------------------------
+|gh-buffer-issue-list|		`normal`	<C-h>		<Plug>(gh_issue_list_prev)
+				`normal`	<C-l>		<Plug>(gh_issue_list_next)
+				`normal`	<C-o>		<Plug>(gh_issue_open_browser)
+				`normal`	ghe		<Plug>(gh_issue_edit)
+				`normal`	ghc		<Plug>(gh_issue_close)
+				`normal`	gho		<Plug>(gh_issue_open)
+				`normal`	ghm		<Plug>(gh_issue_open_comment)
+				`normal`	ghy		<Plug>(gh_issue_url_yank)
+|gh-buffer-issue-edit|		`normal`	ghm		<Plug>(gh_issue_comment_open_on_issue)
+|gh-buffer-issue-comment-list|	`normal`	<C-h>		<Plug>(gh_issue_comment_list_prev)
+				`normal`	<C-l>		<Plug>(gh_issue_comment_list_next)
+				`normal`	<C-o>		<Plug>(gh_issue_comment_open_browser)
+				`normal`	ghn		<Plug>(gh_issue_comment_new)
+				`normal`	ghy		<Plug>(gh_issue_comment_url_yank)
+|gh-buffer-pull-list|		`normal`	<C-h>		<Plug>(gh_pull_list_prev)
+				`normal`	<C-l>		<Plug>(gh_pull_list_next)
+				`normal`	<C-o>		<Plug>(gh_pull_open_browser)
+				`normal`	ghd		<Plug>(gh_pull_diff)
+				`normal`	ghy		<Plug>(gh_pull_url_yank)
+|gh-buffer-repo-list|		`normal`	<C-h>		<Plug>(gh_repo_list_prev)
+				`normal`	<C-l>		<Plug>(gh_repo_list_next)
+				`normal`	<C-o>		<Plug>(gh_repo_open_browser)
+				`normal`	gho		<Plug>(gh_repo_show_readme)
+|gh-buffer-project-list|	`normal`	<CR>		<Plug>(gh_project_open)
+				`normal`	<C-o>		<Plug>(gh_project_open_browser)
+				`normal`	ghy		<Plug>(gh_project_url_yank)
+|gh-buffer-project-column-list|	`normal`	<C-o>		<Plug>(gh_projects_card_open_browser)
+				`normal`	ghe		<Plug>(gh_projects_card_edit)
+				`normal`	ghm		<Plug>(gh_projects_card_move)
+				`normal`	ghy		<Plug>(gh_projects_card_url_yank)
+				`normal`	ghc		<Plug>(gh_projects_card_close)
+				`normal`	gho		<Plug>(gh_projects_card_open)
+|gh-buffer-bookmark-list|	`normal`	gho		<Plug>(gh_bookmark_open)
+|gh-buffer-action-list|		`normal`	<C-o>		<Plug>(gh_actions_open_browser)
+				`normal`	ghy		<Plug>(gh_actions_yank_url)
+				`normal`	gho		<Plug>(gh_actions_open_logs)
+|gh-buffer-file-list|		`normal`	ghe		<Plug>(gh_files_edit)
+				`normal`	ghy		<Plug>(gh_files_yank_url)
+				`normal`	<C-o>		<Plug>(gh_files_open_browser)
+|gh-buffer-file|		`visual`	ghy		<Plug>(gh_file_yank_url)
+				`visual`	<C-o>		<Plug>(gh_file_open_browser)
 
 ------------------------------------------------------------------------------
 FUNCTIONS					*gh-functions*
