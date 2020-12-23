@@ -2,7 +2,6 @@
 " Author: skanehira
 " License: MIT
 
-let s:Promise = vital#gh#import('Async.Promise')
 let s:base64 = vital#gh#import('Data.Base64')
 
 function! gh#github#repos#list(owner, param) abort

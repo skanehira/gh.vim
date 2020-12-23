@@ -2,8 +2,6 @@
 " Author: skanehira
 " License: MIT
 
-let s:Promise = vital#gh#import('Async.Promise')
-
 function! gh#github#issues#list(owner, repo, param) abort
   let settings = {
         \ 'method': 'GET',
