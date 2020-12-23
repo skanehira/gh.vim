@@ -39,7 +39,7 @@ function! s:set_action_list(resp) abort
     return
   endif
 
-  let b:tree = {
+  let b:gh_actions_tree = {
         \ 'id': a:resp.body.total_count,
         \ 'name': s:action_list.repo.name,
         \ 'state': 'open',
@@ -49,7 +49,7 @@ function! s:set_action_list(resp) abort
         \ }
 
   call s:make_tree(a:resp.body.workflow_runs)
-  call gh#provider#tree#open(b:tree)
+  call gh#provider#tree#open(b:gh_actions_tree)
 
   nnoremap <buffer> <silent> <Plug>(gh_actions_open_browser) :call <SID>open_browser()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_actions_yank_url) :call <SID>yank_url()<CR>
@@ -130,7 +130,7 @@ function! s:get_status_annotation(status, conclusion) abort
 endfunction
 
 function! s:make_tree(actions) abort
-  let b:actions = []
+  let b:gh_actions = []
   let promises = []
 
   for action in a:actions
@@ -146,12 +146,12 @@ function! s:make_tree(actions) abort
     let node = {
           \ 'id': action.id,
           \ 'name': printf('%s %s %s %s', status, message, author, printf('[%s]', action.head_branch)),
-          \ 'path': printf('%s/%s', b:tree.id, action.id),
+          \ 'path': printf('%s/%s', b:gh_actions_tree.id, action.id),
           \ 'markable': 1,
           \ 'info': action
           \ }
-    call add(b:actions, action)
-    call add(b:tree.children, node)
+    call add(b:gh_actions, action)
+    call add(b:gh_actions_tree.children, node)
 
     call add(promises, gh#http#get(action.jobs_url)
           \.then(function('s:set_job_list', [node])))

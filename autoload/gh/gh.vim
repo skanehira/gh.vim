@@ -2,16 +2,16 @@
 " Author: skanehira
 " License: MIT
 
-let s:cmd = 'open'
+let s:gh_open_cmd = 'open'
 if has('linux')
-  let s:cmd = 'xdg-open'
+  let s:gh_open_cmd = 'xdg-open'
 elseif has('win64')
-  let s:cmd = 'cmd /c start'
+  let s:gh_open_cmd = 'cmd /c start'
 endif
 
-let s:yank_reg = '*'
+let s:gh_yank_reg = '*'
 if has('linux') || has('unix')
-  let s:yank_reg = '+'
+  let s:gh_yank_reg = '+'
 endif
 
 function! gh#gh#init() abort
@@ -87,11 +87,11 @@ function! gh#gh#global_buf_settings() abort
 endfunction
 
 function! gh#gh#open_url(url) abort
-  call system(printf('%s %s', s:cmd, a:url))
+  call system(printf('%s %s', s:gh_open_cmd, a:url))
 endfunction
 
 function! gh#gh#yank(text) abort
-  call setreg(s:yank_reg, a:text)
+  call setreg(s:gh_yank_reg, a:text)
 endfunction
 
 function! gh#gh#delete_buffer(s, name) abort

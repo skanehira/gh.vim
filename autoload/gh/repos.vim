@@ -3,11 +3,11 @@
 " License: MIT
 
 function! s:repo_open() abort
-  call gh#gh#open_url(b:repos[line('.') - 1].html_url)
+  call gh#gh#open_url(b:gh_repos[line('.') - 1].html_url)
 endfunction
 
 function! s:repo_open_readme() abort
-  let full_name = b:repos[line('.')-1].full_name
+  let full_name = b:gh_repos[line('.')-1].full_name
   call execute(printf('belowright vnew gh://%s/readme', full_name))
 endfunction
 
@@ -52,7 +52,7 @@ function! s:set_repo_list(resp) abort
     return
   endif
 
-  let b:repos = []
+  let b:gh_repos = []
   let lines = []
 
   let dict = map(copy(a:resp.body), {_, v -> {
@@ -63,7 +63,7 @@ function! s:set_repo_list(resp) abort
 
   for repo in a:resp.body
     call add(lines, printf(format, repo.full_name, repo.stargazers_count))
-    call add(b:repos, repo)
+    call add(b:gh_repos, repo)
   endfor
 
   call setbufline(b:gh_repo_list_bufid, 1, lines)
