@@ -9,8 +9,8 @@ function! s:set_pull_list(resp) abort
   nmap <buffer> <silent> <C-h> <Plug>(gh_pull_list_prev)
 
   let list = {
-        \ 'bufname': printf('gh://%s/%s/pulls', b:pull_list.repo.owner, b:pull_list.repo.name),
-        \ 'param': b:pull_list.param,
+        \ 'bufname': printf('gh://%s/%s/pulls', b:gh_pull_list.repo.owner, b:gh_pull_list.repo.name),
+        \ 'param': b:gh_pull_list.param,
         \ 'data': []
         \ }
 
@@ -20,7 +20,7 @@ function! s:set_pull_list(resp) abort
     return
   endif
 
-  let url = printf('https://github.com/%s/%s/pull/', b:pull_list.repo.owner, b:pull_list.repo.name)
+  let url = printf('https://github.com/%s/%s/pull/', b:gh_pull_list.repo.owner, b:gh_pull_list.repo.name)
   let data = map(copy(a:resp.body), {_, pr -> {
         \ 'id': pr.id,
         \ 'number': printf('#%s', pr.number),
@@ -97,7 +97,7 @@ function! gh#pulls#list() abort
     let param['page'] = 1
   endif
 
-  let b:pull_list = {
+  let b:gh_pull_list = {
         \ 'repo': {
         \   'owner': m[1],
         \   'name': m[2],
@@ -108,7 +108,7 @@ function! gh#pulls#list() abort
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
 
-  call gh#github#pulls#list(b:pull_list.repo.owner, b:pull_list.repo.name, b:pull_list.param)
+  call gh#github#pulls#list(b:gh_pull_list.repo.owner, b:gh_pull_list.repo.name, b:gh_pull_list.param)
         \.then(function('s:set_pull_list'))
         \.then({-> gh#map#apply('gh-buffer-pull-list', b:gh_pulls_list_bufid)})
         \.catch({err -> execute('call gh#gh#set_message_buf(err.body)', '')})
@@ -118,7 +118,7 @@ endfunction
 function! s:pull_open_diff() abort
   let number = gh#provider#list#current().number[1:]
   call execute(printf('belowright vnew gh://%s/%s/pulls/%s/diff',
-        \ b:pull_list.repo.owner, b:pull_list.repo.name, number))
+        \ b:gh_pull_list.repo.owner, b:gh_pull_list.repo.name, number))
 endfunction
 
 function! s:set_diff_contents(resp) abort

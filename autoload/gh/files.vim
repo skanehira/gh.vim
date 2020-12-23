@@ -3,18 +3,18 @@
 " License: MIT
 
 let s:Promise = vital#gh#import('Async.Promise')
-let s:tree_cache = {}
+let s:gh_tree_cache = {}
 
 function! gh#files#tree() abort
   " cahce to create tree structure more faster
-  let b:tree_node_cache = {}
+  let b:gh_tree_node_cache = {}
   " Cache the tree created at the first time
 
   setlocal ft=gh-files
   let m = matchlist(bufname(), 'gh://\(.\{-}\)/\(.\{-}\)/\(.*\)\/files?*\(.*\)')
   let b:gh_file_list_bufid = bufnr()
 
-  let b:file_list = {
+  let b:gh_file_list = {
         \ 'repo': {
         \   'owner': m[1],
         \   'name': m[2],
@@ -26,8 +26,8 @@ function! gh#files#tree() abort
   if !empty(m[4])
     let kv = split(m[4], '=')
     if len(kv) > 1 && kv[0] is# 'recache' && kv[1] is# '1'
-      if has_key(s:tree_cache, b:file_list.cache_key)
-        call remove(s:tree_cache, b:file_list.cache_key)
+      if has_key(s:gh_tree_cache, b:gh_file_list.cache_key)
+        call remove(s:gh_tree_cache, b:gh_file_list.cache_key)
       endif
     endif
   endif
@@ -36,7 +36,7 @@ function! gh#files#tree() abort
   call gh#gh#set_message_buf('loading')
 
   call s:files(m[1], m[2], m[3])
-        \.then({-> gh#provider#tree#open(b:tree)})
+        \.then({-> gh#provider#tree#open(b:gh_file_tree)})
         \.then({-> s:set_keymap()})
         \.then({-> gh#map#apply('gh-buffer-file-list', b:gh_file_list_bufid)})
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
@@ -44,8 +44,8 @@ function! gh#files#tree() abort
 endfunction
 
 function! s:files(owner, repo, branch) abort
-  if has_key(s:tree_cache, b:file_list.cache_key)
-    let b:tree = s:tree_cache[b:file_list.cache_key]
+  if has_key(s:gh_tree_cache, b:gh_file_list.cache_key)
+    let b:gh_file_tree = s:gh_tree_cache[b:gh_file_list.cache_key]
     return s:Promise.resolve({})
   endif
   return gh#github#repos#files(a:owner, a:repo, a:branch)
@@ -83,9 +83,9 @@ function! s:set_keymap() abort
 endfunction
 
 function! s:make_tree(body) abort
-  let b:tree = {
-        \ 'name': b:file_list.repo.name,
-        \ 'path': b:file_list.repo.name,
+  let b:gh_file_tree = {
+        \ 'name': b:gh_file_list.repo.name,
+        \ 'path': b:gh_file_list.repo.name,
         \ 'state': 'open',
         \ 'children': [],
         \ 'markable': 0,
@@ -94,16 +94,16 @@ function! s:make_tree(body) abort
   " add project name to root path
   " because github trees doesn't have root path
   for file in a:body.tree
-    let file.path = join([b:file_list.repo.name, file.path], '/')
+    let file.path = join([b:gh_file_list.repo.name, file.path], '/')
   endfor
 
   let files_len = len(a:body.tree)
   for idx in range(files_len)
-    call s:make_node(b:tree, a:body.tree[idx])
+    call s:make_node(b:gh_file_tree, a:body.tree[idx])
     echo printf('[gh.vim] creating tree: %d/%d', idx+1, files_len)
     redraw
   endfor
-  let s:tree_cache[b:file_list.cache_key] = deepcopy(b:tree, 1)
+  let s:gh_tree_cache[b:gh_file_list.cache_key] = deepcopy(b:gh_file_tree, 1)
 endfunction
 
 function! s:make_node(tree, file) abort
@@ -125,10 +125,10 @@ function! s:make_node(tree, file) abort
   endif
 
   let item.info['html_url'] = printf(url_format,
-        \ b:file_list.repo.owner, b:file_list.repo.name, b:file_list.repo.branch, join(paths[1:], '/'))
+        \ b:gh_file_list.repo.owner, b:gh_file_list.repo.name, b:gh_file_list.repo.branch, join(paths[1:], '/'))
 
-  if has_key(b:tree_node_cache, parent_path)
-    call add(b:tree_node_cache[parent_path], item)
+  if has_key(b:gh_tree_node_cache, parent_path)
+    call add(b:gh_tree_node_cache[parent_path], item)
     return
   endif
 
@@ -140,7 +140,7 @@ function! s:make_node(tree, file) abort
 
   if tree.path is# parent_path
     call add(a:tree.children, item)
-    let b:tree_node_cache[parent_path] = a:tree.children
+    let b:gh_tree_node_cache[parent_path] = a:tree.children
   endif
 endfunction
 

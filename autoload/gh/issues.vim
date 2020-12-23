@@ -36,7 +36,7 @@ endfunction
 function! s:edit_issue() abort
   let number = gh#provider#list#current().number[1:]
   call execute(printf('belowright vnew gh://%s/%s/issues/%s',
-        \ b:issue_list.repo.owner, b:issue_list.repo.name, number))
+        \ b:gh_issue_list.repo.owner, b:gh_issue_list.repo.name, number))
 endfunction
 
 function! s:set_issue_list(resp) abort
@@ -44,8 +44,8 @@ function! s:set_issue_list(resp) abort
   call filter(a:resp.body, '!has_key(v:val, "pull_request")')
 
   let list = {
-        \ 'bufname': printf('gh://%s/%s/issues', b:issue_list.repo.owner, b:issue_list.repo.name),
-        \ 'param': b:issue_list.param
+        \ 'bufname': printf('gh://%s/%s/issues', b:gh_issue_list.repo.owner, b:gh_issue_list.repo.name),
+        \ 'param': b:gh_issue_list.param
         \ }
 
   if empty(a:resp.body)
@@ -55,7 +55,7 @@ function! s:set_issue_list(resp) abort
     return
   endif
 
-  let url = printf('https://github.com/%s/%s/issues/', b:issue_list.repo.owner, b:issue_list.repo.name)
+  let url = printf('https://github.com/%s/%s/issues/', b:gh_issue_list.repo.owner, b:gh_issue_list.repo.name)
   let data = map(copy(a:resp.body), { _, issue -> {
         \ 'id': issue.id,
         \ 'number': printf('#%d', issue.number),
@@ -104,7 +104,7 @@ endfunction
 function! s:issue_open_comment() abort
   let number = gh#provider#list#current().number[1:]
   call execute(printf('new gh://%s/%s/issues/%d/comments',
-        \ b:issue_list.repo.owner, b:issue_list.repo.name, number))
+        \ b:gh_issue_list.repo.owner, b:gh_issue_list.repo.name, number))
 endfunction
 
 function! s:set_issue_state(state) abort
@@ -119,17 +119,17 @@ function! s:set_issue_state(state) abort
   let issues = s:get_selected_issues()
   for issue in issues
     let number = issue.number[1:]
-    call add(promises, gh#github#issues#update_state(b:issue_list.repo.owner, b:issue_list.repo.name, number, a:state))
+    call add(promises, gh#github#issues#update_state(b:gh_issue_list.repo.owner, b:gh_issue_list.repo.name, number, a:state))
   endfor
 
   let state = a:state is# 'open' ? a:state : 'closed'
   call s:Promise.all(promises)
-        \.then({-> s:issue_state_update(issues, state)})
+        \.then({-> s:gh_issue_state_update(issues, state)})
         \.catch({err -> gh#gh#error_message(err.body)})
         \.finally({-> execute('echom ""', '')})
 endfunction
 
-function! s:issue_state_update(issues, state) abort
+function! s:gh_issue_state_update(issues, state) abort
   for issue in a:issues
     let issue.state = a:state
   endfor
@@ -148,7 +148,7 @@ function! gh#issues#list() abort
     let param['page'] = 1
   endif
 
-  let b:issue_list = {
+  let b:gh_issue_list = {
         \ 'repo': {
         \   'owner': m[1],
         \   'name': m[2],
@@ -159,7 +159,7 @@ function! gh#issues#list() abort
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
 
-  call gh#github#issues#list(b:issue_list.repo.owner, b:issue_list.repo.name, b:issue_list.param)
+  call gh#github#issues#list(b:gh_issue_list.repo.owner, b:gh_issue_list.repo.name, b:gh_issue_list.param)
         \.then(function('s:set_issue_list'))
         \.then({-> gh#map#apply('gh-buffer-issue-list', b:gh_issues_list_bufid)})
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
@@ -167,10 +167,10 @@ function! gh#issues#list() abort
 endfunction
 
 function! gh#issues#new() abort
-  let s:issue_title = input('[gh.vim] issue title ')
+  let s:gh_issue_title = input('[gh.vim] issue title ')
   echom ''
   redraw
-  if s:issue_title is# ''
+  if s:gh_issue_title is# ''
     call gh#gh#error_message('no issue title')
     bw!
     return
@@ -181,13 +181,13 @@ function! gh#issues#new() abort
   call gh#gh#set_message_buf('loading')
 
   let m = matchlist(bufname(), 'gh://\(.\{-}\)/\(.\{-}\)/\(.*\)/issues/new$')
-  let s:issue_new = {
+  let s:gh_issue_new = {
         \ 'owner': m[1],
         \ 'name': m[2],
         \ 'branch': m[3],
         \ }
 
-  call gh#github#repos#files(s:issue_new.owner, s:issue_new.name, s:issue_new.branch)
+  call gh#github#repos#files(s:gh_issue_new.owner, s:gh_issue_new.name, s:gh_issue_new.branch)
         \.then(function('s:get_template_files'))
         \.then(function('s:open_template_list'))
         \.catch(function('s:get_template_error'))
@@ -205,11 +205,11 @@ endfunction
 function! s:create_issue() abort
   call gh#gh#message('issue creating...')
   let data = {
-        \ 'title': s:issue_title,
+        \ 'title': s:gh_issue_title,
         \ 'body': join(getline(1, '$'), "\r\n"),
         \ }
 
-  call gh#github#issues#new(s:issue_new.owner, s:issue_new.name, data)
+  call gh#github#issues#new(s:gh_issue_new.owner, s:gh_issue_new.name, data)
         \.then(function('s:create_issue_success'))
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
 endfunction
@@ -224,7 +224,7 @@ function! s:create_issue_success(resp) abort
 endfunction
 
 function! s:set_issue_template_buffer(resp) abort
-  call execute(printf('e gh://%s/%s/issues/%s', s:issue_new.owner, s:issue_new.name, s:issue_title))
+  call execute(printf('e gh://%s/%s/issues/%s', s:gh_issue_new.owner, s:gh_issue_new.name, s:gh_issue_title))
   call gh#map#apply('gh-buffer-issue-new', bufnr())
   setlocal buftype=acwrite
   setlocal ft=markdown
@@ -242,7 +242,7 @@ function! s:set_issue_template_buffer(resp) abort
 endfunction
 
 function! s:get_template() abort
-  let url = s:files[line('.')-1].url
+  let url = s:gh_template_files[line('.')-1].url
   call gh#http#get(url)
         \.then(function('s:set_issue_template_buffer'))
         \.catch({err -> execute('%d_ | call gh#gh#set_message_buf(err.body)', '')})
@@ -253,7 +253,7 @@ function! s:open_template_list(files) abort
     call s:set_issue_template_buffer({'body': ''})
     return
   endif
-  let s:files = a:files
+  let s:gh_template_files = a:files
   call setbufline(s:gh_issues_new_bufid, 1, map(copy(a:files), {_, v -> v.file}))
   nnoremap <buffer> <silent> <CR> :call <SID>get_template()<CR>
 endfunction
@@ -273,7 +273,7 @@ function! s:get_template_files(resp) abort
 
   let files = map(files, {_, v -> {'file': s:file_basename(v.path),
         \ 'url': printf('https://raw.githubusercontent.com/%s/%s/%s/%s',
-        \ s:issue_new.owner, s:issue_new.name, s:issue_new.branch, v.path)}})
+        \ s:gh_issue_new.owner, s:gh_issue_new.name, s:gh_issue_new.branch, v.path)}})
   return files
 endfunction
 
@@ -284,7 +284,7 @@ function! s:update_issue_success(resp) abort
 endfunction
 
 function! s:update_issue() abort
-  let title = input(printf('[title] %s -> ', s:issue.title))
+  let title = input(printf('[title] %s -> ', s:gh_issue.title))
   echom ''
   redraw!
 
@@ -294,7 +294,7 @@ function! s:update_issue() abort
   endif
 
   if title is# ''
-    let title = s:issue.title
+    let title = s:gh_issue.title
   endif
 
   call gh#gh#message('issue updating...')
@@ -303,14 +303,14 @@ function! s:update_issue() abort
         \ 'body': join(getline(1, '$'), "\r\n"),
         \ }
 
-  call gh#github#issues#update(s:issue.repo.owner, s:issue.repo.name, s:issue.number, data)
+  call gh#github#issues#update(s:gh_issue.repo.owner, s:gh_issue.repo.name, s:gh_issue.number, data)
         \.then(function('s:update_issue_success'))
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
 endfunction
 
 function! s:comments_open_on_issue() abort
   let cmd = printf('new gh://%s/%s/issues/%s/comments',
-        \ s:issue.repo.owner, s:issue.repo.name, s:issue.number)
+        \ s:gh_issue.repo.owner, s:gh_issue.repo.name, s:gh_issue.number)
   call execute(cmd)
 endfunction
 
@@ -319,7 +319,7 @@ function! s:set_issues_body(resp) abort
     call gh#gh#set_message_buf('no description provided')
     return
   endif
-  let s:issue['title'] = a:resp.body.title
+  let s:gh_issue['title'] = a:resp.body.title
   call setbufline(s:gh_issues_edit_bufid, 1, split(a:resp.body.body, '\r\?\n'))
   setlocal nomodified buftype=acwrite ft=markdown
 
@@ -340,7 +340,7 @@ function! gh#issues#issue() abort
   call gh#gh#delete_buffer(s:, 'gh_issues_edit_bufid')
   let s:gh_issues_edit_bufid = bufnr()
 
-  let s:issue = {
+  let s:gh_issue = {
         \ 'repo': {
         \   'owner': m[1],
         \   'name': m[2],
@@ -352,7 +352,7 @@ function! gh#issues#issue() abort
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
 
-  call gh#github#issues#issue(s:issue.repo.owner, s:issue.repo.name, s:issue.number)
+  call gh#github#issues#issue(s:gh_issue.repo.owner, s:gh_issue.repo.name, s:gh_issue.number)
         \.then(function('s:set_issues_body'))
         \.then({-> gh#map#apply('gh-buffer-issue-edit', s:gh_issues_edit_bufid)})
         \.catch({err -> execute('call gh#gh#set_message_buf(err.body)', '')})
@@ -395,7 +395,7 @@ function! gh#issues#comments() abort
 endfunction
 
 function! s:issue_comment_url_yank() abort
-  let url = s:issue_comments[line('.') -1].url
+  let url = s:gh_issue_comments[line('.') -1].url
   call gh#gh#yank(url)
   call gh#gh#message('copied ' .. url)
 endfunction
@@ -411,7 +411,7 @@ function! s:set_issue_comments_body(resp) abort
     return
   endif
 
-  let s:issue_comments = []
+  let s:gh_issue_comments = []
   let lines = []
 
   let dict = map(copy(a:resp.body), {_, v -> {
@@ -422,7 +422,7 @@ function! s:set_issue_comments_body(resp) abort
 
   for comment in a:resp.body
     call add(lines, printf(format, printf('#%s', comment.id), printf('@%s', comment.user.login)))
-    call add(s:issue_comments, {
+    call add(s:gh_issue_comments, {
           \ 'id': comment.id,
           \ 'user': comment.user.login,
           \ 'body': split(comment.body, '\r\?\n'),
@@ -438,12 +438,12 @@ function! s:set_issue_comments_body(resp) abort
 
   " open preview/edit window
   let winid = win_getid()
-  call s:issue_comment_open()
+  call s:gh_issue_comment_open()
   call win_gotoid(winid)
 
   augroup gh-issue-comment-show
     au!
-    au CursorMoved <buffer> call s:issue_comment_edit()
+    au CursorMoved <buffer> call s:gh_issue_comment_edit()
   augroup END
 endfunction
 
@@ -461,7 +461,7 @@ function! s:issue_comment_open() abort
 
   call gh#map#apply('gh-buffer-issue-comment-edit', s:gh_issues_comment_edit_bufid)
 
-  call s:issue_comment_edit()
+  call s:gh_issue_comment_edit()
 
   augroup gh-issue-comment-update
     au!
@@ -474,10 +474,10 @@ function! s:issue_comment_new() abort
         \ s:comment_list.repo.owner, s:comment_list.repo.name, s:comment_list.number))
 endfunction
 
-function! s:issue_comment_edit() abort
+function! s:gh_issue_comment_edit() abort
   call deletebufline(s:gh_issues_comment_edit_bufid, 1, '$')
-  let s:comment = s:issue_comments[line('.')-1]
-  call setbufline(s:gh_issues_comment_edit_bufid, 1, s:comment.body)
+  let s:gh_comment = s:gh_issue_comments[line('.')-1]
+  call setbufline(s:gh_issues_comment_edit_bufid, 1, s:gh_comment.body)
 
   " neovim not have win_execute()
   " https://github.com/neovim/neovim/issues/10822
@@ -500,7 +500,7 @@ function! s:update_issue_comment() abort
 
   call gh#gh#message('comment updating...')
 
-  call gh#github#issues#comment_update(s:comment_list.repo.owner, s:comment_list.repo.name, s:comment.id, data)
+  call gh#github#issues#comment_update(s:comment_list.repo.owner, s:comment_list.repo.name, s:gh_comment.id, data)
         \.then(function('s:update_issue_comment_success'))
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
 endfunction
@@ -530,7 +530,7 @@ function! s:issue_comment_list_change_page(op) abort
 endfunction
 
 function! s:issue_comment_open_browser() abort
-  call gh#gh#open_url(s:issue_comments[line('.')-1].url)
+  call gh#gh#open_url(s:gh_issue_comments[line('.')-1].url)
 endfunction
 
 function! gh#issues#comment_new() abort

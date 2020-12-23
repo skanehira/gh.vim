@@ -2,7 +2,7 @@
 " Author: skanehira
 " License: MIT
 
-let s:bookmark_file = expand("~/.gh-bookmark")
+let s:gh_bookmark_file = expand("~/.gh-bookmark")
 
 function! gh#bookmark#list() abort
   call gh#gh#init_buffer()
@@ -16,9 +16,9 @@ function! gh#bookmark#list() abort
 
   let s:gh_bookmark_list_bufid = bufnr()
 
-  if filereadable(s:bookmark_file)
+  if filereadable(s:gh_bookmark_file)
     let lnum = 1
-    for bufname in readfile(s:bookmark_file)
+    for bufname in readfile(s:gh_bookmark_file)
       call setbufline(s:gh_bookmark_list_bufid, lnum, bufname)
       let lnum += 1
     endfor
@@ -40,9 +40,9 @@ endfunction
 
 function! s:bookmark_file_update() abort
   try
-    if filewritable(s:bookmark_file)
+    if filewritable(s:gh_bookmark_file)
       let lines = getbufline(s:gh_bookmark_list_bufid, 1, '$')
-      call writefile(lines, s:bookmark_file)
+      call writefile(lines, s:gh_bookmark_file)
     endif
     setlocal nomodified
   catch
