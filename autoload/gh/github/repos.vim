@@ -2,7 +2,7 @@
 " Author: skanehira
 " License: MIT
 
-let s:base64 = vital#gh#import('Data.Base64')
+let s:Base64 = vital#gh#import('Data.Base64')
 
 function! gh#github#repos#list(owner, param) abort
   let url = printf('https://api.github.com/users/%s/repos', a:owner)
@@ -39,7 +39,7 @@ function! gh#github#repos#readme(owner, repo) abort
 endfunction
 
 function! s:decode_content(resp) abort
-  let body = s:base64.decode(join(split(a:resp.body.content, "\n"), ''))
+  let body = s:Base64.decode(join(split(a:resp.body.content, "\n"), ''))
   return split(body, "\n")
 endfunction
 
