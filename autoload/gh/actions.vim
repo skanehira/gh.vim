@@ -15,7 +15,7 @@ function! gh#actions#list() abort
     let param['page'] = 1
   endif
 
-  let s:action_list = {
+  let b:gh_action_list = {
         \ 'repo': {
         \   'owner': m[1],
         \   'name': m[2],
@@ -26,7 +26,7 @@ function! gh#actions#list() abort
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
 
-  call gh#github#actions#list(s:action_list.repo.owner, s:action_list.repo.name, s:action_list.param)
+  call gh#github#actions#list(b:gh_action_list.repo.owner, b:gh_action_list.repo.name, b:gh_action_list.param)
         \.then(function('s:set_action_list'))
         \.then({-> gh#map#apply('gh-buffer-action-list', b:gh_action_list_bufid)})
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
@@ -41,7 +41,7 @@ function! s:set_action_list(resp) abort
 
   let b:gh_actions_tree = {
         \ 'id': a:resp.body.total_count,
-        \ 'name': s:action_list.repo.name,
+        \ 'name': b:gh_action_list.repo.name,
         \ 'state': 'open',
         \ 'path': printf('%d', a:resp.body.total_count),
         \ 'markable': 0,
