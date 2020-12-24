@@ -91,6 +91,48 @@ function! s:set_issue_list(resp) abort
   nmap <buffer> <silent> gho   <Plug>(gh_issue_open)
   nmap <buffer> <silent> ghm   <Plug>(gh_issue_open_comment)
   nmap <buffer> <silent> ghy   <Plug>(gh_issue_url_yank)
+
+  if has('nvim')
+    " TODO support neovim
+  else
+    augroup gh-gist-popup
+      au!
+      au CursorMoved <buffer> :silent call <SID>file_contents_popup()
+    augroup END
+
+    nnoremap <buffer> <silent> <C-n> :call <SID>scroll_popup('down')<CR>
+    nnoremap <buffer> <silent> <C-p> :call <SID>scroll_popup('up')<CR>
+  endif
+  call s:file_contents_popup()
+endfunction
+
+function s:file_contents_popup() abort
+  let current = gh#provider#list#current()
+  if !empty(current.body)
+    let b:gh_issue_preview_window = popup_create(current.body, {
+          \ 'line': 1,
+          \ 'firstline': 1,
+          \ 'col': &columns/2,
+          \ 'minwidth': &columns/2,
+          \ 'minheight': &lines,
+          \ 'padding': [0,0,0,1],
+          \ 'moved': 'any'
+          \ })
+    call win_execute(b:gh_issue_preview_window, 'set number | set ft=markdown')
+  endif
+endfunction
+
+function! s:scroll_popup(op) abort
+  let opt = popup_getoptions(b:gh_issue_preview_window)
+  if a:op is# 'up'
+    if opt.firstline ==# 1
+      return
+    endif
+    let opt.firstline -= 1
+  elseif a:op is# 'down'
+    let opt.firstline += 1
+  endif
+  call popup_setoptions(b:gh_issue_preview_window, {'firstline': opt.firstline})
 endfunction
 
 function! s:get_selected_issues() abort
