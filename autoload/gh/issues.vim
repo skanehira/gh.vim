@@ -95,18 +95,18 @@ function! s:set_issue_list(resp) abort
   if has('nvim')
     " TODO support neovim
   else
-    augroup gh-gist-popup
+    augroup gh-issue-preview
       au!
-      au CursorMoved <buffer> :silent call <SID>file_contents_popup()
+      au CursorMoved <buffer> :silent call <SID>issue_preview()
     augroup END
 
     nnoremap <buffer> <silent> <C-n> :call <SID>scroll_popup('down')<CR>
     nnoremap <buffer> <silent> <C-p> :call <SID>scroll_popup('up')<CR>
   endif
-  call s:file_contents_popup()
+  call s:issue_preview()
 endfunction
 
-function s:file_contents_popup() abort
+function s:issue_preview() abort
   let current = gh#provider#list#current()
   if !empty(current.body)
     let b:gh_issue_preview_window = popup_create(current.body, {
