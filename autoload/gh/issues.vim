@@ -92,48 +92,151 @@ function! s:set_issue_list(resp) abort
   nmap <buffer> <silent> ghm   <Plug>(gh_issue_open_comment)
   nmap <buffer> <silent> ghy   <Plug>(gh_issue_url_yank)
 
-  if has('nvim')
-    " TODO support neovim
-  else
-    augroup gh-issue-preview
-      au!
-      au CursorMoved <buffer> :silent call <SID>issue_preview()
-    augroup END
+  nnoremap <buffer> <silent> <Plug>(gh_issue_preview_move_down) :call <SID>scroll_popup('down')<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_issue_preview_move_up) :call <SID>scroll_popup('up')<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_issue_toggle_preview) :call <SID>toggle_issue_preview()<CR>
 
-    nnoremap <buffer> <silent> <C-n> :call <SID>scroll_popup('down')<CR>
-    nnoremap <buffer> <silent> <C-p> :call <SID>scroll_popup('up')<CR>
+  nmap <buffer> <silent> ghp <Plug>(gh_issue_toggle_preview)
+
+  let b:gh_issue_preview_window = -1
+  let b:gh_enable_issue_preview = 0
+endfunction
+
+function! s:toggle_issue_preview() abort
+  if b:gh_enable_issue_preview
+    call s:disable_issue_preview()
+  else
+    call s:enable_issue_preview()
   endif
+  let b:gh_enable_issue_preview = !b:gh_enable_issue_preview
+endfunction
+
+function! s:enable_issue_preview() abort
+  exe printf('augroup gh-issue-preview-%d', bufnr())
+    au!
+    au CursorMoved <buffer> :silent call <SID>issue_preview()
+    au BufLeave <buffer> call s:close_preview_window(b:gh_issue_preview_window)
+  augroup END
+
+  nmap <buffer> <silent> <C-n> <Plug>(gh_issue_preview_move_down)
+  nmap <buffer> <silent> <C-p> <Plug>(gh_issue_preview_move_up)
+
   call s:issue_preview()
 endfunction
 
-function s:issue_preview() abort
-  let current = gh#provider#list#current()
-  if !empty(current.body)
-    let b:gh_issue_preview_window = popup_create(current.body, {
-          \ 'line': 1,
-          \ 'firstline': 1,
-          \ 'col': &columns/2,
-          \ 'minwidth': &columns/2,
-          \ 'minheight': &lines,
-          \ 'padding': [0,0,0,1],
-          \ 'moved': 'any'
-          \ })
-    call win_execute(b:gh_issue_preview_window, 'set number | set ft=markdown')
-  endif
+function! s:disable_issue_preview() abort
+  call s:close_preview_window(b:gh_issue_preview_window)
+
+  exe printf('augroup gh-issue-preview-%d', bufnr()) | au! | augroup END
+
+  unmap <buffer> <C-n>
+  unmap <buffer> <C-p>
 endfunction
 
-function! s:scroll_popup(op) abort
-  let opt = popup_getoptions(b:gh_issue_preview_window)
-  if a:op is# 'up'
-    if opt.firstline ==# 1
-      return
+if has('nvim')
+  function! s:close_preview_window(id) abort
+    if s:has_window(a:id)
+      call nvim_win_close(a:id, v:false)
     endif
-    let opt.firstline -= 1
-  elseif a:op is# 'down'
-    let opt.firstline += 1
-  endif
-  call popup_setoptions(b:gh_issue_preview_window, {'firstline': opt.firstline})
-endfunction
+  endfunction
+
+  function! s:has_window(id) abort
+    let winids = nvim_list_wins()
+    for winid in winids
+      if winid is# a:id
+        return 1
+      endif
+    endfor
+    return 0
+  endfunction
+
+  function! s:issue_preview() abort
+    let current = gh#provider#list#current()
+    if !empty(current.body)
+      let buf = nvim_create_buf(v:false, v:true)
+      let opts = {
+            \ 'relative': 'win',
+            \ 'width': &columns/2+1,
+            \ 'height': &lines,
+            \ 'row': 0,
+            \ 'col': &columns/2,
+            \ 'style': 'minimal'
+            \ }
+
+      call s:close_preview_window(b:gh_issue_preview_window)
+
+      let b:gh_issue_preview_contents_maxrow = len(current.body)
+
+      let b:gh_issue_preview_window = nvim_open_win(buf, 0, opts)
+      call nvim_win_set_option(b:gh_issue_preview_window, 'number', v:true)
+      call nvim_win_set_option(b:gh_issue_preview_window, 'scrolloff', 100)
+      call nvim_win_set_option(b:gh_issue_preview_window, 'cursorline', v:true)
+      call nvim_buf_set_option(buf, 'ft', 'markdown')
+      call nvim_buf_set_lines(buf, 0, -1, v:true, current.body)
+    else
+      call s:close_preview_window(b:gh_issue_preview_window)
+    endif
+  endfunction
+
+  function! s:scroll_popup(op) abort
+    let [row, col] = nvim_win_get_cursor(b:gh_issue_preview_window)
+    if a:op is# 'up'
+      if row ==# 1
+        return
+      endif
+      let row -= 1
+    elseif a:op is# 'down' && row < b:gh_issue_preview_contents_maxrow
+      let row += 1
+    endif
+    call nvim_win_set_cursor(b:gh_issue_preview_window, [row, col])
+  endfunction
+else
+  function! s:close_preview_window(id) abort
+    if s:has_window(a:id)
+      call popup_close(a:id)
+    endif
+  endfunction
+
+  function! s:has_window(id) abort
+    for winid in popup_list()
+      if winid is# a:id
+        return 1
+      endif
+    endfor
+    return 0
+  endfunction
+
+  function! s:issue_preview() abort
+    let current = gh#provider#list#current()
+    if !empty(current.body)
+      let b:gh_issue_preview_window = popup_create(current.body, {
+            \ 'line': 1,
+            \ 'firstline': 1,
+            \ 'col': &columns/2,
+            \ 'minwidth': &columns/2,
+            \ 'minheight': &lines,
+            \ 'padding': [0,0,0,1],
+            \ 'moved': 'any'
+            \ })
+      call win_execute(b:gh_issue_preview_window, 'set number | set ft=markdown')
+    else
+      call s:close_preview_window(b:gh_issue_preview_window)
+    endif
+  endfunction
+
+  function! s:scroll_popup(op) abort
+    let opt = popup_getoptions(b:gh_issue_preview_window)
+    if a:op is# 'up'
+      if opt.firstline ==# 1
+        return
+      endif
+      let opt.firstline -= 1
+    elseif a:op is# 'down'
+      let opt.firstline += 1
+    endif
+    call popup_setoptions(b:gh_issue_preview_window, {'firstline': opt.firstline})
+  endfunction
+endif
 
 function! s:get_selected_issues() abort
   let issues = gh#provider#list#get_marked()
