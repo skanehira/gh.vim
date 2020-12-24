@@ -54,6 +54,8 @@ function! gh#gh#init() abort
     call gh#files#tree()
   elseif bufname =~# '^gh:\/\/bookmarks$'
     call gh#bookmark#list()
+  elseif bufname =~# '^gh:\/\/[^/]\+\/gists$'
+    call gh#gists#list()
   endif
 endfunction
 
