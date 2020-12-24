@@ -1,2 +1,2 @@
-syntax match gh_files_dir /[+-] .*\S/
-syntax match gh_files_selected /.*\*$/
+syntax match gh_gists_page /[+-] .*\S/
+syntax match gh_gists_selected /.*\*$/
