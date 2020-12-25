@@ -592,7 +592,7 @@ function! s:set_issue_comments_body(resp) abort
   augroup END
 endfunction
 
-function! s:issue_comment_open() abort
+function! s:gh_issue_comment_open() abort
   call execute(printf('belowright vnew gh://%s/%s/issues/%s/comments/edit',
         \ s:comment_list.repo.owner, s:comment_list.repo.name, s:comment_list.number))
   call gh#gh#init_buffer()
