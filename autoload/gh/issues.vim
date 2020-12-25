@@ -583,7 +583,7 @@ function! s:set_issue_comments_body(resp) abort
 
   " open preview/edit window
   let winid = win_getid()
-  call s:gh_issue_comment_open()
+  call s:issue_comment_open()
   call win_gotoid(winid)
 
   augroup gh-issue-comment-show
