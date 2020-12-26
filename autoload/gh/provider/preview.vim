@@ -6,12 +6,14 @@
 "   'filename': 'gh.vim',
 "   'contents': ['a', 'b'],
 " }
-function! gh#provider#preview#open(opts, updatefunc) abort
+function! gh#provider#preview#open(opts, ...) abort
   let b:gh_preview_buf = -1
   let b:gh_preview_winid = -1
   let b:gh_preview_enable = 0
   let b:gh_preview_opts = a:opts
-  let b:gh_preview_updatefunc = a:updatefunc
+  if a:0 is# 1
+    let b:gh_preview_updatefunc = a:1
+  endif
 
   nnoremap <buffer> <silent> <Plug>(gh_preview_move_down) :call <SID>scroll_popup('down')<CR>
   nnoremap <buffer> <silent> <Plug>(gh_preview_move_up) :call <SID>scroll_popup('up')<CR>
