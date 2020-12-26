@@ -124,6 +124,10 @@ gh://:owner/:repo/[:branch|:tree_sha]/files[?recache=1]	*gh-buffer-file-list*
 	`:tree_sha` is commit hash and `:branch` is branch name.
 	when `recache` is 1, file tree's cache will be cleard.
 
+gh://:owner/gists					*gh-buffer-gist-list*
+	show `:owner` gists.
+	currently can display max 100 gists
+
 gh://bookmarks						*gh-buffer-bookmark-list*
 	show your buffer bookmarks.
 	you can edit this buffer and use |:w| to save bookmarks.
@@ -330,7 +334,9 @@ default mappings
 				`normal`	<C-o>		<Plug>(gh_files_open_browser)
 |gh-buffer-file|		`visual`	ghy		<Plug>(gh_file_yank_url)
 				`visual`	<C-o>		<Plug>(gh_file_open_browser)
-
+|gh-buffer-gist-list|		`normal`	ghp		<Plug>(gh_preview_toggle)
+				`normal`	<C-n>		<Plug>(gh_preview_move_down)
+				`normal`	<C-p>		<Plug>(gh_preview_move_up)
 ------------------------------------------------------------------------------
 FUNCTIONS					*gh-functions*
 

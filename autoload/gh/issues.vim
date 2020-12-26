@@ -92,21 +92,25 @@ function! s:set_issue_list(resp) abort
   nmap <buffer> <silent> ghm   <Plug>(gh_issue_open_comment)
   nmap <buffer> <silent> ghy   <Plug>(gh_issue_url_yank)
 
-  let current = gh#provider#list#current()
-  let issue = {
-        \ 'filename': 'issue.md',
-        \ 'contents': current.body,
-        \ }
-  call gh#provider#preview#open(issue, function('s:preview_update'))
+  call gh#provider#preview#open(s:get_preview_info(), function('s:preview_update'))
 endfunction
 
 function! s:preview_update() abort
+  call gh#provider#preview#update(s:get_preview_info())
+endfunction
+
+function! s:get_preview_info() abort
   let current = gh#provider#list#current()
-  let issue = {
-        \ 'filename': 'issue.md',
-        \ 'contents': current.body,
+  if !empty(current)
+    return {
+          \ 'filename': 'issue.md',
+          \ 'contents': current.body,
+          \ }
+  endif
+  return {
+        \ 'filename': '',
+        \ 'contents': [],
         \ }
-  call gh#provider#preview#update(issue)
 endfunction
 
 function! s:get_selected_issues() abort

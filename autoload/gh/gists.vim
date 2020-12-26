@@ -22,7 +22,6 @@ function! gh#gists#list() abort
 endfunction
 
 function! s:set_gists_list(gists) abort
-  try
   if empty(a:gists)
     call gh#gh#set_message_buf('not found any actions')
     return
@@ -40,22 +39,26 @@ function! s:set_gists_list(gists) abort
 
   call s:make_tree(a:gists)
 
-  if has('nvim')
-    " TODO support neovim
-  else
-    augroup gh-gist-popup
-      au!
-      au CursorMoved <buffer> :silent call <SID>file_contents_popup()
-    augroup END
-
-    nnoremap <buffer> <silent> <C-n> :call <SID>scroll_popup('down')<CR>
-    nnoremap <buffer> <silent> <C-p> :call <SID>scroll_popup('up')<CR>
-  endif
-
   call gh#provider#tree#open(b:gh_gist_tree)
-  catch
-    echom v:exception
-  endtry
+  call gh#provider#preview#open(s:get_preview_info(), function('s:preview_update'))
+endfunction
+
+function! s:preview_update() abort
+  call gh#provider#preview#update(s:get_preview_info())
+endfunction
+
+function! s:get_preview_info() abort
+  let current = gh#provider#tree#current_node()
+  if current.type is# 'file'
+    return {
+          \ 'filename': current.info.name,
+          \ 'contents': current.info.text,
+          \ }
+  endif
+  return {
+        \ 'filename': '',
+        \ 'contents': [],
+        \ }
 endfunction
 
 function s:file_contents_popup() abort

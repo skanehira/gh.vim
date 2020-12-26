@@ -67,6 +67,7 @@ currently `gh.vim` provides buffers is bellow.
 | `gh://:owner/:repo/actions[?status=success&...]`          | github action's workflows/steps    |
 | `gh://:owner/:repo/[:branch/:tree_sha]/files[?recache=1]` | repository file tree               |
 | `gh://bookmarks`                                          | your bookmarks                     |
+| `gh://:owner/gists`                                       | gist list                          |
 
 ## Author
 skanehira

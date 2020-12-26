@@ -37,13 +37,12 @@ function! s:toggle_preview() abort
   else
     call s:enable_preview()
   endif
-  let b:gh_preview_enable = !b:gh_preview_enable
 endfunction
 
 function! s:enable_preview() abort
   exe printf('augroup gh-preview-%d', bufnr())
     au!
-    au BufEnter <buffer> call s:open_preview()
+    au BufEnter <buffer> call s:preview()
     au BufLeave <buffer> call s:close_preview_window(b:gh_preview_winid)
     if exists('b:gh_preview_updatefunc')
       au CursorMoved <buffer> call b:gh_preview_updatefunc()
@@ -52,7 +51,9 @@ function! s:enable_preview() abort
 
   nmap <buffer> <silent> <C-n> <Plug>(gh_preview_move_down)
   nmap <buffer> <silent> <C-p> <Plug>(gh_preview_move_up)
-  call s:preview()
+  call s:open_preview()
+
+  let b:gh_preview_enable = 1
 endfunction
 
 function! s:disable_preview() abort
@@ -62,6 +63,8 @@ function! s:disable_preview() abort
 
   unmap <buffer> <C-n>
   unmap <buffer> <C-p>
+
+  let b:gh_preview_enable = 0
 endfunction
 
 function! s:preview() abort
@@ -107,17 +110,15 @@ if has('nvim')
           \ 'style': 'minimal'
           \ }
 
-    let b:gh_preview_contents_maxrow = len(b:gh_preview_opts.contents)
-
     let b:gh_preview_winid = nvim_open_win(b:gh_preview_buf, 0, opts)
     call nvim_win_set_option(b:gh_preview_winid, 'number', v:true)
-    call nvim_win_set_option(b:gh_preview_winid, 'scrolloff', 100)
-    call nvim_win_set_option(b:gh_preview_winid, 'cursorline', v:true)
+    call b:gh_preview_updatefunc()
   endfunction
 
   function! s:update_preview() abort
+    let b:gh_preview_contents_maxrow = len(b:gh_preview_opts.contents)
     call nvim_buf_set_lines(b:gh_preview_buf, 0, -1, v:true, b:gh_preview_opts.contents)
-    call s:win_execute(b:gh_preview_winid, printf('do <nomodeline> BufRead %s', b:gh_preview_opts.filename))
+    call s:win_execute(b:gh_preview_winid, printf('do <nomodeline> BufRead %s | normal zn', b:gh_preview_opts.filename))
   endfunction
 
   function! s:scroll_popup(op) abort
@@ -152,21 +153,20 @@ else
   endfunction
 
   function! s:open_preview() abort
-    let b:gh_preview_winid = popup_create(b:gh_preview_opts.contents, {
+    let b:gh_preview_winid = popup_create([], {
           \ 'line': 1,
           \ 'firstline': 1,
-          \ 'col': &columns/2,
+          \ 'col': &columns/2+2,
           \ 'minwidth': &columns/2,
           \ 'minheight': &lines,
-          \ 'padding': [0,0,0,1],
           \ })
 
-    let b:gh_preview_contents_maxrow = len(b:gh_preview_opts.contents)
     call win_execute(b:gh_preview_winid, 'set number')
-    call s:update_preview()
+    call b:gh_preview_updatefunc()
   endfunction
 
   function! s:update_preview() abort
+    let b:gh_preview_contents_maxrow = len(b:gh_preview_opts.contents)
     call win_execute(b:gh_preview_winid, printf('do <nomodeline> BufRead %s | normal zn', b:gh_preview_opts.filename))
     call popup_setoptions(b:gh_preview_winid, {'firstline': 1})
     call popup_settext(b:gh_preview_winid, b:gh_preview_opts.contents)
@@ -179,7 +179,10 @@ else
         return
       endif
       let opt.firstline -= 1
-    elseif a:op is# 'down' && opt.firstline < b:gh_preview_contents_maxrow
+    elseif a:op is# 'down'
+      if opt.firstline >= b:gh_preview_contents_maxrow
+        return
+      endif
       let opt.firstline += 1
     endif
     call popup_setoptions(b:gh_preview_winid, {'firstline': opt.firstline})
