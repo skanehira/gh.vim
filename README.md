@@ -18,6 +18,8 @@ Vim/Neovim plugin for GitHub
   - list/open job logs
 - file tree
   - open file
+- gist
+  - list
 
 ## Installation
 Please install `curl` before installtion.
