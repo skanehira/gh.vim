@@ -197,13 +197,13 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 <Plug>(gh_issue_url_yank)			*<Plug>(gh_issue_url_yank)*
 	yank issue url
 
-<Plug>(gh_issue_toggle_preview)			*<Plug>(gh_issue_toggle_preview)*
-	toggle previewing issue contents
+<Plug>(gh_preview_toggle)			*<Plug>(gh_preview_toggle)*
+	toggle open/close previewing issue contents
 
-<Plug>(gh_issue_preview_move_down)		*<Plug>(gh_issue_preview_move_down)*
+<Plug>(gh_preview_move_down)			*<Plug>(gh_preview_move_down)*
 	move down cursorline in preview
 
-<Plug>(gh_issue_preview_move_up)		*<Plug>(gh_issue_preview_move_up)*
+<Plug>(gh_preview_move_up)			*<Plug>(gh_preview_move_up)*
 	move up cursorline in preview
 
 <Plug>(gh_issue_comment_list_next)              *<Plug>(gh_issue_comment_list_next)*
@@ -294,9 +294,9 @@ default mappings
 				`normal`	gho		<Plug>(gh_issue_open)
 				`normal`	ghm		<Plug>(gh_issue_open_comment)
 				`normal`	ghy		<Plug>(gh_issue_url_yank)
-				`normal`	ghp		<Plug>(gh_issue_toggle_preview)
-				`normal`	<C-n>		<Plug>(gh_issue_preview_move_down)
-				`normal`	<C-p>		<Plug>(gh_issue_preview_move_up)
+				`normal`	ghp		<Plug>(gh_preview_toggle)
+				`normal`	<C-n>		<Plug>(gh_preview_move_down)
+				`normal`	<C-p>		<Plug>(gh_preview_move_up)
 |gh-buffer-issue-edit|		`normal`	ghm		<Plug>(gh_issue_comment_open_on_issue)
 |gh-buffer-issue-comment-list|	`normal`	<C-h>		<Plug>(gh_issue_comment_list_prev)
 				`normal`	<C-l>		<Plug>(gh_issue_comment_list_next)

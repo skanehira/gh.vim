@@ -15,9 +15,9 @@ function! gh#provider#preview#open(opts, updatefunc) abort
 
   nnoremap <buffer> <silent> <Plug>(gh_preview_move_down) :call <SID>scroll_popup('down')<CR>
   nnoremap <buffer> <silent> <Plug>(gh_preview_move_up) :call <SID>scroll_popup('up')<CR>
-  nnoremap <buffer> <silent> <Plug>(gh_toggle_preview) :call <SID>toggle_preview()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_preview_toggle) :call <SID>toggle_preview()<CR>
 
-  nmap <buffer> <silent> ghp <Plug>(gh_toggle_preview)
+  nmap <buffer> <silent> ghp <Plug>(gh_preview_toggle)
 endfunction
 
 function! gh#provider#preview#update(opts) abort
