@@ -126,7 +126,8 @@ gh://:owner/:repo/[:branch|:tree_sha]/files[?recache=1]	*gh-buffer-file-list*
 
 gh://:owner/gists					*gh-buffer-gist-list*
 	show `:owner` gists.
-	currently can display max 100 gists
+	currently can display max 30 gists.
+	use `ghf` can get gists more.
 
 gh://bookmarks						*gh-buffer-bookmark-list*
 	show your buffer bookmarks.
@@ -285,9 +286,13 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 <Plug>(gh_file_open_browser)			*<Plug>(gh_file_open_browser)*
 	open selected file's line in browser.
 
+<Plug>(gh_gist_list_fetch)			*<Plug>(gh_gist_list_fetch)*
+	get gists more.
+
 						*gh-default-key-mappings*
 
 default mappings
+
 {buffer}			{mode}		{lhs}		{rhs}
 -----------------------------------------------------------------------------------------------
 |gh-buffer-issue-list|		`normal`	<C-h>		<Plug>(gh_issue_list_prev)
@@ -337,6 +342,8 @@ default mappings
 |gh-buffer-gist-list|		`normal`	ghp		<Plug>(gh_preview_toggle)
 				`normal`	<C-n>		<Plug>(gh_preview_move_down)
 				`normal`	<C-p>		<Plug>(gh_preview_move_up)
+				`normal`	ghf		<Plug>(gh_gist_list_fetch)
+
 ------------------------------------------------------------------------------
 FUNCTIONS					*gh-functions*
 
