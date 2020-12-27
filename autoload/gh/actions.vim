@@ -90,16 +90,7 @@ function! s:yank_url() abort
   call gh#provider#tree#clean_marked_nodes()
   call gh#provider#tree#redraw()
 
-  let ln = "\n"
-  if &ff == "dos"
-    let ln = "\r\n"
-  endif
-
-  call gh#gh#yank(join(urls, ln))
-  call gh#gh#message('copied ' .. urls[0])
-  for url in urls[1:]
-    call gh#gh#message('       ' .. url)
-  endfor
+  call gh#gh#yank(urls)
 endfunction
 
 function! s:open_browser() abort

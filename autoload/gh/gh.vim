@@ -92,8 +92,22 @@ function! gh#gh#open_url(url) abort
   call system(printf('%s %s', s:gh_open_cmd, a:url))
 endfunction
 
-function! gh#gh#yank(text) abort
-  call setreg(s:gh_yank_reg, a:text)
+function! gh#gh#yank(arg) abort
+  if type(a:arg) is v:t_list
+    let ln = "\n"
+    if &ff == "dos"
+      let ln = "\r\n"
+    endif
+
+    call setreg(s:gh_yank_reg, join(a:arg, ln))
+    call gh#gh#message('copied ' .. a:arg[0])
+    for item in a:arg[1:]
+      call gh#gh#message('       ' .. item)
+    endfor
+  else
+    call setreg(s:gh_yank_reg, a:arg)
+    call gh#gh#message('copied ' .. a:arg)
+  endif
 endfunction
 
 function! gh#gh#delete_buffer(s, name) abort

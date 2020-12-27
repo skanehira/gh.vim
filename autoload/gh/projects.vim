@@ -52,7 +52,6 @@ endfunction
 function! s:project_url_yank() abort
   let url = s:gh_projects[line('.') -1].url
   call gh#gh#yank(url)
-  call gh#gh#message('copied ' .. url)
 endfunction
 
 function! s:set_project_list_result(resp) abort
@@ -299,21 +298,12 @@ function! s:card_url_yank() abort
     endif
   endfor
 
-  let ln = "\n"
-  if &ff == "dos"
-    let ln = "\r\n"
-  endif
-
-  call gh#gh#yank(join(urls, ln))
-
   if empty(urls)
     call gh#gh#message('your selected is not project card! you can select only project card.')
-  else
-    call gh#gh#message('copied ' .. urls[0])
-    for url in urls[1:]
-      call gh#gh#message('       ' .. url)
-    endfor
+    return
   endif
+
+  call gh#gh#yank(urls)
 endfunction
 
 function! s:set_project_column_list(resp) abort

@@ -15,22 +15,16 @@ endfunction
 
 function! s:issue_url_yank() abort
   let urls = []
-  for issue in s:get_selected_issues()
+  let issues = s:get_selected_issues()
+
+  for issue in issues
     call add(urls, issue.url)
   endfor
+
   call gh#provider#list#clean_marked()
   call gh#provider#list#redraw()
 
-  let ln = "\n"
-  if &ff == "dos"
-    let ln = "\r\n"
-  endif
-
-  call gh#gh#yank(join(urls, ln))
-  call gh#gh#message('copied ' .. urls[0])
-  for url in urls[1:]
-    call gh#gh#message('       ' .. url)
-  endfor
+  call gh#gh#yank(urls)
 endfunction
 
 function! s:edit_issue() abort
@@ -417,7 +411,6 @@ endfunction
 function! s:issue_comment_url_yank() abort
   let url = s:gh_issue_comments[line('.') -1].url
   call gh#gh#yank(url)
-  call gh#gh#message('copied ' .. url)
 endfunction
 
 function! s:set_issue_comments_body(resp) abort

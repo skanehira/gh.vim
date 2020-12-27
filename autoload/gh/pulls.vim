@@ -55,19 +55,11 @@ function! s:pull_url_yank() abort
   for pull in s:get_selected_pulls()
     call add(urls, pull.url)
   endfor
+
   call gh#provider#list#clean_marked()
   call gh#provider#list#redraw()
 
-  let ln = "\n"
-  if &ff == "dos"
-    let ln = "\r\n"
-  endif
-
-  call gh#gh#yank(join(urls, ln))
-  call gh#gh#message('copied ' .. urls[0])
-  for url in urls[1:]
-    call gh#gh#message('       ' .. url)
-  endfor
+  call gh#gh#yank(urls)
 endfunction
 
 function! s:pull_open() abort

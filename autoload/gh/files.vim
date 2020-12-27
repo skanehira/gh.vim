@@ -158,21 +158,10 @@ endfunction
 function! s:files_yank_url() abort
   let urls = s:get_selected_urls()
 
-  if len(urls) > 1
-    call gh#provider#tree#clean_marked_nodes()
-    call gh#provider#tree#redraw()
-  endif
+  call gh#provider#tree#clean_marked_nodes()
+  call gh#provider#tree#redraw()
 
-  let ln = "\n"
-  if &ff == "dos"
-    let ln = "\r\n"
-  endif
-
-  call gh#gh#yank(join(urls, ln))
-  call gh#gh#message('copied ' .. urls[0])
-  for url in urls[1:]
-    call gh#gh#message('       ' .. url)
-  endfor
+  call gh#gh#yank(urls)
 endfunction
 
 function! s:files_open_browser() abort
@@ -204,7 +193,6 @@ function! s:yank_or_open_file_url(op) abort
       call gh#gh#open_url(url)
     else
       call gh#gh#yank(url)
-      call gh#gh#message('copied ' .. url)
     endif
   endif
 endfunction
