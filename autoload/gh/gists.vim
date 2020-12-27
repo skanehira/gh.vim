@@ -51,7 +51,12 @@ endfunction
 
 function! s:set_keymap() abort
   nnoremap <buffer> <silent> <Plug>(gh_gist_list_fetch) :call <SID>fetch_gists()<CR>
-  nmap <buffer> <silent> ghf <Plug>(gh_gist_list_fetch)
+  nnoremap <buffer> <silent> <Plug>(gh_gist_list_yank) :call <SID>yank_or_open_gists_url('yank')<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_gist_list_open_browser) :call <SID>yank_or_open_gists_url('open')<CR>
+
+  nmap <buffer> <silent> <C-o> <Plug>(gh_gist_list_open_browser)
+  nmap <buffer> <silent> ghy   <Plug>(gh_gist_list_yank)
+  nmap <buffer> <silent> ghf   <Plug>(gh_gist_list_fetch)
 endfunction
 
 function! s:preview_update() abort
@@ -93,15 +98,18 @@ function! s:make_tree(gists) abort
         call add(node['children'], {
               \ 'name': f.name,
               \ 'path': printf('%s/%s', node.path, f.name),
-              \ 'markable': 0,
+              \ 'markable': 1,
               \ 'type': 'file',
-              \ 'info': f,
+              \ 'info': {
+              \   'url': node.info.url
+              \ },
               \ })
       endfor
     else
       let node['type'] = 'file'
       let gist.files[0].text = split(gist.files[0].text, '\r\?\n')
-      let node['info'] = gist.files[0]
+      let node.info = gist.files[0]
+      let node.info['url'] = gist.url
     endif
 
     call add(b:gh_gist_tree.children, node)
@@ -129,4 +137,43 @@ function! s:fetch_gists() abort
         \.then({-> gh#provider#tree#redraw()})
         \.then({-> execute('echom ""', '')})
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
+endfunction
+
+function! s:yank_or_open_gists_url(op) abort
+  let urls = s:get_gists_url()
+  if empty(urls)
+    return
+  endif
+
+  call gh#provider#tree#clean_marked_nodes()
+  call gh#provider#tree#redraw()
+
+  if a:op is# 'yank'
+    call gh#gh#yank(urls)
+  else
+    for url in urls
+      call gh#gh#open_url(url)
+    endfor
+  endif
+endfunction
+
+function! s:get_gists_url() abort
+  let urls = []
+  for node in s:get_selected_gists()
+    if exists('node.info.url')
+      call add(urls, node.info.url)
+    endif
+  endfor
+  return urls
+endfunction
+
+function! s:get_selected_gists() abort
+  let nodes = []
+  for node in values(gh#provider#tree#marked_nodes())
+    call add(nodes, node)
+  endfor
+  if empty(nodes)
+    let nodes = [gh#provider#tree#current_node()]
+  endif
+  return nodes
 endfunction
