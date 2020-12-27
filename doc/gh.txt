@@ -289,6 +289,12 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 <Plug>(gh_gist_list_fetch)			*<Plug>(gh_gist_list_fetch)*
 	get gists more.
 
+<Plug>(gh_gist_list_open_browser)		*<Plug>(gh_gist_list_open_browser)*
+	open gist in browser.
+
+<Plug>(gh_gist_list_yank)			*<Plug>(gh_gist_list_yank)*
+	yank gist url.
+
 						*gh-default-key-mappings*
 
 default mappings
@@ -343,6 +349,8 @@ default mappings
 				`normal`	<C-n>		<Plug>(gh_preview_move_down)
 				`normal`	<C-p>		<Plug>(gh_preview_move_up)
 				`normal`	ghf		<Plug>(gh_gist_list_fetch)
+				`normal`	ghy		<Plug>(gh_gist_list_yank)
+				`normal`	<C-o>		<Plug>(gh_gist_list_open_browser)
 
 ------------------------------------------------------------------------------
 FUNCTIONS					*gh-functions*
