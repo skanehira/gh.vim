@@ -56,6 +56,10 @@ function! gh#gh#init() abort
     call gh#bookmark#list()
   elseif bufname =~# '^gh:\/\/[^/]\+\/gists$'
     call gh#gists#list()
+  elseif bufname =~# '^gh:\/\/[^/]\+\/gists\/[^/]\+$'
+    call gh#gists#gist()
+  elseif bufname =~# '^gh:\/\/[^/]\+\/gists\/[^/]\+\/[^/]\+'
+    call gh#gists#edit()
   endif
 endfunction
 
