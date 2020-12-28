@@ -186,7 +186,7 @@ function! s:get_selected_gists() abort
 endfunction
 
 function! gh#gists#gist() abort
-  setlocal ft=gh-gist
+  setlocal ft=gh-gists
   let b:gh_gists_bufid = bufnr()
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
