@@ -129,6 +129,12 @@ gh://:owner/gists					*gh-buffer-gist-list*
 	currently can display max 30 gists.
 	use `ghf` can get gists more.
 
+gh://:owner/gists/:id					*gh-buffer-gist*
+	show gist.
+
+gh://:owner/gists/:id/:file				*gh-buffer-gist-edit*
+	edit gist file.
+
 gh://bookmarks						*gh-buffer-bookmark-list*
 	show your buffer bookmarks.
 	you can edit this buffer and use |:w| to save bookmarks.
@@ -295,6 +301,9 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 <Plug>(gh_gist_list_yank)			*<Plug>(gh_gist_list_yank)*
 	yank gist url.
 
+<Plug>(gh_gist_edit_file)			*<Plug>(gh_gist_edit_file)*
+	edit gist file.
+
 						*gh-default-key-mappings*
 
 default mappings
@@ -351,6 +360,8 @@ default mappings
 				`normal`	ghf		<Plug>(gh_gist_list_fetch)
 				`normal`	ghy		<Plug>(gh_gist_list_yank)
 				`normal`	<C-o>		<Plug>(gh_gist_list_open_browser)
+				`normal`	ghe		<Plug>(gh_gist_edit_file)
+|gh-buffer-gist|		`normal`	ghe		<Plug>(gh_gist_edit_file)
 
 ------------------------------------------------------------------------------
 FUNCTIONS					*gh-functions*

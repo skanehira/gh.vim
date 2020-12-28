@@ -22,6 +22,8 @@ function! gh#map#init() abort
       \ 'gh-buffer-action-list': [],
       \ 'gh-buffer-file-list': [],
       \ 'gh-buffer-file': [],
+      \ 'gh-buffer-gist-list': [],
+      \ 'gh-buffer-gist': [],
       \ }
 endfunction
 

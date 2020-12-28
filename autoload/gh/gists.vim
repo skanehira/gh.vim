@@ -56,12 +56,12 @@ function! s:set_keymap() abort
   nnoremap <buffer> <silent> <Plug>(gh_gist_list_fetch) :call <SID>fetch_gists()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_gist_list_yank) :call <SID>yank_or_open_gists_url('yank')<CR>
   nnoremap <buffer> <silent> <Plug>(gh_gist_list_open_browser) :call <SID>yank_or_open_gists_url('open')<CR>
-  nnoremap <buffer> <silent> <Plug>(gh_gist_list_edit_file) :call <SID>edit_gist_file()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_gist_edit_file) :call <SID>edit_gist_file()<CR>
 
   nmap <buffer> <silent> <C-o> <Plug>(gh_gist_list_open_browser)
   nmap <buffer> <silent> ghy   <Plug>(gh_gist_list_yank)
   nmap <buffer> <silent> ghf   <Plug>(gh_gist_list_fetch)
-  nmap <buffer> <silent> ghe   <Plug>(gh_gist_list_edit_file)
+  nmap <buffer> <silent> ghe   <Plug>(gh_gist_edit_file)
 endfunction
 
 function! s:preview_update() abort
@@ -186,7 +186,7 @@ function! s:get_selected_gists() abort
 endfunction
 
 function! gh#gists#gist() abort
-  setlocal ft=gh-gists
+  setlocal ft=gh-gist
   let b:gh_gists_bufid = bufnr()
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
@@ -198,6 +198,7 @@ function! gh#gists#gist() abort
         \ }
   call gh#github#gists#gist(b:gh_gist.owner, b:gh_gist.id)
         \.then({gist -> s:set_gist(gist)})
+        \.then({-> gh#map#apply('gh-buffer-gist', b:gh_gists_bufid)})
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
@@ -216,8 +217,8 @@ function! s:set_gist(gist) abort
   call gh#provider#tree#open(b:gh_gist_tree)
   call gh#provider#preview#open(s:get_preview_info(), function('s:preview_update'))
 
-  nnoremap <buffer> <silent> <Plug>(gh_gist_list_edit_file) :call <SID>edit_gist_file()<CR>
-  nmap <buffer> <silent> ghe   <Plug>(gh_gist_list_edit_file)
+  nnoremap <buffer> <silent> <Plug>(gh_gist_edit_file) :call <SID>edit_gist_file()<CR>
+  nmap <buffer> <silent> ghe   <Plug>(gh_gist_edit_file)
 endfunction
 
 function! s:edit_gist_file() abort
