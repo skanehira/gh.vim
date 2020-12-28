@@ -95,14 +95,13 @@ function! s:make_tree(gists) abort
 
       for f in gist.files
         let f.text = split(f.text, '\r\?\n')
+        let f['url'] = node.info.url
         call add(node['children'], {
               \ 'name': f.name,
               \ 'path': printf('%s/%s', node.path, f.name),
               \ 'markable': 1,
               \ 'type': 'file',
-              \ 'info': {
-              \   'url': node.info.url
-              \ },
+              \ 'info': f,
               \ })
       endfor
     else
