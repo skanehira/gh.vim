@@ -36,13 +36,18 @@ let s:gist_query =<< trim END
 {
   user (login: "%s") {
     gist(name: "%s") {
+      owner {
+        login
+      }
       name
       description
+      isPublic
       files {
         name
         text
       }
       url
+      stargazerCount
       pushedAt
       createdAt
     }
@@ -63,7 +68,17 @@ function! gh#github#gists#list(owner, ...) abort
         \ }})
 endfunction
 
-function! gh#github#gists#one(id) abort
-  let query = {'query': printf(s:gist_query, a:id)}
+function! gh#github#gists#gist(owner, id) abort
+  let query = {'query': printf(s:gist_query, a:owner, a:id)}
   return gh#graphql#query(query).then({resp -> resp.body.data.user.gist})
+endfunction
+
+function! gh#github#gists#update(id, data) abort
+  let settings = {
+        \ 'method': 'PATCH',
+        \ 'url': printf('https://api.github.com/gists/%s', a:id),
+        \ 'data': a:data,
+        \ }
+
+  return gh#http#request(settings)
 endfunction
