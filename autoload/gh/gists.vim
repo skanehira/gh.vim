@@ -224,7 +224,7 @@ endfunction
 function! s:edit_gist_file() abort
   let current = gh#provider#tree#current_node()
   if current.type is# 'file'
-    echom '[gh.vim] (e)dit, (n)ew, (v)new, (t)abnew: '
+    echo '[gh.vim] (e)dit, (n)ew, (v)new, (t)abnew: '
     let result = nr2char(getchar())
     if result is# 'e'
       let open = 'e'
