@@ -124,10 +124,11 @@ gh://:owner/:repo/[:branch|:tree_sha]/files[?recache=1]	*gh-buffer-file-list*
 	`:tree_sha` is commit hash and `:branch` is branch name.
 	when `recache` is 1, file tree's cache will be cleard.
 
-gh://:owner/gists					*gh-buffer-gist-list*
+gh://:owner/gists[?privacy=public]			*gh-buffer-gist-list*
 	show `:owner` gists.
 	currently can display max 30 gists.
 	use `ghf` can get gists more.
+	privacy parameter can be specified `all`, `public`, `secret`
 
 gh://:owner/gists/:id					*gh-buffer-gist*
 	show gist.
