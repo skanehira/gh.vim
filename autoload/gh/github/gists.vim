@@ -5,7 +5,7 @@
 let s:gist_list_query =<< trim END
 {
   user (login: "%s") {
-    gists(first: 30, %s privacy: PUBLIC, orderBy: {field: CREATED_AT, direction: DESC}) {
+    gists(first: 30, privacy: %s, %s orderBy: {field: CREATED_AT, direction: DESC}) {
       nodes {
         owner {
           login
@@ -56,11 +56,11 @@ let s:gist_query =<< trim END
 END
 let s:gist_query = join(s:gist_query)
 
-function! gh#github#gists#list(owner, ...) abort
+function! gh#github#gists#list(owner, privacy, ...) abort
   if a:0 is# 1
-    let query = {'query': printf(s:gist_list_query, a:owner, printf('after: "%s", ', a:1))}
+    let query = {'query': printf(s:gist_list_query, a:owner, a:privacy, printf('after: "%s", ', a:1))}
   else
-    let query = {'query': printf(s:gist_list_query, a:owner, '')}
+    let query = {'query': printf(s:gist_list_query, a:owner, a:privacy, '')}
   endif
   return gh#graphql#query(query).then({resp -> {
         \ 'gists': resp.body.data.user.gists.nodes,

@@ -17,12 +17,20 @@ function! gh#gists#list() abort
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
 
-  let m = matchlist(bufname(), 'gh://\(.*\)/gists')
+  let m = matchlist(bufname(), 'gh://\(.*\)/gists?*\(.*\)')
   let b:gh_gist_list = {
         \ 'owner': m[1],
         \ }
 
-  call gh#github#gists#list(b:gh_gist_list.owner)
+  let b:gh_gist_list['privacy'] = 'PUBLIC'
+  if !empty(m[2])
+    let p = split(m[2], '=')
+    if p[0] is# 'privacy' && p[1] =~? '\(PUBLIC\|ALL\|SECRET\)'
+      let b:gh_gist_list['privacy'] = toupper(p[1])
+    endif
+  endif
+
+  call gh#github#gists#list(b:gh_gist_list.owner, b:gh_gist_list.privacy)
         \.then({resp -> s:set_page_info(resp)})
         \.then({resp -> s:set_gists_list(resp)})
         \.then({-> s:set_keymap()})
@@ -139,7 +147,7 @@ function! s:fetch_gists() abort
   endif
 
   call gh#gh#message('fetching gists...')
-  call gh#github#gists#list(b:gh_gist_list.owner, b:gh_gists_list_page_info.cursor)
+  call gh#github#gists#list(b:gh_gist_list.owner, b:gh_gist_list.privacy, b:gh_gists_list_page_info.cursor)
         \.then({resp -> s:set_page_info(resp)})
         \.then({resp -> s:make_tree(b:gh_gist_list.owner, resp.gists)})
         \.then({-> gh#provider#tree#redraw()})
@@ -281,6 +289,7 @@ function! s:init_edit_gist_buffer(contents) abort
   call setbufline(b:gh_edit_gist_bufid, 1, a:contents)
   exe printf('do BufRead %s | normal zn', b:gh_gist_edit.filename)
   setlocal buftype=acwrite
+  setlocal nomodified
 
   augroup gh-gist-update
     au!
@@ -347,6 +356,7 @@ function! s:gist_create_files() abort
   let is_public = input('make a public?(y/n)') =~ '^y' ? v:true : v:false
   let data = {'files': files, 'public': is_public}
 
+  echo '' | redraw
   call gh#gh#message('creating...')
 
   call gh#github#gists#create(data)

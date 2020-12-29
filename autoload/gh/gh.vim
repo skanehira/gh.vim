@@ -55,6 +55,7 @@ function! gh#gh#init() abort
   elseif bufname =~# '^gh:\/\/bookmarks$'
     call gh#bookmark#list()
   elseif bufname =~# '^gh:\/\/[^/]\+\/gists$'
+        \ || bufname =~# '^gh:\/\/[^/]\+\/gists?\+'
     call gh#gists#list()
   elseif bufname =~# '^gh:\/\/[^/]\+\/gists\/[^/]\+$'
     call gh#gists#gist()
@@ -77,14 +78,12 @@ function! gh#gh#set_message_buf(msg) abort
 endfunction
 
 function! gh#gh#error_message(msg) abort
-  echo '' | redraw
   echohl ErrorMsg
   echo '[gh.vim] ' . a:msg
   echohl None
 endfunction
 
 function! gh#gh#message(msg) abort
-  echo '' | redraw
   echohl Directory
   echo '[gh.vim] ' . a:msg
   echohl None
