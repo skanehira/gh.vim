@@ -135,6 +135,12 @@ gh://:owner/gists/:id					*gh-buffer-gist*
 gh://:owner/gists/:id/:file				*gh-buffer-gist-edit*
 	edit gist file.
 
+gh://gists/new/:filename				*gh-buffer-gist-new*
+	create new gist.
+	buffers will closed when creating is success.
+	if you want to create gist which contain multiple files,
+	please open multiple buffers.
+
 gh://bookmarks						*gh-buffer-bookmark-list*
 	show your buffer bookmarks.
 	you can edit this buffer and use |:w| to save bookmarks.

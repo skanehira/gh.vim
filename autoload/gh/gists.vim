@@ -4,6 +4,7 @@
 
 let s:Promise = vital#gh#import('Async.Promise')
 let s:gh_gists_cache = {}
+let s:gh_gist_new_files = []
 
 function! gh#gists#list() abort
   setlocal ft=gh-gists
@@ -280,7 +281,6 @@ function! s:init_edit_gist_buffer(contents) abort
   call setbufline(b:gh_edit_gist_bufid, 1, a:contents)
   exe printf('do BufRead %s | normal zn', b:gh_gist_edit.filename)
   setlocal buftype=acwrite
-  setlocal nomodified
 
   augroup gh-gist-update
     au!
@@ -313,4 +313,52 @@ function! s:gist_update_success(text) abort
   let file.text = a:text
   call gh#gh#message('gist updated')
   setlocal nomodified
+endfunction
+
+function! gh#gists#new() abort
+  call s:gist_new_file()
+endfunction
+
+function! s:gist_new_file() abort
+  setlocal buftype=acwrite
+
+  let filename = split(bufname(), '/')[-1]
+  exe printf('do BufRead %s', filename)
+
+  call add(s:gh_gist_new_files, {'name': filename, 'bufid': bufnr()})
+
+  augroup gh-gist-create
+    au BufWriteCmd <buffer> call s:gist_create_files()
+  augroup END
+endfunction
+
+function! s:gist_create_files() abort
+  let files = {}
+
+  for file in s:gh_gist_new_files
+    let content = join(getbufline(file.bufid, 1, '$'), "\r\n")
+    if empty(content)
+      call gh#gh#error_message(file.name .. ' is emtpy')
+      return
+    endif
+    let files[file.name] = {'content': content}
+  endfor
+
+  let is_public = input('make a public?(y/n)') =~ '^y' ? v:true : v:false
+  let data = {'files': files, 'public': is_public}
+
+  call gh#gh#message('creating...')
+
+  call gh#github#gists#create(data)
+        \.then({resp -> s:gist_create_file_success(resp)})
+        \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
+endfunction
+
+function! s:gist_create_file_success(resp) abort
+  for file in s:gh_gist_new_files
+    exe printf('bw! %s', file.bufid)
+  endfor
+  let s:gh_gist_new_files = []
+
+  call gh#gh#message(printf('new gist: %s', a:resp.body.html_url))
 endfunction

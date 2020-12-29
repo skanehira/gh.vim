@@ -60,6 +60,8 @@ function! gh#gh#init() abort
     call gh#gists#gist()
   elseif bufname =~# '^gh:\/\/[^/]\+\/gists\/[^/]\+\/[^/]\+'
     call gh#gists#edit()
+  elseif bufname =~# '^gh:\/\/gists\/new\/[^/]\+$'
+    call gh#gists#new()
   endif
 endfunction
 
@@ -75,14 +77,16 @@ function! gh#gh#set_message_buf(msg) abort
 endfunction
 
 function! gh#gh#error_message(msg) abort
+  echo '' | redraw
   echohl ErrorMsg
-  echom '[gh.vim] ' . a:msg
+  echo '[gh.vim] ' . a:msg
   echohl None
 endfunction
 
 function! gh#gh#message(msg) abort
+  echo '' | redraw
   echohl Directory
-  echom '[gh.vim] ' . a:msg
+  echo '[gh.vim] ' . a:msg
   echohl None
 endfunction
 

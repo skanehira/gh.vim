@@ -82,3 +82,12 @@ function! gh#github#gists#update(id, data) abort
 
   return gh#http#request(settings)
 endfunction
+
+function! gh#github#gists#create(data) abort
+  let settings = {
+        \ 'method': 'POST',
+        \ 'url': 'https://api.github.com/gists',
+        \ 'data': a:data,
+        \ }
+  return gh#http#request(settings)
+endfunction
