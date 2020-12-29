@@ -19,7 +19,7 @@ Vim/Neovim plugin for GitHub
 - file tree
   - open file
 - gist
-  - list
+  - list/edit/create
 
 ## Installation
 Please install `curl` before installtion.
