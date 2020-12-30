@@ -336,9 +336,20 @@ function! s:gist_new_file() abort
 
   call add(s:gh_gist_new_files, {'name': filename, 'bufid': bufnr()})
 
-  augroup gh-gist-create
+  exe printf('augroup gh-gist-create-%d', bufnr())
+    au!
     au BufWriteCmd <buffer> call s:gist_create_files()
+    au BufDelete <buffer> call s:gist_remove_cache_file()
   augroup END
+endfunction
+
+function! s:gist_remove_cache_file() abort
+  let bufid = str2nr(expand('<abuf>'))
+  for idx in range(len(s:gh_gist_new_files))
+    if s:gh_gist_new_files[idx].bufid is# bufid
+      call remove(s:gh_gist_new_files, idx)
+    endif
+  endfor
 endfunction
 
 function! s:gist_create_files() abort
@@ -368,7 +379,6 @@ function! s:gist_create_file_success(resp) abort
   for file in s:gh_gist_new_files
     exe printf('bw! %s', file.bufid)
   endfor
-  let s:gh_gist_new_files = []
 
   call gh#gh#message(printf('new gist: %s', a:resp.body.html_url))
 endfunction
