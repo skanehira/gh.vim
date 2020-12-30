@@ -233,18 +233,9 @@ endfunction
 function! s:edit_gist_file() abort
   let current = gh#provider#tree#current_node()
   if current.type is# 'file'
-    echo '[gh.vim] (e)dit, (n)ew, (v)new, (t)abnew: '
-    let result = nr2char(getchar())
-    if result is# 'e'
-      let open = 'e'
-    elseif result is# 'n'
-      let open = 'new'
-    elseif result is# 'v'
-      let open = 'vnew'
-    elseif result is# 't'
-      let open = 'tabnew'
-    else
-      call gh#gh#message('canced')
+    let open = gh#gh#decide_open()
+    if empty(open)
+      call gh#gh#message('cancelled')
       return
     endif
     let paths = split(current.path, '/')

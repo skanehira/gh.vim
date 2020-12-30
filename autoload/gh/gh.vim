@@ -212,3 +212,18 @@ function! gh#gh#termopen(cmd, opt) abort
     nnoremap <buffer> <silent> q :bw<CR>
   endif
 endfunction
+
+function! gh#gh#decide_open() abort
+  call gh#gh#message('(e)dit, (n)ew, (v)new, (t)abnew: ')
+  let result = nr2char(getchar())
+  if result is# 'e'
+    return 'e'
+  elseif result is# 'n'
+    return 'new'
+  elseif result is# 'v'
+    return 'vnew'
+  elseif result is# 't'
+    return 'tabnew'
+  endif
+  return ''
+endfunction

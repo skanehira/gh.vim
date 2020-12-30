@@ -55,18 +55,23 @@ endfunction
 function! s:edit_file() abort
   let node = gh#provider#tree#current_node()
   if node.info.type isnot# 'tree'
-    call gh#gh#message('opening...')
+    let open = gh#gh#decide_open()
+    if empty(open)
+      call gh#gh#message('cancelled')
+      return
+    endif
+    echo '' | redraw | call gh#gh#message('opening...')
     call gh#github#repos#get_file(node.info.url)
-          \.then({body -> s:set_file_contents(node, body)})
+          \.then({body -> s:set_file_contents(node, body, open)})
           \.then({-> s:set_edit_keymap()})
           \.then({-> gh#map#apply('gh-buffer-file', b:gh_file_bufid)})
           \.finally({-> execute('echom ""', '')})
   endif
 endfunction
 
-function! s:set_file_contents(node, body) abort
+function! s:set_file_contents(node, body, open) abort
   call gh#gh#init_buffer()
-  exe printf('rightbelow vnew %s', a:node.path)
+  exe printf('%s %s', a:open, a:node.path)
   call setline(1, a:body)
   setlocal nomodified
   let b:gh_file_info = a:node.info
