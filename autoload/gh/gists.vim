@@ -25,8 +25,10 @@ function! gh#gists#list() abort
   let b:gh_gist_list['privacy'] = 'PUBLIC'
   if !empty(m[2])
     let p = split(m[2], '=')
-    if p[0] is# 'privacy' && p[1] =~? '\(PUBLIC\|ALL\|SECRET\)'
-      let b:gh_gist_list['privacy'] = toupper(p[1])
+    if len(p) > 1
+      if p[0] is# 'privacy' && p[1] =~? '\(PUBLIC\|ALL\|SECRET\)'
+        let b:gh_gist_list['privacy'] = toupper(p[1])
+      endif
     endif
   endif
 
