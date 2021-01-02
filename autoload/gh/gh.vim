@@ -163,8 +163,9 @@ function! gh#gh#def_highlight() abort
   hi! link gh_files_dir gh_green
   hi! link gh_files_selected gh_red
 
-  hi! link gh_gists_page gh_green
   hi! link gh_gists_selected gh_red
+  hi! link gh_gists_public gh_blue
+  hi! link gh_gists_secret gh_purple
 endfunction
 
 function! s:dict_value_len(items, keys) abort

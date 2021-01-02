@@ -94,9 +94,8 @@ endfunction
 function! s:make_tree(owner, gists) abort
   for gist in a:gists
     let name = empty(gist.description) ? gist.files[0].name : gist.description
-
     let node = {
-          \ 'name': name,
+          \ 'name': printf('[%s] %s', gist.isPublic ? 'PUBLIC' : 'SECRET', name),
           \ 'path': printf('%s/%s', a:owner, gist.name),
           \ 'markable': 1,
           \ 'info': gist,
