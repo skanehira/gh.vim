@@ -256,7 +256,7 @@ function! s:set_issue_template_buffer(resp) abort
   endif
 
   setlocal nomodified
-  nnoremap <buffer> <silent> q :bw<CR>
+  nnoremap <buffer> <silent> q :q<CR>
   augroup gh-create-issue
     au!
     au BufWriteCmd <buffer> call s:create_issue()
@@ -348,7 +348,7 @@ function! s:set_issues_body(resp) abort
   nnoremap <buffer> <silent> <Plug>(gh_issue_comment_open_on_issue) :<C-u>call <SID>comments_open_on_issue()<CR>
 
   nmap <buffer> <silent> ghm <Plug>(gh_issue_comment_open_on_issue)
-  nnoremap <buffer> <silent> q :bw<CR>
+  nnoremap <buffer> <silent> q :q<CR>
 
   augroup gh-update-issue
     au!
@@ -475,7 +475,6 @@ function! s:issue_comment_open() abort
 
   setlocal ft=markdown
   setlocal buftype=acwrite
-  nnoremap <buffer> <silent> q :bw<CR>
 
   let s:gh_issues_comment_edit_bufid = bufnr()
   let s:gh_issues_comment_edit_winid = win_getid()
@@ -574,7 +573,6 @@ function! gh#issues#comment_new() abort
         \ }
 
   setlocal buftype=acwrite
-  nnoremap <buffer> <silent> q :bw<CR>
 
   augroup gh-issue-comment-create
     au!

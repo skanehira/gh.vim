@@ -3,11 +3,6 @@
 " License: MIT
 
 function! s:set_pull_list(resp) abort
-  nnoremap <buffer> <silent> <Plug>(gh_pull_list_next) :<C-u>call <SID>pull_list_change_page('+')<CR>
-  nnoremap <buffer> <silent> <Plug>(gh_pull_list_prev) :<C-u>call <SID>pull_list_change_page('-')<CR>
-  nmap <buffer> <silent> <C-l> <Plug>(gh_pull_list_next)
-  nmap <buffer> <silent> <C-h> <Plug>(gh_pull_list_prev)
-
   let list = {
         \ 'bufname': printf('gh://%s/%s/pulls', b:gh_pull_list.repo.owner, b:gh_pull_list.repo.name),
         \ 'param': b:gh_pull_list.param,
