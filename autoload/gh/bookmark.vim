@@ -35,7 +35,11 @@ function! s:bookmark_open() abort
   if empty(bufname)
     return
   endif
-  exe printf('new %s', bufname[0])
+  let open = gh#gh#decide_open()
+  if empty(open)
+    return
+  endif
+  exe printf('%s %s', open, bufname[0])
 endfunction
 
 function! s:bookmark_file_update() abort

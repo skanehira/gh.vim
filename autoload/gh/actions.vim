@@ -215,6 +215,12 @@ function! s:open_logs() abort
 
   for node in nodes
     if exists('node.info.log_url')
+      let open = gh#gh#decide_open()
+      if empty(open)
+        call gh#gh#message('cancelled')
+        return
+      endif
+
       let cmd = [
             \ 'curl', '-L',
             \ '-H', 'Accept: application/vnd.github.v3+json',
@@ -222,7 +228,8 @@ function! s:open_logs() abort
             \ node.info.log_url
             \ ]
       let opt = {
-            \ 'bufname': substitute(node.info.log_url, 'https:\/\/api\.github.com\/repos\/', 'gh:\/\/', 'g')
+            \ 'bufname': substitute(node.info.log_url, 'https:\/\/api\.github.com\/repos\/', 'gh:\/\/', 'g'),
+            \ 'open': open,
             \ }
       call gh#gh#termopen(cmd, opt)
       setlocal ft=gh-actions-logs

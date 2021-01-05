@@ -108,9 +108,14 @@ function! gh#pulls#list() abort
 endfunction
 
 function! s:pull_open_diff() abort
+  let open = gh#gh#decide_open()
+  if empty(open)
+    return
+  endif
+
   let number = gh#provider#list#current().number[1:]
-  call execute(printf('belowright vnew gh://%s/%s/pulls/%s/diff',
-        \ b:gh_pull_list.repo.owner, b:gh_pull_list.repo.name, number))
+  call execute(printf('belowright %s gh://%s/%s/pulls/%s/diff',
+        \ open, b:gh_pull_list.repo.owner, b:gh_pull_list.repo.name, number))
 endfunction
 
 function! s:set_diff_contents(resp) abort
