@@ -67,7 +67,7 @@ function! gh#gh#init() abort
 endfunction
 
 function! gh#gh#init_buffer() abort
-  setlocal buftype=nofile bufhidden=wipe
+  setlocal buftype=nofile bufhidden=hide
         \ noswapfile nonumber nowrap
         \ cursorline
 endfunction
@@ -92,7 +92,7 @@ endfunction
 function! gh#gh#global_buf_settings() abort
   setlocal nomodifiable
 
-  nnoremap <buffer> <silent> q :bw!<CR>
+  nnoremap <buffer> <silent> q :q<CR>
 endfunction
 
 function! gh#gh#open_url(url) abort
@@ -211,7 +211,7 @@ function! gh#gh#termopen(cmd, opt) abort
           \ 'exit_cb': { -> execute('setlocal foldmethod=expr foldexpr=gh#actions#fold_logs(v:lnum)') }
           \ })
     setlocal termwinscroll=50000
-    nnoremap <buffer> <silent> q :bw<CR>
+    nnoremap <buffer> <silent> q :q<CR>
   endif
 endfunction
 

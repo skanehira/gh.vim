@@ -43,15 +43,26 @@ function! s:init_keymap() abort
   nnoremap <buffer> <silent> <C-l> :<C-u>call <SID>next_page()<CR>
 endfunction
 
+function! s:get_page() abort
+  let page = matchlist(bufname(), '.*page=\(.*\).*')
+  if empty(page)
+    return 1
+  endif
+  return str2nr(page[1])
+endfunction
+
 function! s:next_page() abort
+  let b:gh_list_param.page = s:get_page()
   let b:gh_list_param.page += 1
   call s:change_page()
 endfunction
 
 function! s:prev_page() abort
-  if b:gh_list_param.page < 2
+  let page = s:get_page()
+  if page < 2
     return
   endif
+  let b:gh_list_param.page = page
   let b:gh_list_param.page -= 1
   call s:change_page()
 endfunction

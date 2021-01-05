@@ -9,8 +9,6 @@ function! gh#bookmark#list() abort
   setlocal buftype=acwrite
   setlocal ft=gh-bookmarks
 
-  nnoremap <buffer> <silent> q :bw!<CR>
-
   nnoremap <buffer> <silent> <Plug>(gh_bookmark_open) :<C-u>call <SID>bookmark_open()<CR>
   nmap <buffer> <silent> gho <Plug>(gh_bookmark_open)
 
