@@ -198,7 +198,8 @@ function! gh#gh#dict_format(items, keys) abort
 endfunction
 
 function! gh#gh#termopen(cmd, opt) abort
-  tabnew
+  exe a:opt.open
+
   if has('nvim')
     " NOTE: Neovim can't fold when job finished
     call termopen(a:cmd)

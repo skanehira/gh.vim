@@ -28,9 +28,13 @@ function! s:issue_url_yank() abort
 endfunction
 
 function! s:edit_issue() abort
+  let open = gh#gh#decide_open()
+  if empty(open)
+    return
+  endif
   let number = gh#provider#list#current().number[1:]
-  call execute(printf('belowright vnew gh://%s/%s/issues/%s',
-        \ b:gh_issue_list.repo.owner, b:gh_issue_list.repo.name, number))
+  call execute(printf('belowright %s gh://%s/%s/issues/%s',
+        \ open, b:gh_issue_list.repo.owner, b:gh_issue_list.repo.name, number))
 endfunction
 
 function! s:set_issue_list(resp) abort
@@ -116,9 +120,13 @@ function! s:get_selected_issues() abort
 endfunction
 
 function! s:issue_open_comment() abort
+  let open = gh#gh#decide_open()
+  if empty(open)
+    return
+  endif
   let number = gh#provider#list#current().number[1:]
-  call execute(printf('new gh://%s/%s/issues/%d/comments',
-        \ b:gh_issue_list.repo.owner, b:gh_issue_list.repo.name, number))
+  call execute(printf('%s gh://%s/%s/issues/%d/comments',
+        \ open, b:gh_issue_list.repo.owner, b:gh_issue_list.repo.name, number))
 endfunction
 
 function! s:set_issue_state(state) abort
@@ -483,8 +491,12 @@ function! s:issue_comment_open() abort
 endfunction
 
 function! s:issue_comment_new() abort
-  call execute(printf('topleft new gh://%s/%s/issues/%d/comments/new',
-        \ s:comment_list.repo.owner, s:comment_list.repo.name, s:comment_list.number))
+  let open = gh#gh#decide_open()
+  if empty(open)
+    return
+  endif
+  call execute(printf('%s gh://%s/%s/issues/%d/comments/new',
+        \ open, s:comment_list.repo.owner, s:comment_list.repo.name, s:comment_list.number))
 endfunction
 
 function! s:gh_issue_comment_edit() abort

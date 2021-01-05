@@ -45,8 +45,13 @@ function! s:project_open_browser() abort
 endfunction
 
 function! s:project_open() abort
+  let open = gh#gh#decide_open()
+  if empty(open)
+    return
+  endif
+
   let id = s:gh_projects[line('.') -1].id
-  call execute(printf('vnew gh://projects/%d/columns', id))
+  call execute(printf('%s gh://projects/%d/columns', open, id))
 endfunction
 
 function! s:project_url_yank() abort
