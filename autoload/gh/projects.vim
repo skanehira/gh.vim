@@ -188,7 +188,11 @@ endfunction
 function! s:card_edit() abort
   let node = gh#provider#tree#current_node()
   if exists('node.info')
-    call execute('new ' .. substitute(gh#provider#tree#current_node().info.html_url, 'https://github.com/','gh://',''))
+    let open = gh#gh#decide_open()
+    if empty(open)
+      return
+    endif
+    exe printf('%s %s', open, substitute(gh#provider#tree#current_node().info.html_url, 'https://github.com/','gh://','')) 
   endif
 endfunction
 
