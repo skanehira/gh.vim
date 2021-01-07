@@ -368,7 +368,9 @@ default mappings
 				`normal`	ghy		<Plug>(gh_gist_list_yank)
 				`normal`	<C-o>		<Plug>(gh_gist_list_open_browser)
 				`normal`	ghe		<Plug>(gh_gist_edit_file)
-|gh-buffer-gist|		`normal`	ghe		<Plug>(gh_gist_edit_file)
+|gh-buffer-gist|		`normal`	ghy		<Plug>(gh_gist_list_yank)
+				`normal`	<C-o>		<Plug>(gh_gist_list_open_browser)
+				`normal`	ghe		<Plug>(gh_gist_edit_file)
 
 ------------------------------------------------------------------------------
 FUNCTIONS					*gh-functions*

@@ -227,7 +227,12 @@ function! s:set_gist(gist) abort
   call gh#provider#tree#open(b:gh_gist_tree)
   call gh#provider#preview#open(s:get_preview_info(), function('s:preview_update'))
 
+  nnoremap <buffer> <silent> <Plug>(gh_gist_list_yank) :call <SID>yank_or_open_gists_url('yank')<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_gist_list_open_browser) :call <SID>yank_or_open_gists_url('open')<CR>
   nnoremap <buffer> <silent> <Plug>(gh_gist_edit_file) :call <SID>edit_gist_file()<CR>
+
+  nmap <buffer> <silent> <C-o> <Plug>(gh_gist_list_open_browser)
+  nmap <buffer> <silent> ghy   <Plug>(gh_gist_list_yank)
   nmap <buffer> <silent> ghe   <Plug>(gh_gist_edit_file)
 endfunction
 
