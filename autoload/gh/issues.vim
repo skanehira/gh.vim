@@ -306,7 +306,7 @@ function! s:update_issue_success(resp) abort
 endfunction
 
 function! s:update_issue() abort
-  let title = input(printf('[title] %s -> ', s:gh_issue.title))
+  let title = input(printf('[title] %s -> ', b:gh_issue.title))
   echom ''
   redraw!
 
@@ -316,7 +316,7 @@ function! s:update_issue() abort
   endif
 
   if title is# ''
-    let title = s:gh_issue.title
+    let title = b:gh_issue.title
   endif
 
   call gh#gh#message('issue updating...')
@@ -325,14 +325,14 @@ function! s:update_issue() abort
         \ 'body': join(getline(1, '$'), "\r\n"),
         \ }
 
-  call gh#github#issues#update(s:gh_issue.repo.owner, s:gh_issue.repo.name, s:gh_issue.number, data)
+  call gh#github#issues#update(b:gh_issue.repo.owner, b:gh_issue.repo.name, b:gh_issue.number, data)
         \.then(function('s:update_issue_success'))
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
 endfunction
 
 function! s:comments_open_on_issue() abort
   let cmd = printf('new gh://%s/%s/issues/%s/comments',
-        \ s:gh_issue.repo.owner, s:gh_issue.repo.name, s:gh_issue.number)
+        \ b:gh_issue.repo.owner, b:gh_issue.repo.name, b:gh_issue.number)
   call execute(cmd)
 endfunction
 
@@ -341,8 +341,8 @@ function! s:set_issues_body(resp) abort
     call gh#gh#set_message_buf('no description provided')
     return
   endif
-  let s:gh_issue['title'] = a:resp.body.title
-  call setbufline(s:gh_issues_edit_bufid, 1, split(a:resp.body.body, '\r\?\n'))
+  let b:gh_issue['title'] = a:resp.body.title
+  call setbufline(b:gh_issues_edit_bufid, 1, split(a:resp.body.body, '\r\?\n'))
   setlocal nomodified buftype=acwrite ft=markdown
 
   nnoremap <buffer> <silent> <Plug>(gh_issue_comment_open_on_issue) :<C-u>call <SID>comments_open_on_issue()<CR>
@@ -350,7 +350,7 @@ function! s:set_issues_body(resp) abort
   nmap <buffer> <silent> ghm <Plug>(gh_issue_comment_open_on_issue)
   nnoremap <buffer> <silent> q :q<CR>
 
-  augroup gh-update-issue
+  exe printf('augroup gh-update-issue-%d', bufnr())
     au!
     au BufWriteCmd <buffer> call s:update_issue()
   augroup END
@@ -358,11 +358,9 @@ endfunction
 
 function! gh#issues#issue() abort
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/\(.*\)$')
+  let b:gh_issues_edit_bufid = bufnr()
 
-  call gh#gh#delete_buffer(s:, 'gh_issues_edit_bufid')
-  let s:gh_issues_edit_bufid = bufnr()
-
-  let s:gh_issue = {
+  let b:gh_issue = {
         \ 'repo': {
         \   'owner': m[1],
         \   'name': m[2],
@@ -374,9 +372,9 @@ function! gh#issues#issue() abort
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
 
-  call gh#github#issues#issue(s:gh_issue.repo.owner, s:gh_issue.repo.name, s:gh_issue.number)
+  call gh#github#issues#issue(b:gh_issue.repo.owner, b:gh_issue.repo.name, b:gh_issue.number)
         \.then(function('s:set_issues_body'))
-        \.then({-> gh#map#apply('gh-buffer-issue-edit', s:gh_issues_edit_bufid)})
+        \.then({-> gh#map#apply('gh-buffer-issue-edit', b:gh_issues_edit_bufid)})
         \.catch({err -> execute('call gh#gh#set_message_buf(err.body)', '')})
 endfunction
 
