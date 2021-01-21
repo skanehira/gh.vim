@@ -339,10 +339,10 @@ endfunction
 function! s:set_issues_body(resp) abort
   if empty(a:resp.body.body)
     call gh#gh#set_message_buf('no description provided')
-    return
+  else
+    call setbufline(b:gh_issues_edit_bufid, 1, split(a:resp.body.body, '\r\?\n'))
   endif
   let b:gh_issue['title'] = a:resp.body.title
-  call setbufline(b:gh_issues_edit_bufid, 1, split(a:resp.body.body, '\r\?\n'))
   setlocal nomodified buftype=acwrite ft=markdown
 
   nnoremap <buffer> <silent> <Plug>(gh_issue_comment_open_on_issue) :<C-u>call <SID>comments_open_on_issue()<CR>
