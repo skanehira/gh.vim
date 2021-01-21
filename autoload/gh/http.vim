@@ -69,8 +69,8 @@ function! s:make_response(tmp_file, body) abort
   let header = s:parseHeader(headers[1:])
   let body = a:body
 
-  if has_key(header, 'Content-Type') &&
-        \ header['Content-Type'] is# 'application/json; charset=utf-8'
+  if has_key(header, 'content-type') &&
+        \ header['content-type'] is# 'application/json; charset=utf-8'
     if body isnot# ''
       let body = json_decode(a:body)
       if status isnot# '200' && has_key(body, 'message')
