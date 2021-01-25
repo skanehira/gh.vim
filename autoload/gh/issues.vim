@@ -237,6 +237,7 @@ function! s:create_issue() abort
 endfunction
 
 function! s:create_issue_success(resp) abort
+  call gh#gh#delete_buffer(s:, 'gh_issues_new_bufid')
   bw!
   redraw!
   if has_key(g:, 'gh_open_issue_on_create') && g:gh_open_issue_on_create is# 1
