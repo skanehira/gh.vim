@@ -189,14 +189,6 @@ function! gh#issues#list() abort
 endfunction
 
 function! gh#issues#new() abort
-  let s:gh_issue_title = input('[gh.vim] issue title ')
-  echom ''
-  redraw
-  if s:gh_issue_title is# ''
-    call gh#gh#error_message('no issue title')
-    bw!
-    return
-  endif
 
   let s:gh_issues_new_bufid = bufnr()
   call gh#gh#init_buffer()
@@ -246,6 +238,14 @@ function! s:create_issue_success(resp) abort
 endfunction
 
 function! s:set_issue_template_buffer(resp) abort
+  let s:gh_issue_title = input('[gh.vim] issue title ')
+  echom ''
+  redraw
+  if s:gh_issue_title is# ''
+    call gh#gh#error_message('no issue title')
+    return
+  endif
+
   call execute(printf('e gh://%s/%s/issues/%s', s:gh_issue_new.owner, s:gh_issue_new.name, s:gh_issue_title))
   call gh#map#apply('gh-buffer-issue-new', bufnr())
   setlocal buftype=acwrite
@@ -272,6 +272,7 @@ endfunction
 
 function! s:open_template_list(files) abort
   if empty(a:files)
+    bw!
     call s:set_issue_template_buffer({'body': ''})
     return
   endif
