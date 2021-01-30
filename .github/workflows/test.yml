@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: test
 
 # Controls when the action will run.
 on: push
@@ -10,6 +10,7 @@ jobs:
   build:
     strategy:
       matrix:
+        # Currently Neovim stable fails to build on ubuntu-latest
         vim_type: ['Vim'] # , 'Neovim']
         version: ['head', 'stable']
         os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
