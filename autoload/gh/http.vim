@@ -99,7 +99,7 @@ function! gh#http#get(url) abort
 endfunction
 
 function! gh#http#request(settings) abort
-  let token = get(g:, 'gh_token', '')
+  let token = gh#gh#get_token()
   if empty(token)
     return s:Promise.reject('[gh.vim] g:gh_token is undefined')
   endif

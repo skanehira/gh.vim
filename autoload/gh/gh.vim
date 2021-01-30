@@ -229,3 +229,18 @@ function! gh#gh#decide_open() abort
   endif
   return ''
 endfunction
+
+function! gh#gh#get_token() abort
+  let token = get(g:, 'gh_token', '')
+  if !empty(token)
+    return token
+  endif
+  let s:gh_token_path = glob('~/.config/gh/hosts.yml')
+  if !empty(s:gh_token_path)
+    for line in readfile(s:gh_token_path, '')
+      if line =~ 'oauth_token'
+        return matchlist(line, 'oauth_token: \(.*\)')[1]
+      endif
+    endfor
+  endif
+endfunction
