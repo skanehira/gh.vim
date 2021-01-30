@@ -21,9 +21,11 @@ Vim/Neovim plugin for GitHub
 - gist
   - list/edit/create
 
+## Requirements
+- curl
+
 ## Installation
-Please install `curl` before installtion.
-After you have installed `curl`, you can add this repo using your favorite plugin manager.
+You can add this repo using your favorite plugin manager.
 
 ## Usage
 Set your [personal access token](https://github.com/settings/tokens).
@@ -44,9 +46,10 @@ So if you want see issue list, please open buffer likes bellow
 
 ## Options
 
-| option     | description                  |
-|------------|------------------------------|
-| `gh_token` | GitHub personal access token |
+| option                      | description                       |
+|-----------------------------|-----------------------------------|
+| `g:gh_token`                | GitHub personal access token      |
+| `g:gh_open_issue_on_create` | open issue url on default browser |
 
 ## Buffer list
 currently `gh.vim` provides buffers is bellow.
@@ -72,7 +75,6 @@ currently `gh.vim` provides buffers is bellow.
 | `gh://:owner/gists[?privacy=public]`                      | gist list                          |
 | `gh://:owner/gists/:id/:file`                             | edit gist file                     |
 | `gh://gists/new/:filename`                                | new gist                           |
-
 
 ## Author
 skanehira
