@@ -58,9 +58,11 @@ VARIABLES					*gh-variables*
 g:gh_token					*g:gh_token*
 	GitHub personal access token.
 	please reference https://git.io/JJyrT
+	If you logged in with https://github.com/cli/cli,
+	the access token is automatically fetched.
 
 g:gh_open_issue_on_create			*g:gh_open_issue_on_create*
-	open issue in browser on created.
+	open issue on browser after created.
 
 ------------------------------------------------------------------------------
 BUFFER							*gh-buffer*

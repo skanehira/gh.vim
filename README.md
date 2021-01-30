@@ -37,22 +37,21 @@ If you want to overwrite the token or set manually, write your [personal access 
 let g:gh_token = 'xxxxxxxxxxxxxxxxxxxx'
 ```
 
-`gh.vim` just provides virtual buffers likes `gh://xxx`, no any commands.
-So if you want see issue list, please open buffer likes bellow
+`gh.vim` just provides virtual buffers likes `gh://:owner/:repo/issues`, no any commands.
+`:owner` is user name or organization name, `:repo` is repository name.
+
+If you want see issue list, please open buffer likes bellow
 
 ```
-:new gh://:owner/:repo/issues
+:new gh://skanehira/gh.vim/issues
 ```
-
-`:owner` is user name or organization name.
-`:repo` is repository name.
 
 ## Options
 
-| option                      | description                       |
-|-----------------------------|-----------------------------------|
-| `g:gh_token`                | GitHub personal access token      |
-| `g:gh_open_issue_on_create` | open issue url on default browser |
+| option                      | description                         |
+|-----------------------------|-------------------------------------|
+| `g:gh_token`                | GitHub personal access token        |
+| `g:gh_open_issue_on_create` | open issue on browser after created |
 
 ## Buffer list
 currently `gh.vim` provides buffers is bellow.
