@@ -207,9 +207,10 @@ function! s:open_logs() abort
   call gh#provider#tree#clean_marked_nodes()
   call gh#provider#tree#redraw()
 
-  let token = get(g:, 'gh_token', '')
+  let token = gh#gh#get_token()
   if empty(token)
-    call gh#gh#message('g:gh_token is undefined')
+    call gh#gh#message('g:gh_token is undefined. please set like
+    \ `let g:gh_token = xxxxxxxxxxxxxxxxxxxx` or login using `gh` cli.')
     return
   endif
 

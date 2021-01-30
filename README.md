@@ -28,7 +28,10 @@ Vim/Neovim plugin for GitHub
 You can add this repo using your favorite plugin manager.
 
 ## Usage
-Set your [personal access token](https://github.com/settings/tokens).
+
+If you logged in with [`gh`](https://github.com/cli/cli) command, the access token is automatically fetched.
+
+If you want to overwrite the token or set manually, write your [personal access token](https://github.com/settings/tokens) like below.
 
 ```vim
 let g:gh_token = 'xxxxxxxxxxxxxxxxxxxx'
