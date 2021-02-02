@@ -60,7 +60,7 @@ currently `gh.vim` provides buffers is bellow.
 |-----------------------------------------------------------|------------------------------------|
 | `gh://:owner/:repo/issues[?state=open&..]`                | issue list                         |
 | `gh://:owner/:repo/issues/:number`                        | edit issue                         |
-| `gh://:owner/:repo/:branch/issues/new`                    | new issue                          |
+| `gh://:owner/:repo/issues/new`                            | new issue                          |
 | `gh://:owner/:repo/issues/:number/comments[?page=1&..]`   | issue comment list                 |
 | `gh://:owner/:repo/issues/:number/comments/new`           | new issue comment                  |
 | `gh://:owner/repos`                                       | repository list                    |

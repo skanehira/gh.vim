@@ -194,17 +194,31 @@ function! gh#issues#new() abort
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
 
-  let m = matchlist(bufname(), 'gh://\(.\{-}\)/\(.\{-}\)/\(.*\)/issues/new$')
+  let m = matchlist(bufname(), 'gh://\(.\{-}\)/\(.\{-}\)/issues/new$')
+
+  let l:owner = m[1]
+  let l:repo = m[2]
   let s:gh_issue_new = {
-        \ 'owner': m[1],
-        \ 'name': m[2],
-        \ 'branch': m[3],
+        \ 'owner': l:owner,
+        \ 'name': l:repo,
+        \ 'branch': '',
         \ }
 
-  call gh#github#repos#files(s:gh_issue_new.owner, s:gh_issue_new.name, s:gh_issue_new.branch)
+  call gh#github#repos#get_repo(l:owner, l:repo)
+        \.then(function('s:set_default_branch'))
+        \.then({-> gh#github#repos#files(s:gh_issue_new.owner, s:gh_issue_new.name, s:gh_issue_new.branch)})
         \.then(function('s:get_template_files'))
         \.then(function('s:open_template_list'))
         \.catch(function('s:get_template_error'))
+
+endfunction
+
+function! s:set_default_branch(resp)
+  if !has_key(a:resp.body, 'default_branch')
+    call gh#gh#error_message('not found default branch')
+    return
+  endif
+  let s:gh_issue_new.branch = a:resp.body['default_branch']
 endfunction
 
 function! s:get_template_error(error) abort
