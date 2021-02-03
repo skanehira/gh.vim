@@ -392,17 +392,14 @@ function! gh#issues#comments() abort
   setlocal ft=gh-issue-comments
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/\(.*\)/comments?*\(.*\)')
 
-  call gh#gh#delete_buffer(s:, 'gh_issues_comments_bufid')
-  call gh#gh#delete_buffer(s:, 'gh_issues_comment_edit_bufid')
-
-  let s:gh_issues_comments_bufid = bufnr()
+  let b:gh_issues_comments_bufid = bufnr()
 
   let param = gh#http#decode_param(m[4])
   if !has_key(param, 'page')
     let param['page'] = 1
   endif
 
-  let s:comment_list = {
+  let b:gh_comment_list = {
         \ 'repo': {
         \   'owner': m[1],
         \   'name': m[2],
@@ -415,86 +412,113 @@ function! gh#issues#comments() abort
   call gh#gh#set_message_buf('loading')
 
   nnoremap <buffer> <silent> <Plug>(gh_issue_comment_new) :<C-u>call <SID>issue_comment_new()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_issue_comment_edit) :<C-u>call <SID>issue_comment_edit()<CR>
   nmap <buffer> <silent> ghn <Plug>(gh_issue_comment_new)
+  nmap <buffer> <silent> ghe <Plug>(gh_issue_comment_edit)
 
-  call gh#github#issues#comments(s:comment_list.repo.owner, s:comment_list.repo.name, s:comment_list.number, s:comment_list.param)
+  call gh#github#issues#comments(b:gh_comment_list.repo.owner, b:gh_comment_list.repo.name, b:gh_comment_list.number, b:gh_comment_list.param)
         \.then(function('s:set_issue_comments_body'))
-        \.then({-> gh#map#apply('gh-buffer-issue-comment-list', s:gh_issues_comments_bufid)})
+        \.then({-> gh#map#apply('gh-buffer-issue-comment-list', b:gh_issues_comments_bufid)})
         \.catch({err -> execute('call gh#gh#set_message_buf(has_key(err, "body") ? err.body : err)', '')})
         \.finally(function('gh#gh#global_buf_settings'))
 endfunction
 
+function! s:get_selected_comments() abort
+  let comments = gh#provider#list#get_marked()
+  if empty(comments)
+    return [gh#provider#list#current()]
+  endif
+  return comments
+endfunction
+
 function! s:issue_comment_url_yank() abort
-  let url = s:gh_issue_comments[line('.') -1].url
-  call gh#gh#yank(url)
+  let urls = []
+  for comment in s:get_selected_comments()
+    call add(urls, comment.url)
+  endfor
+
+  call gh#provider#list#clean_marked()
+  call gh#provider#list#redraw()
+
+  call gh#gh#yank(urls)
+endfunction
+
+function! s:issue_comment_open_browser() abort
+  for comment in s:get_selected_comments()
+    call gh#gh#open_url(comment.url)
+  endfor
+  call gh#provider#list#clean_marked()
+  call gh#provider#list#redraw()
 endfunction
 
 function! s:set_issue_comments_body(resp) abort
-  nnoremap <buffer> <silent> <Plug>(gh_issue_comment_list_next) :<C-u>call <SID>issue_comment_list_change_page('+')<CR>
-  nnoremap <buffer> <silent> <Plug>(gh_issue_comment_list_prev) :<C-u>call <SID>issue_comment_list_change_page('-')<CR>
-  nmap <buffer> <silent> <C-l> <Plug>(gh_issue_comment_list_next)
-  nmap <buffer> <silent> <C-h> <Plug>(gh_issue_comment_list_prev)
+  let list = {
+        \ 'bufname': printf('gh://%s/%s/issues/%d/comments', b:gh_comment_list.repo.owner, b:gh_comment_list.repo.name, b:gh_comment_list.number),
+        \ 'param': b:gh_comment_list.param
+        \ }
 
   if empty(a:resp.body)
+    let list['data'] = []
     call gh#gh#set_message_buf('not found issue comments')
+    call gh#provider#list#open(list)
     return
   endif
 
-  let s:gh_issue_comments = []
-  let lines = []
-
-  let dict = map(copy(a:resp.body), {_, v -> {
-        \ 'id': printf('#%s', v.id),
-        \ 'user': printf('@%s', v.user.login),
-        \ }})
-  let format = gh#gh#dict_format(dict, ['id', 'user'])
-
+  " cache issue comments
+  let s:gh_issue_comment = []
   for comment in a:resp.body
-    call add(lines, printf(format, printf('#%s', comment.id), printf('@%s', comment.user.login)))
-    call add(s:gh_issue_comments, {
-          \ 'id': comment.id,
-          \ 'user': comment.user.login,
-          \ 'body': split(comment.body, '\r\?\n'),
-          \ 'url': comment.html_url,
-          \ })
+    call add(s:gh_issue_comment, {
+        \ 'id': printf('#%d', comment.id),
+        \ 'user': printf('@%s', comment.user.login),
+        \ 'head': split(comment.body, '\r\?\n')[0] .. '...',
+        \ 'body': split(comment.body, '\r\?\n'),
+        \ 'url': comment.html_url,
+        \ })
   endfor
-  call setbufline(s:gh_issues_comments_bufid, 1, lines)
+
+  let header = [
+        \ 'id',
+        \ 'user',
+        \ 'head',
+        \ ]
+
+  let list['header'] = header
+  let list['data'] = s:gh_issue_comment
+
+  call gh#provider#list#open(list)
 
   nnoremap <buffer> <silent> <Plug>(gh_issue_comment_open_browser) :<C-u>call <SID>issue_comment_open_browser()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_issue_comment_url_yank) :<C-u>call <SID>issue_comment_url_yank()<CR>
   nmap <buffer> <silent> <C-o> <Plug>(gh_issue_comment_open_browser)
   nmap <buffer> <silent> ghy <Plug>(gh_issue_comment_url_yank)
 
-  " open preview/edit window
-  let winid = win_getid()
-  call s:issue_comment_open()
-  call win_gotoid(winid)
-
-  augroup gh-issue-comment-show
-    au!
-    au CursorMoved <buffer> call s:gh_issue_comment_edit()
-  augroup END
+  call gh#provider#preview#open(function('s:get_comment_preview_info'))
+  normal ghp
 endfunction
 
-function! s:issue_comment_open() abort
-  call execute(printf('belowright vnew gh://%s/%s/issues/%s/comments/edit',
-        \ s:comment_list.repo.owner, s:comment_list.repo.name, s:comment_list.number))
-  call gh#gh#init_buffer()
+function! s:get_comment_from_cache(id) abort
+  if has_key(s:, 'gh_issue_comment')
+    for comment in s:gh_issue_comment
+      if comment.id[1:] is# a:id
+        return comment
+      endif
+    endfor
+  endif
+  return {}
+endfunction
 
-  setlocal ft=markdown
-  setlocal buftype=acwrite
-
-  let s:gh_issues_comment_edit_bufid = bufnr()
-  let s:gh_issues_comment_edit_winid = win_getid()
-
-  call gh#map#apply('gh-buffer-issue-comment-edit', s:gh_issues_comment_edit_bufid)
-
-  call s:gh_issue_comment_edit()
-
-  augroup gh-issue-comment-update
-    au!
-    au BufWriteCmd <buffer> call s:update_issue_comment()
-  augroup END
+function! s:get_comment_preview_info() abort
+  let current = gh#provider#list#current()
+  if !empty(current)
+    return {
+          \ 'filename': 'comment.md',
+          \ 'contents': current.body,
+          \ }
+  endif
+  return {
+        \ 'filename': '',
+        \ 'contents': [],
+        \ }
 endfunction
 
 function! s:issue_comment_new() abort
@@ -503,20 +527,70 @@ function! s:issue_comment_new() abort
     return
   endif
   call execute(printf('%s gh://%s/%s/issues/%d/comments/new',
-        \ open, s:comment_list.repo.owner, s:comment_list.repo.name, s:comment_list.number))
+        \ open, b:gh_comment_list.repo.owner, b:gh_comment_list.repo.name, b:gh_comment_list.number))
 endfunction
 
-function! s:gh_issue_comment_edit() abort
-  call deletebufline(s:gh_issues_comment_edit_bufid, 1, '$')
-  let s:gh_comment = s:gh_issue_comments[line('.')-1]
-  call setbufline(s:gh_issues_comment_edit_bufid, 1, s:gh_comment.body)
+let s:comment_bufid_with_comment_id = {}
 
-  " neovim not have win_execute()
-  " https://github.com/neovim/neovim/issues/10822
+function! s:issue_comment_edit() abort
+  let open = gh#gh#decide_open()
+  if empty(open)
+    return
+  endif
+
   let winid = win_getid()
-  call win_gotoid(s:gh_issues_comment_edit_winid)
+
+  let comment = gh#provider#list#current()
+  " remove `#`
+  let id = comment.id[1:]
+  call execute(printf('%s gh://%s/%s/issues/%s/comments/%d',
+        \ open, b:gh_comment_list.repo.owner, b:gh_comment_list.repo.name, b:gh_comment_list.number, id))
+
+  let s:comment_bufid_with_comment_id[bufnr()] = winid
+endfunction
+
+function! gh#issues#comment_edit() abort
+  call gh#gh#init_buffer()
+
+  setlocal ft=markdown
+  setlocal buftype=acwrite
+
+  let b:gh_issues_comment_edit_bufid = bufnr()
+  call gh#map#apply('gh-buffer-issue-comment-edit', b:gh_issues_comment_edit_bufid)
+
+  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/\(.*\)/comments/\(.*\)')
+
+  call s:get_issue_comment(m[1], m[2], m[4])
+        \.then({comment -> s:set_issue_comment_body(comment)})
+        \.catch({err -> execute('call gh#gh#error_message(err)', '')})
+endfunction
+
+function! s:get_issue_comment(owner, repo, comment_id) abort
+  let comment = s:get_comment_from_cache(a:comment_id)
+  if !empty(comment)
+    return s:Promise.resolve(comment)
+  endif
+  return gh#github#issues#comment(a:owner, a:repo, a:comment_id)
+        \.then({resp -> resp.body})
+        \.then({comment -> {
+        \ 'id': printf('#%d', comment.id),
+        \ 'user': printf('@%s', comment.user.login),
+        \ 'head': split(comment.body, '\r\?\n')[0] .. '...',
+        \ 'body': split(comment.body, '\r\?\n'),
+        \ 'url': comment.html_url,
+        \ }})
+endfunction
+
+function! s:set_issue_comment_body(comment) abort
+  call setline(1, a:comment.body)
+
   setlocal nomodified
-  call win_gotoid(winid)
+  nnoremap <buffer> <silent> q :q<CR>
+
+  augroup gh-issue-comment-update
+    au!
+    au BufWriteCmd <buffer> call s:update_issue_comment()
+  augroup END
 endfunction
 
 function! s:update_issue_comment() abort
@@ -526,50 +600,46 @@ function! s:update_issue_comment() abort
     return
   endif
 
+  let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/\(.*\)/comments/\(.*\)')
+  let owner = m[1]
+  let repo = m[2]
+  let comment_id = m[4]
+
   let data = {
         \ 'body': join(body, "\r\n"),
         \ }
 
   call gh#gh#message('comment updating...')
 
-  call gh#github#issues#comment_update(s:comment_list.repo.owner, s:comment_list.repo.name, s:gh_comment.id, data)
+  call gh#github#issues#comment_update(owner, repo, comment_id, data)
         \.then(function('s:update_issue_comment_success'))
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
 endfunction
 
 function! s:update_issue_comment_success(resp) abort
-  bw!
-  call gh#gh#message('comment updated')
-  call gh#gh#delete_buffer(s:, 'gh_issues_comments_bufid')
-  call gh#gh#delete_buffer(s:, 'gh_issues_comment_edit_bufid')
-  call execute(printf('new gh://%s/%s/issues/%s/comments',
-        \ s:comment_list.repo.owner, s:comment_list.repo.name, s:comment_list.number))
-endfunction
-
-function! s:issue_comment_list_change_page(op) abort
-  if a:op is# '+'
-    let s:comment_list.param.page += 1
-  else
-    if s:comment_list.param.page < 2
-      return
-    endif
-    let s:comment_list.param.page -= 1
+  let bufid = bufnr()
+  setlocal nomodified
+  " if open edit buffer from comment list
+  " then s:comment_bufid_with_comment_id would have comment list's winid and bufid
+  if exists('s:comment_bufid_with_comment_id[bufid]')
+    let winid = s:comment_bufid_with_comment_id[bufid]
+    let oldid = win_getid()
+    noau call win_gotoid(winid)
+    let comment = gh#provider#list#current()
+    let comment.body = split(a:resp.body.body, '\r\?\n')
+    noau call win_gotoid(oldid)
   endif
-
-  let cmd = printf('vnew gh://%s/%s/issues/%s/comments?%s',
-        \ s:comment_list.repo.owner, s:comment_list.repo.name, s:comment_list.number, gh#http#encode_param(s:comment_list.param))
-  call execute(cmd)
-endfunction
-
-function! s:issue_comment_open_browser() abort
-  call gh#gh#open_url(s:gh_issue_comments[line('.')-1].url)
+  redraw!
+  call gh#gh#message('update success')
 endfunction
 
 function! gh#issues#comment_new() abort
-  call gh#gh#delete_buffer(s:, 'gh_issues_comment_new_bufid')
-  let s:gh_issues_comment_new_bufid = bufnr()
+  let b:gh_issues_comment_new_bufid = bufnr()
+
   call gh#gh#init_buffer()
+
   setlocal ft=markdown
+  setlocal buftype=acwrite
 
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/\(.*\)/comments/new$')
   let s:comment_new = {
@@ -580,13 +650,11 @@ function! gh#issues#comment_new() abort
         \ },
         \ }
 
-  setlocal buftype=acwrite
-
   augroup gh-issue-comment-create
     au!
     au BufWriteCmd <buffer> call s:create_issue_comment()
   augroup END
-  call gh#map#apply('gh-buffer-issue-comment-new', s:gh_issues_comment_new_bufid)
+  call gh#map#apply('gh-buffer-issue-comment-new', b:gh_issues_comment_new_bufid)
 endfunction
 
 function! s:create_issue_comment() abort
@@ -605,9 +673,6 @@ function! s:create_issue_comment() abort
 endfunction
 
 function s:create_issue_comment_success(resp) abort
-  call gh#gh#delete_buffer(s:, 'gh_issues_comment_new_bufid')
+  call gh#gh#delete_buffer(b:, 'gh_issues_comment_new_bufid')
   call gh#gh#message(printf('new comment: %s', a:resp.body.html_url))
-  call gh#gh#delete_buffer(s:, 'gh_issues_comments_bufid')
-  call execute(printf('new gh://%s/%s/issues/%d/comments',
-        \ s:comment_list.repo.owner, s:comment_list.repo.name, s:comment_list.number))
 endfunction

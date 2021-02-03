@@ -88,7 +88,7 @@ gh://:owner/:repo/issues/:number/comments[?page=1&...]	*gh-buffer-issue-comment-
 gh://:owner/:repo/issues/:number/comments/new		*gh-buffer-issue-comment-new*
 	create new issue comment.
 
-gh://:owner/:repo/issues/:number/comments/edit		*gh-buffer-issue-comment-edit*
+gh://:owner/:repo/issues/:number/comments/:id		*gh-buffer-issue-comment-edit*
 	edit issue comment.
 
 gh://:owner/:repo/pulls[?state=open&...]		*gh-buffer-pull-list*
@@ -336,6 +336,9 @@ default mappings
 				`normal`	<C-o>		<Plug>(gh_issue_comment_open_browser)
 				`normal`	ghn		<Plug>(gh_issue_comment_new)
 				`normal`	ghy		<Plug>(gh_issue_comment_url_yank)
+				`normal`	ghp		<Plug>(gh_preview_toggle)
+				`normal`	<C-n>		<Plug>(gh_preview_move_down)
+				`normal`	<C-p>		<Plug>(gh_preview_move_up)
 |gh-buffer-pull-list|		`normal`	<C-h>		<Plug>(gh_pull_list_prev)
 				`normal`	<C-l>		<Plug>(gh_pull_list_next)
 				`normal`	<C-o>		<Plug>(gh_pull_open_browser)

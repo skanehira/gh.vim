@@ -53,6 +53,10 @@ function! gh#github#issues#comments(owner, repo, number, param) abort
   return gh#http#request(settings)
 endfunction
 
+function! gh#github#issues#comment(owner, repo, number) abort
+  return gh#http#get(printf('https://api.github.com/repos/%s/%s/issues/comments/%d', a:owner, a:repo, a:number))
+endfunction
+
 function! gh#github#issues#comment_new(owner, repo, number, data) abort
   let settings = {
         \ 'method': 'POST',

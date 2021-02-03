@@ -33,6 +33,8 @@ function! gh#gh#init() abort
   elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/issues\/\d\+\/comments$'
         \ || bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/issues\/\d\+\/comments?\+'
     call gh#issues#comments()
+  elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/issues\/\d\+\/comments\/\d\+$'
+    call gh#issues#comment_edit()
   elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/issues\/\d\+\/comments\/new$'
     call gh#issues#comment_new()
   elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/pulls$'
