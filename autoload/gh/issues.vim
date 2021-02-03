@@ -621,10 +621,12 @@ function! s:update_issue_comment_success(resp) abort
 endfunction
 
 function! gh#issues#comment_new() abort
-  call gh#gh#delete_buffer(s:, 'gh_issues_comment_new_bufid')
-  let s:gh_issues_comment_new_bufid = bufnr()
+  let b:gh_issues_comment_new_bufid = bufnr()
+
   call gh#gh#init_buffer()
+
   setlocal ft=markdown
+  setlocal buftype=acwrite
 
   let m = matchlist(bufname(), 'gh://\(.*\)/\(.*\)/issues/\(.*\)/comments/new$')
   let s:comment_new = {
@@ -635,13 +637,11 @@ function! gh#issues#comment_new() abort
         \ },
         \ }
 
-  setlocal buftype=acwrite
-
   augroup gh-issue-comment-create
     au!
     au BufWriteCmd <buffer> call s:create_issue_comment()
   augroup END
-  call gh#map#apply('gh-buffer-issue-comment-new', s:gh_issues_comment_new_bufid)
+  call gh#map#apply('gh-buffer-issue-comment-new', b:gh_issues_comment_new_bufid)
 endfunction
 
 function! s:create_issue_comment() abort
@@ -660,9 +660,6 @@ function! s:create_issue_comment() abort
 endfunction
 
 function s:create_issue_comment_success(resp) abort
-  call gh#gh#delete_buffer(s:, 'gh_issues_comment_new_bufid')
+  call gh#gh#delete_buffer(b:, 'gh_issues_comment_new_bufid')
   call gh#gh#message(printf('new comment: %s', a:resp.body.html_url))
-  call gh#gh#delete_buffer(s:, 'gh_issues_comments_bufid')
-  call execute(printf('new gh://%s/%s/issues/%d/comments',
-        \ b:gh_comment_list.repo.owner, b:gh_comment_list.repo.name, b:gh_comment_list.number))
 endfunction
