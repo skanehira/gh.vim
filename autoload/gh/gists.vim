@@ -60,7 +60,7 @@ function! s:set_gists_list(resp) abort
   call s:make_tree(b:gh_gist_list.owner, a:resp.gists)
 
   call gh#provider#tree#open(b:gh_gist_tree)
-  call gh#provider#preview#open(s:get_preview_info(), function('s:preview_update'))
+  call gh#provider#preview#open(function('s:get_preview_info'))
 endfunction
 
 function! s:set_keymap() abort
@@ -73,10 +73,6 @@ function! s:set_keymap() abort
   nmap <buffer> <silent> ghy   <Plug>(gh_gist_list_yank)
   nmap <buffer> <silent> ghf   <Plug>(gh_gist_list_fetch)
   nmap <buffer> <silent> ghe   <Plug>(gh_gist_edit_file)
-endfunction
-
-function! s:preview_update() abort
-  call gh#provider#preview#update(s:get_preview_info())
 endfunction
 
 function! s:get_preview_info() abort
@@ -225,7 +221,8 @@ function! s:set_gist(gist) abort
         \ }
   call s:make_tree(b:gh_gist.owner, [a:gist])
   call gh#provider#tree#open(b:gh_gist_tree)
-  call gh#provider#preview#open(s:get_preview_info(), function('s:preview_update'))
+
+  call gh#provider#preview#open(function('s:get_preview_info'))
 
   nnoremap <buffer> <silent> <Plug>(gh_gist_list_yank) :call <SID>yank_or_open_gists_url('yank')<CR>
   nnoremap <buffer> <silent> <Plug>(gh_gist_list_open_browser) :call <SID>yank_or_open_gists_url('open')<CR>

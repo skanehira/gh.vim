@@ -90,11 +90,7 @@ function! s:set_issue_list(resp) abort
   nmap <buffer> <silent> ghm   <Plug>(gh_issue_open_comment)
   nmap <buffer> <silent> ghy   <Plug>(gh_issue_url_yank)
 
-  call gh#provider#preview#open(s:get_preview_info(), function('s:preview_update'))
-endfunction
-
-function! s:preview_update() abort
-  call gh#provider#preview#update(s:get_preview_info())
+  call gh#provider#preview#open(function('s:get_preview_info'))
 endfunction
 
 function! s:get_preview_info() abort

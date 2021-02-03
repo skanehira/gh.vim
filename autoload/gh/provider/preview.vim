@@ -6,14 +6,13 @@
 "   'filename': 'gh.vim',
 "   'contents': ['a', 'b'],
 " }
-function! gh#provider#preview#open(opts, ...) abort
+function! gh#provider#preview#open(get_preview_info) abort
   let b:gh_preview_buf = -1
   let b:gh_preview_winid = -1
   let b:gh_preview_enable = 0
-  let b:gh_preview_opts = a:opts
-  if a:0 is# 1
-    let b:gh_preview_updatefunc = a:1
-  endif
+  let b:gh_preview_opts = a:get_preview_info()
+  let b:gh_preview_updatefunc = a:get_preview_info
+  call s:update_preview()
 
   nnoremap <buffer> <silent> <Plug>(gh_preview_move_down) :call <SID>scroll_popup('down')<CR>
   nnoremap <buffer> <silent> <Plug>(gh_preview_move_up) :call <SID>scroll_popup('up')<CR>
@@ -22,8 +21,8 @@ function! gh#provider#preview#open(opts, ...) abort
   nmap <buffer> <silent> ghp <Plug>(gh_preview_toggle)
 endfunction
 
-function! gh#provider#preview#update(opts) abort
-  let b:gh_preview_opts = a:opts
+function! gh#provider#preview#update(get_preview_info) abort
+  let b:gh_preview_opts = a:get_preview_info()
   call s:update_preview()
 endfunction
 
@@ -44,9 +43,7 @@ function! s:enable_preview() abort
     au!
     au BufEnter <buffer> call s:preview()
     au BufLeave <buffer> call s:close_preview_window(b:gh_preview_winid)
-    if exists('b:gh_preview_updatefunc')
-      au CursorMoved <buffer> call b:gh_preview_updatefunc()
-    endif
+    au CursorMoved <buffer> call gh#provider#preview#update(b:gh_preview_updatefunc)
   augroup END
 
   nmap <buffer> <silent> <C-n> <Plug>(gh_preview_move_down)
@@ -112,7 +109,7 @@ if has('nvim')
 
     let b:gh_preview_winid = nvim_open_win(b:gh_preview_buf, 0, opts)
     call nvim_win_set_option(b:gh_preview_winid, 'number', v:true)
-    call b:gh_preview_updatefunc()
+    call gh#provider#preview#update(b:gh_preview_updatefunc)
   endfunction
 
   function! s:update_preview() abort
@@ -162,7 +159,7 @@ else
           \ })
 
     call win_execute(b:gh_preview_winid, 'set number')
-    call b:gh_preview_updatefunc()
+    call gh#provider#preview#update(b:gh_preview_updatefunc)
   endfunction
 
   function! s:update_preview() abort
