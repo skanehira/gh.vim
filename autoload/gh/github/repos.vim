@@ -51,3 +51,8 @@ function! gh#github#repos#create(data) abort
         \ }
   return gh#http#request(settings)
 endfunction
+
+function! gh#github#repos#get_repo(owner, repo) abort
+  let url = printf('https://api.github.com/repos/%s/%s', a:owner, a:repo)
+  return gh#http#get(url)
+endfunction
