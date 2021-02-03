@@ -54,9 +54,5 @@ endfunction
 
 function! gh#github#repos#get_repo(owner, repo) abort
   let url = printf('https://api.github.com/repos/%s/%s', a:owner, a:repo)
-  let settings = {
-        \ 'method': 'GET',
-        \ 'url': url,
-        \ }
-  return gh#http#request(settings)
+  return gh#http#get(url)
 endfunction
