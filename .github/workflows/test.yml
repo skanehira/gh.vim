@@ -13,6 +13,7 @@ jobs:
         neovim: [false, true]
         version: ['nightly', 'stable']
         os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
+        use_gh_cli: [false, true]
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: actions/checkout@v2
@@ -27,6 +28,7 @@ jobs:
           neovim: ${{ matrix.neovim }}
           version: ${{ matrix.version }}
       - name: Write gh cli config file for test and check path
+        if: ${{ matrix.use_gh_cli }}
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -47,4 +49,5 @@ jobs:
       - name: Run unit tests with themis.vim
         env:
           THEMIS_VIM: ${{ steps.vim.outputs.executable }}
+          USE_GH_CLI: ${{ matrix.use_gh_cli }}
         run: ./vim-themis/bin/themis -r
