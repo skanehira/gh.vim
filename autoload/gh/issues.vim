@@ -196,15 +196,15 @@ function! gh#issues#new() abort
 
   let m = matchlist(bufname(), 'gh://\(.\{-}\)/\(.\{-}\)/issues/new$')
 
-  let l:owner = m[1]
-  let l:repo = m[2]
+  let owner = m[1]
+  let repo = m[2]
   let s:gh_issue_new = {
-        \ 'owner': l:owner,
-        \ 'name': l:repo,
+        \ 'owner': owner,
+        \ 'name': repo,
         \ 'branch': '',
         \ }
 
-  call gh#github#repos#get_repo(l:owner, l:repo)
+  call gh#github#repos#get_repo(owner, repo)
         \.then(function('s:set_default_branch'))
         \.then({-> gh#github#repos#files(s:gh_issue_new.owner, s:gh_issue_new.name, s:gh_issue_new.branch)})
         \.then(function('s:get_template_files'))
