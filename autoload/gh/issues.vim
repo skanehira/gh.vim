@@ -201,7 +201,7 @@ function! gh#issues#new() abort
   let s:gh_issue_new = {
         \ 'owner': owner,
         \ 'name': repo,
-        \ 'branch': '',
+        \ 'branch': 'main',
         \ }
 
   call gh#github#repos#get_repo(owner, repo)
@@ -214,11 +214,10 @@ function! gh#issues#new() abort
 endfunction
 
 function! s:set_default_branch(resp)
-  if !has_key(a:resp.body, 'default_branch')
-    call gh#gh#error_message('not found default branch')
-    return
+  if has_key(a:resp.body, 'default_branch')
+    " set default branch name, otherwise use 'main' as default branch name.
+    let s:gh_issue_new.branch = a:resp.body['default_branch']
   endif
-  let s:gh_issue_new.branch = a:resp.body['default_branch']
 endfunction
 
 function! s:get_template_error(error) abort
