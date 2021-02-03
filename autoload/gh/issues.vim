@@ -608,7 +608,7 @@ function! s:update_issue_comment_success(resp) abort
   setlocal nomodified
   " if open edit buffer from comment list
   " then s:comment_bufid_with_comment_id would have comment list's winid and bufid
-  if has_key(s:comment_bufid_with_comment_id, bufid)
+  if exists('s:comment_bufid_with_comment_id[bufid]')
     let winid = s:comment_bufid_with_comment_id[bufid]
     let oldid = win_getid()
     noau call win_gotoid(winid)
