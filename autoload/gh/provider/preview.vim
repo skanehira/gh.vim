@@ -166,9 +166,6 @@ else
   endfunction
 
   function! s:update_preview() abort
-    if b:gh_preview_buf is# -1
-      return
-    endif
     let b:gh_preview_contents_maxrow = len(b:gh_preview_opts.contents)
     call win_execute(b:gh_preview_winid, printf('do <nomodeline> BufRead %s | normal zn', b:gh_preview_opts.filename))
     call popup_setoptions(b:gh_preview_winid, {'firstline': 1})
