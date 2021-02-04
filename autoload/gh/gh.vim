@@ -238,6 +238,9 @@ function! gh#gh#get_token() abort
     return token
   endif
   let s:gh_token_path = glob('~/.config/gh/hosts.yml')
+  if empty(s:gh_token_path)
+    let s:gh_token_path = glob('~/.config/gh/config.yml')
+  endif
   if !empty(s:gh_token_path)
     for line in readfile(s:gh_token_path, '')
       if line =~ 'oauth_token'
