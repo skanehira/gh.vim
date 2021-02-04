@@ -169,6 +169,30 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
     au VimEnter * call <SID>gh_map_add()
   augroup END
 <
+<Plug>(gh_list_prev_page)			*<Plug>(gh_list_prev_page)*
+	show previous page at bellow buffers.
+	|gh-buffer-issue-list|
+	|gh-buffer-issue-comment-list|
+	|gh-buffer-pull-list|
+
+<Plug>(gh_list_next_page)			*<Plug>(gh_list_next_page)*
+	show next page at bellow buffers.
+	|gh-buffer-issue-list|
+	|gh-buffer-issue-comment-list|
+	|gh-buffer-pull-list|
+
+<Plug>(gh_list_mark_down)			*<Plug>(gh_list_mark_down)*
+	mark item and move down at bellow buffers.
+	|gh-buffer-issue-list|
+	|gh-buffer-issue-comment-list|
+	|gh-buffer-pull-list|
+
+<Plug>(gh_list_mark_up)				*<Plug>(gh_list_mark_up)*  
+	mark item and move up at bellow buffers.
+	|gh-buffer-issue-list|
+	|gh-buffer-issue-comment-list|
+	|gh-buffer-pull-list|
+
 <Plug>(gh_repo_list_prev)			*<Plug>(gh_repo_list_prev)*
 	show previous page of repository list
 
@@ -181,12 +205,6 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 <Plug>(gh_repo_show_readme)			*<Plug>(gh_repo_show_readme)*
 	show radme of repository
 
-<Plug>(gh_pull_list_prev)			*<Plug>(gh_pull_list_prev)*
-	show previous page of pull reuqest list
-
-<Plug>(gh_pull_list_next)			*<Plug>(gh_pull_list_next)*
-	show next page of pull reuqest list
-
 <Plug>(gh_pull_open_browser)			*<Plug>(gh_pull_open_browser)*
 	open pull request on browser
 
@@ -195,12 +213,6 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 
 <Plug>(gh_pull_url_yank)			*<Plug>(gh_pull_url_yank)*
 	yank pull request url
-
-<Plug>(gh_issue_list_prev)			*<Plug>(gh_issue_list_prev)*
-	show previous page of issue list
-
-<Plug>(gh_issue_list_next)			*<Plug>(gh_issue_list_next)*
-	show next page of issue list
 
 <Plug>(gh_issue_open_browser)			*<Plug>(gh_issue_open_browser)*
 	open issue on browser
@@ -225,12 +237,6 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 
 <Plug>(gh_preview_move_up)			*<Plug>(gh_preview_move_up)*
 	move up cursorline in preview
-
-<Plug>(gh_issue_comment_list_next)              *<Plug>(gh_issue_comment_list_next)*
-	show next page of issue comment list
-
-<Plug>(gh_issue_comment_list_prev)		*<Plug>(gh_issue_comment_list_prev)*
-	show previous page of issue comment list
 
 <Plug>(gh_issue_comment_open_browser)		*<Plug>(gh_issue_comment_open_browser)*
 	open issue on browser
@@ -319,9 +325,11 @@ default mappings
 
 {buffer}			{mode}		{lhs}		{rhs}
 -----------------------------------------------------------------------------------------------
-|gh-buffer-issue-list|		`normal`	<C-h>		<Plug>(gh_issue_list_prev)
-				`normal`	<C-l>		<Plug>(gh_issue_list_next)
+|gh-buffer-issue-list|		`normal`	<C-h>		<Plug>(gh_list_prev_page)
+				`normal`	<C-l>		<Plug>(gh_list_next_page)
 				`normal`	<C-o>		<Plug>(gh_issue_open_browser)
+				`normal`	<C-j>		<Plug>(gh_list_mark_down)
+				`normal`	<C-k>		<Plug>(gh_list_mark_up)
 				`normal`	ghe		<Plug>(gh_issue_edit)
 				`normal`	ghc		<Plug>(gh_issue_close)
 				`normal`	gho		<Plug>(gh_issue_open)
@@ -331,17 +339,22 @@ default mappings
 				`normal`	<C-n>		<Plug>(gh_preview_move_down)
 				`normal`	<C-p>		<Plug>(gh_preview_move_up)
 |gh-buffer-issue-edit|		`normal`	ghm		<Plug>(gh_issue_comment_open_on_issue)
-|gh-buffer-issue-comment-list|	`normal`	<C-h>		<Plug>(gh_issue_comment_list_prev)
-				`normal`	<C-l>		<Plug>(gh_issue_comment_list_next)
+|gh-buffer-issue-comment-list|	`normal`	<C-h>		<Plug>(gh_list_prev_page)
+				`normal`	<C-l>		<Plug>(gh_list_next_page)
 				`normal`	<C-o>		<Plug>(gh_issue_comment_open_browser)
+				`normal`	<C-j>		<Plug>(gh_list_mark_down)
+				`normal`	<C-k>		<Plug>(gh_list_mark_up)
+				`normal`	ghe		<Plug>(gh_issue_comment_edit)
 				`normal`	ghn		<Plug>(gh_issue_comment_new)
 				`normal`	ghy		<Plug>(gh_issue_comment_url_yank)
 				`normal`	ghp		<Plug>(gh_preview_toggle)
 				`normal`	<C-n>		<Plug>(gh_preview_move_down)
 				`normal`	<C-p>		<Plug>(gh_preview_move_up)
-|gh-buffer-pull-list|		`normal`	<C-h>		<Plug>(gh_pull_list_prev)
-				`normal`	<C-l>		<Plug>(gh_pull_list_next)
+|gh-buffer-pull-list|		`normal`	<C-h>		<Plug>(gh_list_prev_page)
+				`normal`	<C-l>		<Plug>(gh_list_next_page)
 				`normal`	<C-o>		<Plug>(gh_pull_open_browser)
+				`normal`	<C-j>		<Plug>(gh_list_mark_down)
+				`normal`	<C-k>		<Plug>(gh_list_mark_up)
 				`normal`	ghd		<Plug>(gh_pull_diff)
 				`normal`	ghy		<Plug>(gh_pull_url_yank)
 |gh-buffer-repo-list|		`normal`	<C-h>		<Plug>(gh_repo_list_prev)
