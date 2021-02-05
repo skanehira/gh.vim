@@ -182,7 +182,7 @@ function! s:dict_value_len(items, keys) abort
 
   for item in a:items
     for k in a:keys
-      let l = strchars(item[k])
+      let l = len(item[k])
       let len_dict[k] = len_dict[k] > l ? len_dict[k] : l
     endfor
   endfor
@@ -194,7 +194,7 @@ function! gh#gh#dict_format(items, keys) abort
   if empty(dict)
     return ''
   endif
-  let format = map(copy(a:keys[:-2]), {_, k -> printf("%%-%ss", dict[k])})
+  let format = map(copy(a:keys[:-2]), {_, k -> printf("%%-%sS", dict[k])})
   let format += ['%s']
   return join(format)
 endfunction
