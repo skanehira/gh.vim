@@ -61,7 +61,8 @@ function! s:set_issue_list(resp) abort
         \ 'user': printf('@%s', issue.user.login),
         \ 'title': issue.title,
         \ 'body': split(issue.body, '\r\?\n'),
-        \ 'url': url .. issue.number
+        \ 'url': url .. issue.number,
+        \ 'comment': issue.comments > 0 ? printf("\uf41f %d", issue.comments) : '',
         \ }})
 
   let header = [
@@ -69,6 +70,7 @@ function! s:set_issue_list(resp) abort
         \ 'state',
         \ 'user',
         \ 'title',
+        \ 'comment',
         \ ]
 
   let list['header'] = header
