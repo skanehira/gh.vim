@@ -187,8 +187,7 @@ function! gh#issues#list() abort
 endfunction
 
 function! gh#issues#new() abort
-
-  let s:gh_issues_new_bufid = bufnr()
+  let b:gh_issues_new_bufid = bufnr()
   call gh#gh#init_buffer()
   call gh#gh#set_message_buf('loading')
 
@@ -196,7 +195,7 @@ function! gh#issues#new() abort
 
   let owner = m[1]
   let repo = m[2]
-  let s:gh_issue_new = {
+  let b:gh_issue_new = {
         \ 'owner': owner,
         \ 'name': repo,
         \ 'branch': 'main',
@@ -204,7 +203,7 @@ function! gh#issues#new() abort
 
   call gh#github#repos#get_repo(owner, repo)
         \.then(function('s:set_default_branch'))
-        \.then({-> gh#github#repos#files(s:gh_issue_new.owner, s:gh_issue_new.name, s:gh_issue_new.branch)})
+        \.then({-> gh#github#repos#files(b:gh_issue_new.owner, b:gh_issue_new.name, b:gh_issue_new.branch)})
         \.then(function('s:get_template_files'))
         \.then(function('s:open_template_list'))
         \.catch(function('s:get_template_error'))
@@ -214,7 +213,7 @@ endfunction
 function! s:set_default_branch(resp)
   if has_key(a:resp.body, 'default_branch')
     " set default branch name, otherwise use 'main' as default branch name.
-    let s:gh_issue_new.branch = a:resp.body['default_branch']
+    let b:gh_issue_new.branch = a:resp.body['default_branch']
   endif
 endfunction
 
@@ -230,11 +229,11 @@ endfunction
 function! s:create_issue() abort
   call gh#gh#message('issue creating...')
   let data = {
-        \ 'title': s:gh_issue_title,
+        \ 'title': b:gh_issue_title,
         \ 'body': join(getline(1, '$'), "\r\n"),
         \ }
 
-  call gh#github#issues#new(s:gh_issue_new.owner, s:gh_issue_new.name, data)
+  call gh#github#issues#new(b:gh_issue_new.owner, b:gh_issue_new.name, data)
         \.then(function('s:create_issue_success'))
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
 endfunction
@@ -249,18 +248,25 @@ function! s:create_issue_success(resp) abort
 endfunction
 
 function! s:set_issue_template_buffer(resp) abort
-  let s:gh_issue_title = input('[gh.vim] issue title ')
+  let gh_issue_title = input('[gh.vim] issue title ')
   echom ''
   redraw
-  if s:gh_issue_title is# ''
+  if gh_issue_title is# ''
     call gh#gh#error_message('no issue title')
     return
   endif
 
-  call execute(printf('e gh://%s/%s/issues/%s', s:gh_issue_new.owner, s:gh_issue_new.name, s:gh_issue_title))
+  " store buffer variable because create new buffer to edit issue body
+  let gh_issue_new = b:gh_issue_new
+
+  call execute(printf('e gh://%s/%s/issues/%s', b:gh_issue_new.owner, b:gh_issue_new.name, gh_issue_title))
   call gh#map#apply('gh-buffer-issue-new', bufnr())
   setlocal buftype=acwrite
   setlocal ft=markdown
+
+  " restore buffer variable
+  let b:gh_issue_title = gh_issue_title
+  let b:gh_issue_new = gh_issue_new
 
   if !empty(a:resp.body)
     call setline(1, split(a:resp.body, '\r'))
@@ -268,14 +274,15 @@ function! s:set_issue_template_buffer(resp) abort
 
   setlocal nomodified
   nnoremap <buffer> <silent> q :q<CR>
-  augroup gh-create-issue
+
+  exe printf('augroup gh-create-issue-%d', bufnr())
     au!
     au BufWriteCmd <buffer> call s:create_issue()
   augroup END
 endfunction
 
 function! s:get_template() abort
-  let url = s:gh_template_files[line('.')-1].url
+  let url = b:gh_template_files[line('.')-1].url
   call gh#http#get(url)
         \.then(function('s:set_issue_template_buffer'))
         \.catch({err -> execute('%d_ | call gh#gh#set_message_buf(err.body)', '')})
@@ -287,8 +294,8 @@ function! s:open_template_list(files) abort
     call s:set_issue_template_buffer({'body': ''})
     return
   endif
-  let s:gh_template_files = a:files
-  call setbufline(s:gh_issues_new_bufid, 1, map(copy(a:files), {_, v -> v.file}))
+  let b:gh_template_files = a:files
+  call setbufline(b:gh_issues_new_bufid, 1, map(copy(a:files), {_, v -> v.file}))
   nnoremap <buffer> <silent> <CR> :call <SID>get_template()<CR>
 endfunction
 
@@ -307,7 +314,7 @@ function! s:get_template_files(resp) abort
 
   let files = map(files, {_, v -> {'file': s:file_basename(v.path),
         \ 'url': printf('https://raw.githubusercontent.com/%s/%s/%s/%s',
-        \ s:gh_issue_new.owner, s:gh_issue_new.name, s:gh_issue_new.branch, v.path)}})
+        \ b:gh_issue_new.owner, b:gh_issue_new.name, b:gh_issue_new.branch, v.path)}})
   return files
 endfunction
 
