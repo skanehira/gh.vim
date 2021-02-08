@@ -22,7 +22,7 @@ function! gh#gists#list() abort
         \ 'owner': m[1],
         \ }
 
-  let b:gh_gist_list['privacy'] = 'PUBLIC'
+  let b:gh_gist_list['privacy'] = 'ALL'
   if !empty(m[2])
     let p = split(m[2], '=')
     if len(p) > 1
