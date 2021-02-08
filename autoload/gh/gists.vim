@@ -327,11 +327,8 @@ function! s:gist_new_file() abort
 
   call add(s:gh_gist_new_files, {'name': filename, 'bufid': bufnr()})
 
-  exe printf('augroup gh-gist-create-%d', bufnr())
-    au!
-    au BufWriteCmd <buffer> call s:gist_create_files()
-    au BufDelete <buffer> call s:gist_remove_cache_file()
-  augroup END
+  au BufWriteCmd <buffer> call s:gist_create_files()
+  au BufDelete <buffer> call s:gist_remove_cache_file()
 endfunction
 
 function! s:gist_remove_cache_file() abort

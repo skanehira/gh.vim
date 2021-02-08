@@ -275,10 +275,7 @@ function! s:set_issue_template_buffer(resp) abort
   setlocal nomodified
   nnoremap <buffer> <silent> q :q<CR>
 
-  exe printf('augroup gh-create-issue-%d', bufnr())
-    au!
-    au BufWriteCmd <buffer> call s:create_issue()
-  augroup END
+  au BufWriteCmd <buffer> call s:create_issue()
 endfunction
 
 function! s:get_template() abort
@@ -369,10 +366,7 @@ function! s:set_issues_body(resp) abort
   nmap <buffer> <silent> ghm <Plug>(gh_issue_comment_open_on_issue)
   nnoremap <buffer> <silent> q :q<CR>
 
-  exe printf('augroup gh-update-issue-%d', bufnr())
-    au!
-    au BufWriteCmd <buffer> call s:update_issue()
-  augroup END
+  au BufWriteCmd <buffer> call s:update_issue()
 endfunction
 
 function! gh#issues#issue() abort
