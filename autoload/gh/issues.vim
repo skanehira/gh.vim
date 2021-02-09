@@ -590,7 +590,10 @@ function! s:set_issue_comment_body(comment) abort
   setlocal nomodified
   nnoremap <buffer> <silent> q :q<CR>
 
-  au BufWriteCmd <buffer> call s:update_issue_comment()
+  augroup gh-issue-comment-update
+    au!
+    au BufWriteCmd <buffer> call s:update_issue_comment()
+  augroup END
 endfunction
 
 function! s:update_issue_comment() abort
@@ -650,7 +653,10 @@ function! gh#issues#comment_new() abort
         \ },
         \ }
 
-  au BufWriteCmd <buffer> call s:create_issue_comment()
+  augroup gh-issue-comment-create
+    au!
+    au BufWriteCmd <buffer> call s:create_issue_comment()
+  augroup END
   call gh#map#apply('gh-buffer-issue-comment-new', b:gh_issues_comment_new_bufid)
 endfunction
 

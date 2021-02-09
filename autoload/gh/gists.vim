@@ -285,7 +285,10 @@ function! s:init_edit_gist_buffer(contents) abort
   setlocal buftype=acwrite
   setlocal nomodified
 
-  au BufWriteCmd <buffer> call s:update_gist()
+  augroup gh-gist-update
+    au!
+    au BufWriteCmd <buffer> call s:update_gist()
+  augroup END
 endfunction
 
 function! s:update_gist() abort
