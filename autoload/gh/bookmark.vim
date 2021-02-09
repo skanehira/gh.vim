@@ -22,7 +22,10 @@ function! gh#bookmark#list() abort
     endfor
   endif
 
-  au BufWriteCmd <buffer> call s:bookmark_file_update()
+  augroup gh-bookmark-update
+    au!
+    au BufWriteCmd <buffer> call s:bookmark_file_update()
+  augroup END
 endfunction
 
 function! s:bookmark_open() abort
