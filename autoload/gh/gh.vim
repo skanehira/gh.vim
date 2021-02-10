@@ -145,6 +145,7 @@ function! gh#gh#def_highlight() abort
   hi! link gh_pull_open gh_green
   hi! link gh_pull_closed gh_red
   hi! link gh_pull_user gh_purple
+  hi! link gh_pull_labels gh_orange
 
   hi! link gh_repo_name gh_blue
   hi! link gh_repo_star gh_orange

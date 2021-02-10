@@ -22,6 +22,7 @@ function! s:set_pull_list(resp) abort
         \ 'state': pr.state,
         \ 'user': printf('@%s', pr.user.login),
         \ 'title': pr.title,
+        \ 'labels': len(pr.labels) > 0 ? printf('(%s)', join(map(copy(pr.labels), {_, label -> label.name}), ", ")) : '',
         \ 'url': url .. pr.number
         \ }})
 
@@ -29,7 +30,8 @@ function! s:set_pull_list(resp) abort
         \ 'number',
         \ 'state',
         \ 'user',
-        \ 'title'
+        \ 'title',
+        \ 'labels',
         \ ]
 
   let list['header'] = header
