@@ -136,6 +136,7 @@ function! gh#gh#def_highlight() abort
   hi! link gh_issue_open gh_green
   hi! link gh_issue_closed gh_red
   hi! link gh_issue_user gh_purple
+  hi! link gh_issue_labels gh_orange
 
   hi! link gh_issue_comment_user gh_purple
   hi! link gh_issue_comment_number gh_blue

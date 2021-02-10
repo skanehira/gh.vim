@@ -62,6 +62,7 @@ function! s:set_issue_list(resp) abort
         \ 'title': issue.title,
         \ 'body': split(issue.body, '\r\?\n'),
         \ 'url': url .. issue.number,
+        \ 'labels': printf('(%s)', join(map(copy(issue.labels), {_, label -> label.name}), ", ")),
         \ 'comment': issue.comments > 0 ? printf("\uf41f %d", issue.comments) : '',
         \ }})
 
@@ -70,6 +71,7 @@ function! s:set_issue_list(resp) abort
         \ 'state',
         \ 'user',
         \ 'title',
+        \ 'labels',
         \ 'comment',
         \ ]
 
