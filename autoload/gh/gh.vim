@@ -171,6 +171,16 @@ function! gh#gh#def_highlight() abort
   hi! link gh_gists_secret gh_purple
 endfunction
 
+" get display string length
+function! s:str_len(str) abort
+  let str_len = 0
+  for s in split(a:str, '\zs')
+    let len = len(s)
+    let str_len += len >= 3 ? 2 : len
+  endfor
+  return str_len
+endfunction
+
 function! s:dict_value_len(items, keys) abort
   if len(a:items) < 1
     return {}
@@ -183,7 +193,7 @@ function! s:dict_value_len(items, keys) abort
 
   for item in a:items
     for k in a:keys
-      let l = len(item[k])
+      let l = s:str_len(item[k])
       let len_dict[k] = len_dict[k] > l ? len_dict[k] : l
     endfor
   endfor
