@@ -22,6 +22,8 @@ function! gh#bookmark#list() abort
     endfor
   endif
 
+  call gh#map#apply('gh-buffer-bookmark-list', s:gh_bookmark_list_bufid)
+
   exe printf('augroup gh-bookmark-update-%d', bufnr())
     au!
     au BufWriteCmd <buffer> call s:bookmark_file_update()
