@@ -260,6 +260,9 @@ function! s:set_issue_template_buffer(resp) abort
 
   " store buffer variable because create new buffer to edit issue body
   let gh_issue_new = b:gh_issue_new
+  " store buffer-id to delete the buffer just after creating new buffer below,
+  " only when the repo has no issue template
+  let gh_issue_new_bufid = b:gh_issues_new_bufid
 
   call execute(printf('e gh://%s/%s/issues/%s', b:gh_issue_new.owner, b:gh_issue_new.name, gh_issue_title))
   call gh#map#apply('gh-buffer-issue-new', bufnr())
@@ -272,6 +275,8 @@ function! s:set_issue_template_buffer(resp) abort
 
   if !empty(a:resp.body)
     call setline(1, split(a:resp.body, '\r'))
+  else
+    execute(printf('%dbw!', gh_issue_new_bufid))
   endif
 
   setlocal nomodified
@@ -292,7 +297,6 @@ endfunction
 
 function! s:open_template_list(files) abort
   if empty(a:files)
-    bw!
     call s:set_issue_template_buffer({'body': ''})
     return
   endif
