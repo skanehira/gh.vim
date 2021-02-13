@@ -85,6 +85,7 @@ function! s:set_issue_list(resp) abort
   nnoremap <buffer> <silent> <Plug>(gh_issue_close) :<C-u>call <SID>set_issue_state('close')<CR>
   nnoremap <buffer> <silent> <Plug>(gh_issue_open) :<C-u>call <SID>set_issue_state('open')<CR>
   nnoremap <buffer> <silent> <Plug>(gh_issue_open_comment) :<C-u>call <SID>issue_open_comment()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_issue_new) :<C-u>call <SID>new_issue()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_issue_url_yank) :<C-u>call <SID>issue_url_yank()<CR>
 
   nmap <buffer> <silent> <C-o> <Plug>(gh_issue_open_browser)
@@ -92,9 +93,15 @@ function! s:set_issue_list(resp) abort
   nmap <buffer> <silent> ghc   <Plug>(gh_issue_close)
   nmap <buffer> <silent> gho   <Plug>(gh_issue_open)
   nmap <buffer> <silent> ghm   <Plug>(gh_issue_open_comment)
+  nmap <buffer> <silent> ghn   <Plug>(gh_issue_new)
   nmap <buffer> <silent> ghy   <Plug>(gh_issue_url_yank)
 
   call gh#provider#preview#open(function('s:get_preview_info'))
+endfunction
+
+function! s:new_issue()
+  call execute(printf('e gh://%s/%s/issues/new',
+        \ b:gh_issue_list.repo.owner, b:gh_issue_list.repo.name))
 endfunction
 
 function! s:get_preview_info() abort
