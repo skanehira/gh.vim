@@ -1,5 +1,6 @@
-# gh.vim
-Vim/Neovim plugin for GitHub
+# gh.vim - Vim/Neovim plugin for GitHub
+gh.vim provides some featuers of GitHub use it on Vim.  
+For instance, you can see issue list or create issue, and GitHub Actions status, etc.  
 
 ![](https://i.gyazo.com/503dfe0eba487449f19d1c93e248902c.png)
 
@@ -24,9 +25,6 @@ Vim/Neovim plugin for GitHub
 ## Requirements
 - curl
 
-## Installation
-You can add this repo using your favorite plugin manager.
-
 ## Usage
 
 If you logged in with [`gh`](https://github.com/cli/cli) command, the access token is automatically fetched.
@@ -37,10 +35,10 @@ If you want to overwrite the token or set manually, write your [personal access 
 let g:gh_token = 'xxxxxxxxxxxxxxxxxxxx'
 ```
 
-`gh.vim` just provides virtual buffers likes `gh://:owner/:repo/issues`, no any commands.
+`gh.vim` just provides virtual buffers likes `gh://:owner/:repo/issues`, no any commands.  
 `:owner` is user name or organization name, `:repo` is repository name.
 
-If you want see issue list, please open buffer likes bellow
+If you want see issue list, please open buffer like bellow.
 
 ```
 :new gh://skanehira/gh.vim/issues
