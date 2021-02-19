@@ -515,7 +515,6 @@ function! s:set_issue_comments_body(resp) abort
   nmap <buffer> <silent> ghy <Plug>(gh_issue_comment_url_yank)
 
   call gh#provider#preview#open(function('s:get_comment_preview_info'))
-  normal ghp
 endfunction
 
 function! s:get_comment_from_cache(id) abort
