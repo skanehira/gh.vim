@@ -59,7 +59,7 @@ function! s:set_issue_list(resp) abort
         \ 'number': printf('#%d', issue.number),
         \ 'state': issue.state,
         \ 'user': printf('@%s', issue.user.login),
-        \ 'assignees': len(issue.assignees) > 0 ? printf('@%s', join(map(copy(issue.assignees), {_, assignee -> assignee.login}), ", ")) : '',
+        \ 'assignees': len(issue.assignees) > 0 ? join(map(copy(issue.assignees), {_, assignee -> printf('@%s', assignee.login)}), " ") : '',
         \ 'title': issue.title,
         \ 'body': split(issue.body, '\r\?\n'),
         \ 'url': url .. issue.number,
