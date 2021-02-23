@@ -256,6 +256,9 @@ function! s:create_issue() abort
         \ 'title': b:gh_issue_title,
         \ 'body': join(getline(1, '$'), "\r\n"),
         \ }
+  if b:gh_issue_assignee !=# '-'
+    let data['assignees'] = [ b:gh_issue_assignee ]
+  endif
 
   call gh#github#issues#new(b:gh_issue_new.owner, b:gh_issue_new.name, data)
         \.then(function('s:create_issue_success'))
@@ -271,22 +274,69 @@ function! s:create_issue_success(resp) abort
   call gh#gh#message(printf('new issue: %s', a:resp.body.html_url))
 endfunction
 
-function! s:set_issue_template_buffer(resp) abort
-  let gh_issue_title = input('[gh.vim] issue title ')
+function s:set_issue_title(resp) abort
+  let b:gh_issue_template = a:resp
+  let b:gh_issue_title = input('[gh.vim] issue title ')
   echom ''
   redraw
-  if gh_issue_title is# ''
+  if b:gh_issue_title is# ''
     call gh#gh#error_message('no issue title')
     return
   endif
+  call s:get_assignees_list()
+endfunction
 
+function! s:get_assignees_list() abort
+  call gh#github#repos#get_assignees(b:gh_issue_new.owner, b:gh_issue_new.name)
+        \.then(function('s:open_assignees_list'))
+        \.catch({err -> execute('%d_ | call gh#gh#set_message_buf(err.body)', '')})
+endfunction
+
+function! s:open_assignees_list(resp) abort
+  let issue_new_assignees = ["-"]
+  for user in a:resp.body
+    call add(issue_new_assignees, user.login)
+  endfor
+
+  let gh_issue_new = b:gh_issue_new
+  let gh_issue_new_bufid = b:gh_issues_new_bufid
+  let gh_issue_template = b:gh_issue_template
+  let gh_issue_title = b:gh_issue_title
+
+  call execute(printf('e gh://repos/%s/%s/assignees', b:gh_issue_new.owner, b:gh_issue_new.name))
+  call setline(1, issue_new_assignees)
+  let b:gh_issue_assignees_bufid = bufnr()
+
+  " restore buffer variable
+  let b:gh_issue_new = gh_issue_new
+  let b:gh_issues_new_bufid = gh_issue_new_bufid
+  let b:gh_issue_template = gh_issue_template
+  let b:gh_issue_title = gh_issue_title
+
+  setlocal buftype=acwrite
+  setlocal nomodifiable
+  nnoremap <buffer> <silent> q :q<CR>
+  nnoremap <buffer> <silent> <Plug>(set_assignee) :<C-u>call <SID>set_assignee()<CR>
+  nmap <buffer> <CR> <Plug>(set_assignee)
+endfunction
+
+function s:set_assignee() abort
+  let b:gh_issue_assignee = trim(getline("."))
+  call s:set_issue_template_buffer()
+endfunction
+
+function! s:set_issue_template_buffer() abort
   " store buffer variable because create new buffer to edit issue body
   let gh_issue_new = b:gh_issue_new
   " store buffer-id to delete the buffer just after creating new buffer below,
   " only when the repo has no issue template
   let gh_issue_new_bufid = b:gh_issues_new_bufid
+  let gh_issue_assignees_bufid = b:gh_issue_assignees_bufid
+  let gh_issue_title = b:gh_issue_title
+  let gh_issue_template = b:gh_issue_template
+  let gh_issue_assignee = b:gh_issue_assignee
 
-  call execute(printf('e gh://%s/%s/issues/%s', b:gh_issue_new.owner, b:gh_issue_new.name, gh_issue_title))
+  call execute(printf('e! gh://%s/%s/issues/%s', b:gh_issue_new.owner, b:gh_issue_new.name, gh_issue_title))
   call gh#map#apply('gh-buffer-issue-new', bufnr())
   setlocal buftype=acwrite
   setlocal ft=markdown
@@ -294,12 +344,14 @@ function! s:set_issue_template_buffer(resp) abort
   " restore buffer variable
   let b:gh_issue_title = gh_issue_title
   let b:gh_issue_new = gh_issue_new
+  let b:gh_issue_assignee = gh_issue_assignee
 
-  if !empty(a:resp.body)
-    call setline(1, split(a:resp.body, '\r'))
+  if !empty(gh_issue_template.body)
+    call setline(1, split(gh_issue_template.body, '\r'))
   else
     execute(printf('%dbw!', gh_issue_new_bufid))
   endif
+  call execute(printf('%dbw!', gh_issue_assignees_bufid))
 
   setlocal nomodified
   nnoremap <buffer> <silent> q :q<CR>
@@ -313,13 +365,13 @@ endfunction
 function! s:get_template() abort
   let url = b:gh_template_files[line('.')-1].url
   call gh#http#get(url)
-        \.then(function('s:set_issue_template_buffer'))
+        \.then(function('s:set_issue_title'))
         \.catch({err -> execute('%d_ | call gh#gh#set_message_buf(err.body)', '')})
 endfunction
 
 function! s:open_template_list(files) abort
   if empty(a:files)
-    call s:set_issue_template_buffer({'body': ''})
+    call s:set_issue_title({'body': ''})
     return
   endif
   let b:gh_template_files = a:files

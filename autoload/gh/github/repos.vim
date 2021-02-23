@@ -56,3 +56,8 @@ function! gh#github#repos#get_repo(owner, repo) abort
   let url = printf('https://api.github.com/repos/%s/%s', a:owner, a:repo)
   return gh#http#get(url)
 endfunction
+
+function! gh#github#repos#get_assignees(owner, repo) abort
+  let url = printf('https://api.github.com/repos/%s/%s/assignees', a:owner, a:repo)
+  return gh#http#get(url)
+endfunction
