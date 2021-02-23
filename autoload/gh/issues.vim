@@ -253,11 +253,11 @@ endfunction
 function! s:create_issue() abort
   call gh#gh#message('issue creating...')
   let data = {
-        \ 'title': b:gh_issue_title,
+        \ 'title': b:gh_issue_new.title,
         \ 'body': join(getline(1, '$'), "\r\n"),
         \ }
-  if b:gh_issue_assignee !=# '-'
-    let data['assignees'] = [ b:gh_issue_assignee ]
+  if b:gh_issue_new.assignee !=# '-'
+    let data['assignees'] = [ b:gh_issue_new.assignee ]
   endif
 
   call gh#github#issues#new(b:gh_issue_new.owner, b:gh_issue_new.name, data)
@@ -275,14 +275,15 @@ function! s:create_issue_success(resp) abort
 endfunction
 
 function s:set_issue_title(resp) abort
-  let b:gh_issue_template = a:resp
-  let b:gh_issue_title = input('[gh.vim] issue title ')
+  let gh_issue_title = input('[gh.vim] issue title ')
   echom ''
   redraw
-  if b:gh_issue_title is# ''
+  if gh_issue_title is# ''
     call gh#gh#error_message('no issue title')
     return
   endif
+  let b:gh_issue_new['title'] = gh_issue_title
+  let b:gh_issue_new['issue_template_list'] = a:resp.body
   call s:get_assignees_list()
 endfunction
 
@@ -300,8 +301,6 @@ function! s:open_assignees_list(resp) abort
 
   let gh_issue_new = b:gh_issue_new
   let gh_issue_new_bufid = b:gh_issues_new_bufid
-  let gh_issue_template = b:gh_issue_template
-  let gh_issue_title = b:gh_issue_title
 
   call execute(printf('e gh://repos/%s/%s/assignees', b:gh_issue_new.owner, b:gh_issue_new.name))
   call setline(1, issue_new_assignees)
@@ -310,8 +309,6 @@ function! s:open_assignees_list(resp) abort
   " restore buffer variable
   let b:gh_issue_new = gh_issue_new
   let b:gh_issues_new_bufid = gh_issue_new_bufid
-  let b:gh_issue_template = gh_issue_template
-  let b:gh_issue_title = gh_issue_title
 
   setlocal buftype=acwrite
   setlocal nomodifiable
@@ -321,7 +318,7 @@ function! s:open_assignees_list(resp) abort
 endfunction
 
 function s:set_assignee() abort
-  let b:gh_issue_assignee = trim(getline("."))
+  let b:gh_issue_new['assignee'] = trim(getline("."))
   call s:set_issue_template_buffer()
 endfunction
 
@@ -332,22 +329,18 @@ function! s:set_issue_template_buffer() abort
   " only when the repo has no issue template
   let gh_issue_new_bufid = b:gh_issues_new_bufid
   let gh_issue_assignees_bufid = b:gh_issue_assignees_bufid
-  let gh_issue_title = b:gh_issue_title
-  let gh_issue_template = b:gh_issue_template
-  let gh_issue_assignee = b:gh_issue_assignee
 
-  call execute(printf('e! gh://%s/%s/issues/%s', b:gh_issue_new.owner, b:gh_issue_new.name, gh_issue_title))
+  call execute(printf('e! gh://%s/%s/issues/%s',
+        \ b:gh_issue_new.owner, b:gh_issue_new.name, b:gh_issue_new.title))
   call gh#map#apply('gh-buffer-issue-new', bufnr())
   setlocal buftype=acwrite
   setlocal ft=markdown
 
   " restore buffer variable
-  let b:gh_issue_title = gh_issue_title
   let b:gh_issue_new = gh_issue_new
-  let b:gh_issue_assignee = gh_issue_assignee
 
-  if !empty(gh_issue_template.body)
-    call setline(1, split(gh_issue_template.body, '\r'))
+  if !empty(b:gh_issue_new.issue_template_list)
+    call setline(1, split(b:gh_issue_new.issue_template_list, '\r'))
   else
     execute(printf('%dbw!', gh_issue_new_bufid))
   endif
