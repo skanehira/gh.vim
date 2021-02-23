@@ -59,22 +59,22 @@ function! s:set_issue_list(resp) abort
         \ 'number': printf('#%d', issue.number),
         \ 'state': issue.state,
         \ 'user': printf('@%s', issue.user.login),
+        \ 'assignees': len(issue.assignees) > 0 ? printf('@%s', join(map(copy(issue.assignees), {_, assignee -> assignee.login}), ", ")) : '',
         \ 'title': issue.title,
         \ 'body': split(issue.body, '\r\?\n'),
         \ 'url': url .. issue.number,
         \ 'labels': len(issue.labels) > 0 ? printf('(%s)', join(map(copy(issue.labels), {_, label -> label.name}), ", ")) : '',
         \ 'comment': issue.comments > 0 ? printf("\uf41f %d", issue.comments) : '',
-        \ 'assignees': len(issue.assignees) > 0 ? printf('@%s', join(map(copy(issue.assignees), {_, assignee -> assignee.login}), ", ")) : 'no-assignees',
         \ }})
 
   let header = [
         \ 'number',
         \ 'state',
         \ 'user',
+        \ 'assignees',
         \ 'title',
         \ 'labels',
         \ 'comment',
-        \ 'assignees',
         \ ]
 
   let list['header'] = header
