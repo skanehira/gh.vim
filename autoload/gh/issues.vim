@@ -312,7 +312,7 @@ function! s:open_assignees_list(resp) abort
 
   setlocal buftype=acwrite
   setlocal nomodifiable
-  nnoremap <buffer> <silent> q :q<CR>
+  nnoremap <buffer> <silent> q :bw!<CR>
   nnoremap <buffer> <silent> <Plug>(set_assignee) :<C-u>call <SID>set_assignee()<CR>
   nmap <buffer> <CR> <Plug>(set_assignee)
 endfunction
