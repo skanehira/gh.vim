@@ -214,6 +214,12 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 <Plug>(gh_pull_url_yank)			*<Plug>(gh_pull_url_yank)*
 	yank pull request url
 
+<Plug>(gh_pull_merge)				*<Plug>(gh_pull_merge)*
+	merge pull request
+	at frist you should select merge method(merge, rebase, squash)
+	if method is merge or squash, then you should input commit title.
+	after input commit title, you can choise whether edit commit message.
+
 <Plug>(gh_issue_open_browser)			*<Plug>(gh_issue_open_browser)*
 	open issue on browser
 
@@ -361,6 +367,7 @@ default mappings
 				`normal`	<C-k>		<Plug>(gh_list_mark_up)
 				`normal`	ghd		<Plug>(gh_pull_diff)
 				`normal`	ghy		<Plug>(gh_pull_url_yank)
+				`normal`	ghm		<Plug>(gh_pull_merge)
 |gh-buffer-repo-list|		`normal`	<C-h>		<Plug>(gh_repo_list_prev)
 				`normal`	<C-l>		<Plug>(gh_repo_list_next)
 				`normal`	<C-o>		<Plug>(gh_repo_open_browser)

@@ -10,7 +10,7 @@ For instance, you can see issue list or create issue, and GitHub Actions status,
 - issue comments
   - create/edit/list
 - pull request
-  - diff/list
+  - diff/list/merge
 - repository
   - list/show README
 - project
@@ -79,3 +79,6 @@ currently `gh.vim` provides buffers is bellow.
 
 ## Author
 skanehira
+
+## Thanks
+- [prabirshrestha/quickpick.vim](https://github.com/prabirshrestha/quickpick.vim) is embeded
