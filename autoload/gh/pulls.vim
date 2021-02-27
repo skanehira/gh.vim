@@ -2,6 +2,9 @@
 " Author: skanehira
 " License: MIT
 
+let s:MERGE_METHOD = {'Create a merge commit': 'merge', 'Squash and merge': 'squash', 'Rebase and merge': 'rebase'}
+let s:MERGE_METHODS = keys(s:MERGE_METHOD)
+
 function! s:set_pull_list(resp) abort
   let list = {
         \ 'bufname': printf('gh://%s/%s/pulls', b:gh_pull_list.repo.owner, b:gh_pull_list.repo.name),
@@ -42,9 +45,77 @@ function! s:set_pull_list(resp) abort
   nnoremap <buffer> <silent> <Plug>(gh_pull_open_browser) :<C-u>call <SID>pull_open()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_pull_diff) :<C-u>call <SID>pull_open_diff()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_pull_url_yank) :<C-u>call <SID>pull_url_yank()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_pull_merge) :<C-u>call <SID>select_merge_method()<CR>
   nmap <buffer> <silent> <C-o> <Plug>(gh_pull_open_browser)
   nmap <buffer> <silent> ghd <Plug>(gh_pull_diff)
   nmap <buffer> <silent> ghy <Plug>(gh_pull_url_yank)
+  nmap <buffer> <silent> ghm <Plug>(gh_pull_merge)
+endfunction
+
+function! s:on_accept_merge(data, name) abort
+  call gh#provider#quickpick#close()
+  redraw!
+  let method = s:MERGE_METHOD[a:data.items[0]]
+  let s:gh_merge_info['method'] = method
+  if method is# 'merge' || method is# 'squash'
+    let s:gh_merge_info['title'] = input('commit title: ')
+    if input('edit commit message?(y/n)') =~ '^y'
+      exe printf('new gh://%s/%s/pulls/%s/message', s:gh_merge_info.owner, s:gh_merge_info.repo, s:gh_merge_info.number)
+      setlocal buftype=acwrite
+      setlocal ft=markdown
+      augroup gh-create-pr-message
+        au!
+        au BufWriteCmd <buffer> call s:on_merge_pull()
+      augroup END
+    else
+      call s:merge_pull()
+    endif
+  elseif method is# 'rebase'
+    call s:merge_pull()
+  endif
+endfunction
+
+function! s:on_merge_pull() abort
+  let s:gh_merge_info['message'] = join(getline(1, '$'), "\r\n")
+  call s:merge_pull()
+endfunction
+
+function! s:merge_pull() abort
+  let body = {
+        \ 'merge_method': s:gh_merge_info.method,
+        \ }
+  if has_key(s:gh_merge_info, 'title') | let body['commit_title'] = s:gh_merge_info.title | endif
+  if has_key(s:gh_merge_info, 'message') | let body['commit_message'] = s:gh_merge_info.message | endif
+
+  call gh#gh#message('merging...')
+  call gh#github#pulls#merge(s:gh_merge_info.owner, s:gh_merge_info.repo, s:gh_merge_info.number, body)
+        \.then({-> execute('bw! | call gh#gh#message("merged")', '')})
+        \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
+endfunction
+
+function! s:on_change_merge_method(data, name) abort
+  call gh#provider#quickpick#on_change(a:data, a:name, s:MERGE_METHODS)
+endfunction
+
+function! s:select_merge_method() abort
+  let pr = gh#provider#list#current()
+  if empty(pr)
+    return
+  endif
+
+  let s:gh_merge_info = {
+        \ 'owner': b:gh_pull_list.repo.owner,
+        \ 'repo': b:gh_pull_list.repo.name,
+        \ 'number': pr.number[1:],
+        \ }
+
+  call gh#provider#quickpick#open({
+        \ 'items': s:MERGE_METHODS,
+        \ 'filter': 0,
+        \ 'debounce': 0,
+        \ 'on_accept': function('s:on_accept_merge'),
+        \ 'on_change': function('s:on_change_merge_method'),
+        \})
 endfunction
 
 function! s:pull_url_yank() abort

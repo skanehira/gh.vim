@@ -20,3 +20,12 @@ function! gh#github#pulls#diff(owner, repo, number) abort
         \ }
   return gh#http#request(settings)
 endfunction
+
+function! gh#github#pulls#merge(owner, repo, number, data) abort
+  let settings = {
+        \ 'method': 'PUT',
+        \ 'url': printf('https://api.github.com/repos/%s/%s/pulls/%s/merge', a:owner, a:repo, a:number),
+        \ 'data': a:data,
+        \ }
+  return gh#http#request(settings)
+endfunction
