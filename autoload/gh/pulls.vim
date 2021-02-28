@@ -58,7 +58,10 @@ function! s:on_accept_merge(data, name) abort
   let method = s:MERGE_METHOD[a:data.items[0]]
   let s:gh_merge_info['method'] = method
   if method is# 'merge' || method is# 'squash'
-    let s:gh_merge_info['title'] = input('commit title: ')
+    let title = input(printf('commit title: %s -> ', s:gh_merge_info.title))
+    if !empty(title)
+      let s:gh_merge_info['title'] = title
+    endif
     if input('edit commit message?(y/n)') =~ '^y'
       exe printf('new gh://%s/%s/pulls/%s/message', s:gh_merge_info.owner, s:gh_merge_info.repo, s:gh_merge_info.number)
       setlocal buftype=acwrite
@@ -77,19 +80,21 @@ endfunction
 
 function! s:on_merge_pull() abort
   let s:gh_merge_info['message'] = join(getline(1, '$'), "\r\n")
+  bw!
   call s:merge_pull()
 endfunction
 
 function! s:merge_pull() abort
+  redraw!
   let body = {
         \ 'merge_method': s:gh_merge_info.method,
         \ }
-  if has_key(s:gh_merge_info, 'title') | let body['commit_title'] = s:gh_merge_info.title | endif
+  let body['commit_title'] = s:gh_merge_info.title
   if has_key(s:gh_merge_info, 'message') | let body['commit_message'] = s:gh_merge_info.message | endif
 
   call gh#gh#message('merging...')
   call gh#github#pulls#merge(s:gh_merge_info.owner, s:gh_merge_info.repo, s:gh_merge_info.number, body)
-        \.then({-> execute('bw! | call gh#gh#message("merged")', '')})
+        \.then({-> execute('call gh#gh#message("merged")', '')})
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
 endfunction
 
@@ -106,6 +111,7 @@ function! s:select_merge_method() abort
   let s:gh_merge_info = {
         \ 'owner': b:gh_pull_list.repo.owner,
         \ 'repo': b:gh_pull_list.repo.name,
+        \ 'title': pr.title,
         \ 'number': pr.number[1:],
         \ }
 
