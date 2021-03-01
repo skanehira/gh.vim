@@ -26,7 +26,8 @@ function! s:set_pull_list(resp) abort
         \ 'user': printf('@%s', pr.user.login),
         \ 'title': pr.title,
         \ 'labels': len(pr.labels) > 0 ? printf('(%s)', join(map(copy(pr.labels), {_, label -> label.name}), ", ")) : '',
-        \ 'url': url .. pr.number
+        \ 'url': url .. pr.number,
+        \ 'head': printf('%s/%s', pr.user.login, pr.head.ref),
         \ }})
 
   let header = [
@@ -58,7 +59,10 @@ function! s:on_accept_merge(data, name) abort
   let method = s:MERGE_METHOD[a:data.items[0]]
   let s:gh_merge_info['method'] = method
   if method is# 'merge' || method is# 'squash'
-    let s:gh_merge_info['title'] = input('commit title: ', s:gh_merge_info.title)
+    let title = method is# 'merge' ?
+          \ printf('Merge pull request #%s from %s', s:gh_merge_info.number, s:gh_merge_info.head) :
+          \ s:gh_merge_info.title
+    let s:gh_merge_info['title'] = input('commit title: ', title)
     if input('edit commit message?(y/n)') =~ '^y'
       exe printf('new gh://%s/%s/pulls/%s/message', s:gh_merge_info.owner, s:gh_merge_info.repo, s:gh_merge_info.number)
       setlocal buftype=acwrite
@@ -82,6 +86,7 @@ function! s:on_merge_pull() abort
 endfunction
 
 function! s:merge_pull() abort
+  redraw!
   let body = {
         \ 'title': s:gh_merge_info.title,
         \ 'merge_method': s:gh_merge_info.method,
@@ -109,6 +114,7 @@ function! s:select_merge_method() abort
         \ 'repo': b:gh_pull_list.repo.name,
         \ 'number': pr.number[1:],
         \ 'title': pr.title,
+        \ 'head': pr.head,
         \ }
 
   call gh#provider#quickpick#open({
