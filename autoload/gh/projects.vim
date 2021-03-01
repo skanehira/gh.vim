@@ -96,6 +96,7 @@ function! s:set_project_list_result(resp) abort
   nmap <buffer> <silent> <C-o> <Plug>(gh_project_open_browser)
   nmap <buffer> <silent> <CR> <Plug>(gh_project_open)
   nmap <buffer> <silent> ghy <Plug>(gh_project_url_yank)
+  call gh#help#set_keymap('projects')
 endfunction
 
 function! s:update_card_info(card, info) abort
@@ -346,6 +347,7 @@ function! s:set_project_column_list(resp) abort
   nmap <buffer> <silent> ghy <Plug>(gh_projects_card_url_yank)
   nmap <buffer> <silent> ghc <Plug>(gh_projects_card_close)
   nmap <buffer> <silent> gho <Plug>(gh_projects_card_open)
+  call gh#help#set_keymap('project-columns')
 endfunction
 
 function! s:open_project_columns(resp) abort

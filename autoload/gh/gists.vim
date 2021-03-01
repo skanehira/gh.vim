@@ -73,6 +73,8 @@ function! s:set_keymap() abort
   nmap <buffer> <silent> ghy   <Plug>(gh_gist_list_yank)
   nmap <buffer> <silent> ghf   <Plug>(gh_gist_list_fetch)
   nmap <buffer> <silent> ghe   <Plug>(gh_gist_edit_file)
+
+  call gh#help#set_keymap('gists')
 endfunction
 
 function! s:get_preview_info() abort
@@ -231,6 +233,8 @@ function! s:set_gist(gist) abort
   nmap <buffer> <silent> <C-o> <Plug>(gh_gist_list_open_browser)
   nmap <buffer> <silent> ghy   <Plug>(gh_gist_list_yank)
   nmap <buffer> <silent> ghe   <Plug>(gh_gist_edit_file)
+
+  call gh#help#set_keymap('gist')
 endfunction
 
 function! s:edit_gist_file() abort

@@ -85,6 +85,8 @@ function! s:set_keymap() abort
   nmap <buffer> <silent> ghe <Plug>(gh_files_edit)
   nmap <buffer> <silent> ghy <Plug>(gh_files_yank_url)
   nmap <buffer> <silent> <C-o> <Plug>(gh_files_open_browser)
+
+  call gh#help#set_keymap('files')
 endfunction
 
 function! s:make_tree(body) abort
@@ -188,6 +190,8 @@ function! s:set_edit_keymap() abort
     vnoremap <buffer> <silent> <Plug>(gh_file_open_browser) :<C-u>call <SID>yank_or_open_file_url('open')<CR>
     vmap <buffer> <silent> ghy <Plug>(gh_file_yank_url)
     vmap <buffer> <silent> <C-o> <Plug>(gh_file_open_browser)
+
+    call gh#help#set_keymap('file')
   endif
 endfunction
 

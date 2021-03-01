@@ -72,6 +72,7 @@ function! s:set_repo_list(resp) abort
   nnoremap <buffer> <silent> <Plug>(gh_repo_show_readme) :<C-u>call <SID>repo_open_readme()<CR>
   nmap <buffer> <silent> <C-o> <Plug>(gh_repo_open_browser)
   nmap <buffer> <silent> gho <Plug>(gh_repo_show_readme)
+  call gh#help#set_keymap('repos')
 endfunction
 
 function! gh#repos#list() abort

@@ -12,6 +12,8 @@ function! gh#bookmark#list() abort
   nnoremap <buffer> <silent> <Plug>(gh_bookmark_open) :<C-u>call <SID>bookmark_open()<CR>
   nmap <buffer> <silent> gho <Plug>(gh_bookmark_open)
 
+  call gh#help#set_keymap('bookmark')
+
   let s:gh_bookmark_list_bufid = bufnr()
 
   if filereadable(s:gh_bookmark_file)
