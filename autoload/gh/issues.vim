@@ -37,6 +37,18 @@ function! s:edit_issue() abort
         \ open, b:gh_issue_list.repo.owner, b:gh_issue_list.repo.name, number))
 endfunction
 
+function! s:format_assignees(assignees) abort
+  if len(a:assignees) > 0 
+    let users = a:assignees
+    let result = ''
+    if len(a:assignees) > 2
+      return join(map(a:assignees[:1], {_, u -> printf('@%s', u.login)}), ' ') .. ' ...'
+    endif
+    return join(map(copy(a:assignees), {_, u -> printf('@%s', u.login)}), ' ')
+  endif
+  return ''
+endfunction
+
 function! s:set_issue_list(resp) abort
   " NOTE: issue may contain pull request
   call filter(a:resp.body, '!has_key(v:val, "pull_request")')
@@ -59,7 +71,7 @@ function! s:set_issue_list(resp) abort
         \ 'number': printf('#%d', issue.number),
         \ 'state': issue.state,
         \ 'user': printf('@%s', issue.user.login),
-        \ 'assignees': len(issue.assignees) > 0 ? join(map(copy(issue.assignees), {_, assignee -> printf('@%s', assignee.login)}), " ") : '',
+        \ 'assignees': s:format_assignees(issue.assignees),
         \ 'title': issue.title,
         \ 'body': split(issue.body, '\r\?\n'),
         \ 'url': url .. issue.number,
