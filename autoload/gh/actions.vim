@@ -58,6 +58,7 @@ function! s:set_action_list(resp) abort
   nmap <buffer> <silent> <C-o> <Plug>(gh_actions_open_browser)
   nmap <buffer> <silent> ghy <Plug>(gh_actions_yank_url)
   nmap <buffer> <silent> gho <Plug>(gh_actions_open_logs)
+  call gh#help#set_keymap('actions')
 endfunction
 
 function! s:get_selected_nodes() abort

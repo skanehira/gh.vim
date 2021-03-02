@@ -109,6 +109,7 @@ function! s:set_issue_list(resp) abort
   nmap <buffer> <silent> ghm   <Plug>(gh_issue_open_comment)
   nmap <buffer> <silent> ghn   <Plug>(gh_issue_new)
   nmap <buffer> <silent> ghy   <Plug>(gh_issue_url_yank)
+  call gh#help#set_keymap('issues')
 
   call gh#provider#preview#open(function('s:get_preview_info'))
 endfunction
@@ -392,9 +393,11 @@ function! s:set_issues_body(resp) abort
   setlocal nomodified buftype=acwrite ft=markdown
 
   nnoremap <buffer> <silent> <Plug>(gh_issue_comment_open_on_issue) :<C-u>call <SID>comments_open_on_issue()<CR>
-
   nmap <buffer> <silent> ghm <Plug>(gh_issue_comment_open_on_issue)
+
   nnoremap <buffer> <silent> q :q<CR>
+
+  call gh#help#set_keymap('issue-edit')
 
   exe printf('augroup gh-update-issue-%d', bufnr())
     au!
@@ -527,6 +530,7 @@ function! s:set_issue_comments_body(resp) abort
   nnoremap <buffer> <silent> <Plug>(gh_issue_comment_url_yank) :<C-u>call <SID>issue_comment_url_yank()<CR>
   nmap <buffer> <silent> <C-o> <Plug>(gh_issue_comment_open_browser)
   nmap <buffer> <silent> ghy <Plug>(gh_issue_comment_url_yank)
+  call gh#help#set_keymap('issue-comments')
 
   call gh#provider#preview#open(function('s:get_comment_preview_info'))
 endfunction

@@ -51,6 +51,7 @@ function! s:set_pull_list(resp) abort
   nmap <buffer> <silent> ghd <Plug>(gh_pull_diff)
   nmap <buffer> <silent> ghy <Plug>(gh_pull_url_yank)
   nmap <buffer> <silent> ghm <Plug>(gh_pull_merge)
+  call gh#help#set_keymap('pulls')
 endfunction
 
 function! s:on_accept_merge(data, name) abort
