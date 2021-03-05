@@ -255,10 +255,8 @@ function! s:create_issue() abort
   let data = {
         \ 'title': b:gh_issue_new.title,
         \ 'body': join(getline(1, '$'), "\r\n"),
+        \ 'assignees': b:gh_issue_new.assignees,
         \ }
-  if b:gh_issue_new.assignee !=# '-'
-    let data['assignees'] = [ b:gh_issue_new.assignee ]
-  endif
 
   call gh#github#issues#new(b:gh_issue_new.owner, b:gh_issue_new.name, data)
         \.then(function('s:create_issue_success'))
@@ -274,7 +272,7 @@ function! s:create_issue_success(resp) abort
   call gh#gh#message(printf('new issue: %s', a:resp.body.html_url))
 endfunction
 
-function s:set_issue_title(resp) abort
+function! s:set_issue_title(resp) abort
   let gh_issue_title = input('[gh.vim] issue title ')
   echom ''
   redraw
@@ -294,32 +292,35 @@ function! s:get_assignees_list() abort
 endfunction
 
 function! s:open_assignees_list(resp) abort
-  let issue_new_assignees = ["-"]
+  let s:issue_new_assignees = ["-"]
   for user in a:resp.body
-    call add(issue_new_assignees, user.login)
+    call add(s:issue_new_assignees, user.login)
   endfor
 
-  let gh_issue_new = b:gh_issue_new
-  let gh_issue_new_bufid = b:gh_issues_new_bufid
-
-  call execute(printf('e gh://repos/%s/%s/assignees', b:gh_issue_new.owner, b:gh_issue_new.name))
-  call setline(1, issue_new_assignees)
-  let b:gh_issue_assignees_bufid = bufnr()
-
-  " restore buffer variable
-  let b:gh_issue_new = gh_issue_new
-  let b:gh_issues_new_bufid = gh_issue_new_bufid
-
-  setlocal buftype=acwrite
-  setlocal nomodifiable
-  nnoremap <buffer> <silent> q :bw!<CR>
-  nnoremap <buffer> <silent> <Plug>(set_assignee) :<C-u>call <SID>set_assignee()<CR>
-  nmap <buffer> <CR> <Plug>(set_assignee)
+  call gh#provider#quickpick#open({
+        \ 'items': s:issue_new_assignees,
+        \ 'filter': 0,
+        \ 'debounce': 0,
+        \ 'multi_select': 1,
+        \ 'on_accept': function('s:on_accept_assignees'),
+        \ 'on_change': function('s:on_change_assignees'),
+        \})
 endfunction
 
-function s:set_assignee() abort
-  let b:gh_issue_new['assignee'] = trim(getline("."))
+function! s:on_accept_assignees(data, name) abort
+  call gh#provider#quickpick#close()
+  let assignee_list = []
+  for assignee in a:data.items
+    if assignee !=# '-'
+      call add(assignee_list, assignee)
+    endif
+  endfor
+  let b:gh_issue_new['assignees'] = assignee_list
   call s:set_issue_template_buffer()
+endfunction
+
+function s:on_change_assignees(data, name) abort
+  call gh#provider#quickpick#on_change(a:data, a:name, s:issue_new_assignees)
 endfunction
 
 function! s:set_issue_template_buffer() abort
@@ -328,7 +329,6 @@ function! s:set_issue_template_buffer() abort
   " store buffer-id to delete the buffer just after creating new buffer below,
   " only when the repo has no issue template
   let gh_issue_new_bufid = b:gh_issues_new_bufid
-  let gh_issue_assignees_bufid = b:gh_issue_assignees_bufid
 
   call execute(printf('e! gh://%s/%s/issues/%s',
         \ b:gh_issue_new.owner, b:gh_issue_new.name, b:gh_issue_new.title))
@@ -344,7 +344,6 @@ function! s:set_issue_template_buffer() abort
   else
     execute(printf('%dbw!', gh_issue_new_bufid))
   endif
-  call execute(printf('%dbw!', gh_issue_assignees_bufid))
 
   setlocal nomodified
   nnoremap <buffer> <silent> q :q<CR>
