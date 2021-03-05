@@ -38,7 +38,7 @@ function! s:edit_issue() abort
 endfunction
 
 function! s:format_assignees(assignees) abort
-  if len(a:assignees) > 0 
+  if len(a:assignees) > 0
     let users = a:assignees
     let result = ''
     if len(a:assignees) > 2
