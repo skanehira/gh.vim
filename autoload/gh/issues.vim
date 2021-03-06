@@ -353,7 +353,7 @@ function! s:update_issue_success(resp) abort
 endfunction
 
 function! s:update_issue() abort
-  let title = input(printf('[title] %s -> ', b:gh_issue.title))
+  let title = input('title: ', b:gh_issue.title)
   echom ''
   redraw!
 
