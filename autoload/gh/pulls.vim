@@ -81,19 +81,18 @@ function! s:on_accept_merge(data, name) abort
 endfunction
 
 function! s:on_merge_pull() abort
-  bw!
   let s:gh_merge_info['message'] = join(getline(1, '$'), "\r\n")
+  bw!
   call s:merge_pull()
 endfunction
 
 function! s:merge_pull() abort
   redraw!
   let body = {
-        \ 'title': s:gh_merge_info.title,
+        \ 'commit_title': s:gh_merge_info.title,
         \ 'merge_method': s:gh_merge_info.method,
         \ }
   if has_key(s:gh_merge_info, 'message') | let body['commit_message'] = s:gh_merge_info.message | endif
-
   call gh#gh#message('merging...')
   call gh#github#pulls#merge(s:gh_merge_info.owner, s:gh_merge_info.repo, s:gh_merge_info.number, body)
         \.then({-> execute('call gh#gh#message("merged")', '')})
