@@ -235,6 +235,9 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 <Plug>(gh_issue_new)				*<Plug>(gh_issue_new)*
 	create new issue
 
+<Plug>(gh_issue_edit_title)			*<Plug>(gh_issue_edit_title)*
+	edit issue title
+
 <Plug>(gh_issue_url_yank)			*<Plug>(gh_issue_url_yank)*
 	yank issue url
 
@@ -344,6 +347,7 @@ default mappings
 				`normal`	gho		<Plug>(gh_issue_open)
 				`normal`	ghm		<Plug>(gh_issue_open_comment)
 				`normal`	ghn		<Plug>(gh_issue_new)
+				`normal`	ghr		<Plug>(gh_issue_edit_title)
 				`normal`	ghy		<Plug>(gh_issue_url_yank)
 				`normal`	ghp		<Plug>(gh_preview_toggle)
 				`normal`	<C-n>		<Plug>(gh_preview_move_down)
