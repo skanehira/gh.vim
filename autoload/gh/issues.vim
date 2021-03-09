@@ -100,6 +100,7 @@ function! s:set_issue_list(resp) abort
   nnoremap <buffer> <silent> <Plug>(gh_issue_open) :<C-u>call <SID>set_issue_state('open')<CR>
   nnoremap <buffer> <silent> <Plug>(gh_issue_open_comment) :<C-u>call <SID>issue_open_comment()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_issue_new) :<C-u>call <SID>new_issue()<CR>
+  nnoremap <buffer> <silent> <Plug>(gh_issue_edit_title) :<C-u>call <SID>edit_issue_title()<CR>
   nnoremap <buffer> <silent> <Plug>(gh_issue_url_yank) :<C-u>call <SID>issue_url_yank()<CR>
 
   nmap <buffer> <silent> <C-o> <Plug>(gh_issue_open_browser)
@@ -108,10 +109,28 @@ function! s:set_issue_list(resp) abort
   nmap <buffer> <silent> gho   <Plug>(gh_issue_open)
   nmap <buffer> <silent> ghm   <Plug>(gh_issue_open_comment)
   nmap <buffer> <silent> ghn   <Plug>(gh_issue_new)
+  nmap <buffer> <silent> ghr   <Plug>(gh_issue_edit_title)
   nmap <buffer> <silent> ghy   <Plug>(gh_issue_url_yank)
   call gh#help#set_keymap('issues')
 
   call gh#provider#preview#open(function('s:get_preview_info'))
+endfunction
+
+function! s:edit_issue_title() abort
+  let title_before = gh#provider#list#current().title
+  let userInput = input("Enter title of issue.\nissue title: ", title_before)
+
+  if trim(userInput) ==# title_before
+    call gh#gh#error_message('title has not changed')
+    return
+  endif
+
+  let data = { 'title': userInput }
+  let number = gh#provider#list#current().number[1:]
+  call gh#gh#message('issue updating...')
+  call gh#github#issues#update(b:gh_issue_list.repo.owner, b:gh_issue_list.repo.name, number, data)
+        \.then(function('s:update_issue_success'))
+        \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
 endfunction
 
 function! s:new_issue()
