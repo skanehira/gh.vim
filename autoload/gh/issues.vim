@@ -293,7 +293,7 @@ endfunction
 
 function! s:open_assignees_list(resp) abort
   let s:issue_new_assignees = ["-"]
-  for user in a:resp.body
+  for user in a:resp.assignees
     call add(s:issue_new_assignees, user.login)
   endfor
 

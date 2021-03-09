@@ -4,6 +4,19 @@
 
 let s:Base64 = vital#gh#import('Data.Base64')
 
+let s:assignee_list_query =<< trim END
+{
+  repository(name: "%s", owner: "%s") {
+    assignableUsers(first: 10) {
+      nodes {
+        login
+      }
+    }
+  }
+}
+END
+let s:assignee_list_query = join(s:assignee_list_query)
+
 function! gh#github#repos#list(owner, param) abort
   let url = printf('https://api.github.com/users/%s/repos', a:owner)
   if a:owner is# 'user'
@@ -58,6 +71,8 @@ function! gh#github#repos#get_repo(owner, repo) abort
 endfunction
 
 function! gh#github#repos#get_assignees(owner, repo) abort
-  let url = printf('https://api.github.com/repos/%s/%s/assignees', a:owner, a:repo)
-  return gh#http#get(url)
+  let query = {'query': printf(s:assignee_list_query, a:repo, a:owner)}
+  return gh#graphql#query(query).then({resp -> {
+        \ 'assignees': resp.body.data.repository.assignableUsers.nodes
+        \ }})
 endfunction
