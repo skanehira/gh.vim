@@ -126,7 +126,7 @@ function! s:edit_issue_title() abort
 
   let data = { 'title': new_title }
   let number = gh#provider#list#current().number[1:]
-  call gh#gh#message('issue updating...')
+  call gh#gh#message('issue title updating...')
   call gh#github#issues#update(b:gh_issue_list.repo.owner, b:gh_issue_list.repo.name, number, data)
         \.then(function('s:update_issue_success'))
         \.catch({err -> execute('call gh#gh#error_message(err.body)', '')})
