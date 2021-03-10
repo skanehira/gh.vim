@@ -120,7 +120,6 @@ function! s:edit_issue_title() abort
   let current_title = gh#provider#list#current().title
   let new_title = input("new issue title: ", current_title)
 
-    call gh#gh#error_message('title has not changed')
   if trim(new_title) ==# current_title
     return
   endif
