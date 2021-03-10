@@ -117,15 +117,15 @@ function! s:set_issue_list(resp) abort
 endfunction
 
 function! s:edit_issue_title() abort
-  let title_before = gh#provider#list#current().title
-  let userInput = input("Enter title of issue.\nissue title: ", title_before)
+  let current_title = gh#provider#list#current().title
+  let new_title = input("new issue title: ", current_title)
 
-  if trim(userInput) ==# title_before
     call gh#gh#error_message('title has not changed')
+  if trim(new_title) ==# current_title
     return
   endif
 
-  let data = { 'title': userInput }
+  let data = { 'title': new_title }
   let number = gh#provider#list#current().number[1:]
   call gh#gh#message('issue updating...')
   call gh#github#issues#update(b:gh_issue_list.repo.owner, b:gh_issue_list.repo.name, number, data)
