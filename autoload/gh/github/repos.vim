@@ -7,7 +7,7 @@ let s:Base64 = vital#gh#import('Data.Base64')
 let s:assignee_list_query =<< trim END
 {
   repository(name: "%s", owner: "%s") {
-    assignableUsers(first: 10) {
+    assignableUsers(first: 100) {
       nodes {
         login
       }
