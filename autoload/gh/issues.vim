@@ -292,7 +292,7 @@ function! s:get_assignees_list() abort
 endfunction
 
 function! s:open_assignees_list(resp) abort
-  let s:issue_new_assignees = ["-"]
+  let s:issue_new_assignees = []
   for user in a:resp.assignees
     call add(s:issue_new_assignees, user.login)
   endfor
@@ -311,9 +311,7 @@ function! s:on_accept_assignees(data, name) abort
   call gh#provider#quickpick#close()
   let assignee_list = []
   for assignee in a:data.items
-    if assignee !=# '-'
-      call add(assignee_list, assignee)
-    endif
+    call add(assignee_list, assignee)
   endfor
   let b:gh_issue_new['assignees'] = assignee_list
   call s:set_issue_template_buffer()
