@@ -132,7 +132,7 @@ function! s:open_diff_window(bufid) abort
 endfunction
 
 function! s:close_diff_window() abort
-  exe 'bw!' s:DIFF_LEFT_BUFID s:DIFF_RIGHT_BUFID
+  silent exe 'bw!' s:DIFF_LEFT_BUFID s:DIFF_RIGHT_BUFID
 endfunction
 
 function! s:init_diff_buf() abort
