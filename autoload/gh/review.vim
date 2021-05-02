@@ -17,6 +17,7 @@ function! gh#review#start() abort
 
   " TODO use this buf to display diff files?
   exe 'bw!' bufnr() | tabnew
+  call gh#gh#message('loading...')
   let s:DIFF_LEFT_BUFID = bufnr()
   call s:init_diff_buf()
 
@@ -67,6 +68,7 @@ function! s:on_change_dffi_file(data, name) abort
 endfunction
 
 function! s:on_accept_open_diff(data, name) abort
+  call gh#gh#message('loading...')
   call gh#provider#quickpick#close()
   let path = a:data.items[0]
   for file in s:diff_files
@@ -98,6 +100,7 @@ function! s:get_files_content(file) abort
     call s:Promise.all(promises)
           \.then({-> s:open_review_window()})
           \.catch({err -> gh#gh#error_message(err.body)})
+          \.finally({-> execute('echom ""', '')})
   endif
 endfunction
 
