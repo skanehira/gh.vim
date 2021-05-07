@@ -5,6 +5,7 @@
 let s:Promise = vital#gh#import('Async.Promise')
 let s:DIFF_LEFT_BUFID = -1
 let s:DIFF_RIGHT_BUFID = -1
+let s:diff_file_cache = {}
 
 function! gh#review#start() abort
   setlocal ft=gh-pulls-review
@@ -20,6 +21,8 @@ function! gh#review#start() abort
   call gh#gh#message('loading...')
   let s:DIFF_LEFT_BUFID = bufnr()
   call s:init_diff_buf()
+  " clear cache when open new buffer
+  let s:diff_file_cache = {}
 
   call gh#github#pulls#pull(s:gh_pull_review.owner, s:gh_pull_review.name, s:gh_pull_review.number)
         \.then({resp -> s:get_base_commit(resp)})
@@ -80,20 +83,31 @@ function! s:on_accept_open_diff(data, name) abort
   call gh#gh#error_message('not found file contents')
 endfunction
 
+function! s:add_diff_cache(url, resp) abort
+  let s:diff_file_cache[a:url] = a:resp
+  return a:resp
+endfunction
+
+function! s:get_file(url) abort
+  if has_key(s:diff_file_cache, a:url)
+    return s:Promise.resolve(s:diff_file_cache[a:url])
+  endif
+  return gh#github#repos#get_file(a:url)
+        \.then({resp -> s:add_diff_cache(a:url, resp)})
+endfunction
+
 function! s:get_files_content(file) abort
   let promises = []
   if empty(a:file.base_url)
     let s:base_diff = ''
   else
-    call add(promises, gh#github#repos#get_file(a:file.base_url)
-          \.then({resp -> execute('let s:base_diff = resp', '')}))
+    call add(promises, s:get_file(a:file.base_url).then({resp -> execute('let s:base_diff = resp', '')}))
   endif
 
   if empty(a:file.head_url)
     let s:head_diff = ''
   else
-    call add(promises, gh#github#repos#get_file(a:file.head_url)
-          \.then({resp -> execute('let s:head_diff = resp', '')}))
+    call add(promises, s:get_file(a:file.head_url).then({resp -> execute('let s:head_diff = resp', '')}))
   endif
 
   if !empty(promises)
