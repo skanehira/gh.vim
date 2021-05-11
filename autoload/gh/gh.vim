@@ -30,16 +30,16 @@ function! gh#gh#init() abort
       let oldbufid = bufnr()
 
       if !bufexists(new_bufname)
-        exe 'e' new_bufname
+        silent exe 'e' new_bufname
         call gh#gh#init()
       else
         if bufwinid(new_bufname) == -1
-          exe 'e' new_bufname
+          silent exe 'e' new_bufname
         else
-          exe 'b' new_bufname
+          silent exe 'b' new_bufname
         endif
       endif
-      exe 'bw!' oldbufid
+      silent exe 'bw!' oldbufid
     catch
       call gh#gh#error_message(v:exception)
     endtry
