@@ -8,8 +8,11 @@
 " }
 function! gh#provider#git#repo_info() abort
   if !executable('git')
-    call gh#gh#error_message('not found git')
-    return
+    throw 'not found git, please install git'
+  endif
+
+  if !isdirectory('.git')
+    throw 'there is not git repository'
   endif
 
   let remote = system('git remote get-url origin')
