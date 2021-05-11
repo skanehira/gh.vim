@@ -67,6 +67,16 @@ g:gh_open_issue_on_create			*g:gh_open_issue_on_create*
 ------------------------------------------------------------------------------
 BUFFER							*gh-buffer*
 
+gh://[pulls*\|issues*\|readme\|projects*\|actions*][?key=value]	*gh-buffer-current*
+	open current :owner/:repo's buffer.
+	if your repository's remote is `ssh@git@github.com/skanehira/gh.vim`
+	and open `gh://pulls`, the buffer will reopen as `gh://skanehira/gh.vim/pulls`
+	examples:
+		`gh://issues?state=all` -> `gh://:owner/:repo/issues?state=all`
+		`gh://issues/1` -> `gh://:owner/:repo/issues/1`
+		`gh://issues/1/comments` -> `gh://:owner/:repo/issues/1/comments`
+		`gh:/pulls/1/diff` -> `gh://:owner/:repo/pulls/1/diff`
+
 gh://:owner/:repo/issues[?state=open&..]		*gh-buffer-issue-list*
 	show :owner/:repo issues.
 	you can use query parameters(https://git.io/JUzlg)

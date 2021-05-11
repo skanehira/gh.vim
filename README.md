@@ -24,6 +24,7 @@ For instance, you can see issue list or create issue, and GitHub Actions status,
 
 ## Requirements
 - curl
+- git
 
 ## Usage
 
@@ -54,28 +55,29 @@ If you want see issue list, please open buffer like bellow.
 ## Buffer list
 currently `gh.vim` provides buffers is bellow.
 
-| buffer                                                    | description                        |
-|-----------------------------------------------------------|------------------------------------|
-| `gh://:owner/:repo/issues[?state=open&..]`                | issue list                         |
-| `gh://:owner/:repo/issues/:number`                        | edit issue                         |
-| `gh://:owner/:repo/issues/new`                            | new issue                          |
-| `gh://:owner/:repo/issues/:number/comments[?page=1&..]`   | issue comment list                 |
-| `gh://:owner/:repo/issues/:number/comments/new`           | new issue comment                  |
-| `gh://:owner/:repo/issues/:number/comments/:id`           | edit issue comment                 |
-| `gh://:owner/repos`                                       | repository list                    |
-| `gh://user/repos`                                         | authenticated user repository list |
-| `gh://:owner/:repo/readme`                                | repository readme                  |
-| `gh://:owner/:repo/pulls[?state=open&...]`                | pull request list                  |
-| `gh://:owner/:repo/pulls/:number/diff`                    | pull request list diff             |
-| `gh://:owner/:repo/projects`                              | project list                       |
-| `gh://orgs/:org/projects`                                 | organization project list          |
-| `gh://projects/:id/columns`                               | project column list                |
-| `gh://:owner/:repo/actions[?status=success&...]`          | github action's workflows/steps    |
-| `gh://:owner/:repo/[:branch/:tree_sha]/files[?recache=1]` | repository file tree               |
-| `gh://bookmarks`                                          | your bookmarks                     |
-| `gh://:owner/gists[?privacy=public]`                      | gist list                          |
-| `gh://:owner/gists/:id/:file`                             | edit gist file                     |
-| `gh://gists/new/:filename`                                | new gist                           |
+| buffer                                                        | description                                        |
+|---------------------------------------------------------------|----------------------------------------------------|
+| `gh://[pulls*|issues*|readme|projects*|actions*][?key=value]` | reopen buffer as current repository's :owner/:repo |
+| `gh://:owner/:repo/issues[?state=open&..]`                    | issue list                                         |
+| `gh://:owner/:repo/issues/:number`                            | edit issue                                         |
+| `gh://:owner/:repo/issues/new`                                | new issue                                          |
+| `gh://:owner/:repo/issues/:number/comments[?page=1&..]`       | issue comment list                                 |
+| `gh://:owner/:repo/issues/:number/comments/new`               | new issue comment                                  |
+| `gh://:owner/:repo/issues/:number/comments/:id`               | edit issue comment                                 |
+| `gh://:owner/repos`                                           | repository list                                    |
+| `gh://user/repos`                                             | authenticated user repository list                 |
+| `gh://:owner/:repo/readme`                                    | repository readme                                  |
+| `gh://:owner/:repo/pulls[?state=open&...]`                    | pull request list                                  |
+| `gh://:owner/:repo/pulls/:number/diff`                        | pull request list diff                             |
+| `gh://:owner/:repo/projects`                                  | project list                                       |
+| `gh://orgs/:org/projects`                                     | organization project list                          |
+| `gh://projects/:id/columns`                                   | project column list                                |
+| `gh://:owner/:repo/actions[?status=success&...]`              | github action's workflows/steps                    |
+| `gh://:owner/:repo/[:branch/:tree_sha]/files[?recache=1]`     | repository file tree                               |
+| `gh://bookmarks`                                              | your bookmarks                                     |
+| `gh://:owner/gists[?privacy=public]`                          | gist list                                          |
+| `gh://:owner/gists/:id/:file`                                 | edit gist file                                     |
+| `gh://gists/new/:filename`                                    | new gist                                           |
 
 ## Author
 skanehira
