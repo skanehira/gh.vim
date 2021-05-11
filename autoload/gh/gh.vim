@@ -17,9 +17,7 @@ endif
 function! gh#gh#init() abort
   setlocal nolist
   let bufname = bufname()
-  if bufname is# 'gh://user/repos/new'
-    call gh#repos#new()
-  elseif bufname =~# '^gh:\/\/[^/]\+\/repos$' || bufname =~# '^gh:\/\/[^/]\+\/repos?\+'
+  if bufname =~# '^gh:\/\/[^/]\+\/repos$' || bufname =~# '^gh:\/\/[^/]\+\/repos?\+'
     call gh#repos#list()
   elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/readme$'
     call gh#repos#readme()

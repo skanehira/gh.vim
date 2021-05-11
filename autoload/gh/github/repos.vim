@@ -43,15 +43,6 @@ function! s:decode_content(resp) abort
   return split(body, "\n")
 endfunction
 
-function! gh#github#repos#create(data) abort
-  let settings = {
-        \ 'method': 'POST',
-        \ 'url': 'https://api.github.com/user/repos',
-        \ 'data': a:data,
-        \ }
-  return gh#http#request(settings)
-endfunction
-
 function! gh#github#repos#get_repo(owner, repo) abort
   let url = printf('https://api.github.com/repos/%s/%s', a:owner, a:repo)
   return gh#http#get(url)
