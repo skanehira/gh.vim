@@ -220,6 +220,10 @@ you can use gh#map#add({buffer}, {mode}, {lhs}, {rhs}) to set key mappings.
 	if method is merge or squash, then you should input commit title.
 	after input commit title, you can choise whether edit commit message.
 
+<Plug>(gh_pull_review)				*<Plug>(gh_pull_review)*
+	review pull request
+	you can use `ghf` to select file to display diff window.
+
 <Plug>(gh_issue_open_browser)			*<Plug>(gh_issue_open_browser)*
 	open issue on browser
 
@@ -372,6 +376,7 @@ default mappings
 				`normal`	ghd		<Plug>(gh_pull_diff)
 				`normal`	ghy		<Plug>(gh_pull_url_yank)
 				`normal`	ghm		<Plug>(gh_pull_merge)
+				`normal`	ghr		<Plug>(gh_pull_review)
 |gh-buffer-repo-list|		`normal`	<C-h>		<Plug>(gh_repo_list_prev)
 				`normal`	<C-l>		<Plug>(gh_repo_list_next)
 				`normal`	<C-o>		<Plug>(gh_repo_open_browser)

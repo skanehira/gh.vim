@@ -11,6 +11,11 @@ function! gh#github#pulls#list(owner, repo, param) abort
   return gh#http#request(settings)
 endfunction
 
+function! gh#github#pulls#pull(owner, repo, number) abort
+  let url = printf('https://api.github.com/repos/%s/%s/pulls/%s', a:owner, a:repo, a:number)
+  return gh#http#get(url)
+endfunction
+
 function! gh#github#pulls#diff(owner, repo, number) abort
   let settings = {
         \ 'url': printf('https://api.github.com/repos/%s/%s/pulls/%s', a:owner, a:repo, a:number),
@@ -28,4 +33,9 @@ function! gh#github#pulls#merge(owner, repo, number, data) abort
         \ 'data': a:data,
         \ }
   return gh#http#request(settings)
+endfunction
+
+function! gh#github#pulls#files(owner, repo, number) abort
+  let url = printf('https://api.github.com/repos/%s/%s/pulls/%s/files', a:owner, a:repo, a:number)
+  return gh#http#get(url)
 endfunction

@@ -65,6 +65,8 @@ function! gh#gh#init() abort
     call gh#gists#edit()
   elseif bufname =~# '^gh:\/\/gists\/new\/[^/]\+$'
     call gh#gists#new()
+  elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/pulls\/[^/]\+\/review'
+    call gh#review#start()
   endif
 endfunction
 

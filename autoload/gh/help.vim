@@ -42,6 +42,7 @@ normal    <C-o>   <Plug>(gh_pull_open_browser)           open pull request on br
 normal    ghd     <Plug>(gh_pull_diff)                   show diff of pull request
 normal    ghy     <Plug>(gh_pull_url_yank)               yank pull request url
 normal    ghm     <Plug>(gh_pull_merge)                  merge pull request
+normal    ghr     <Plug>(gh_pull_review)                 review pull request
 END
 
 let s:keymap_repos =<< trim END
