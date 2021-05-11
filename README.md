@@ -24,6 +24,7 @@ For instance, you can see issue list or create issue, and GitHub Actions status,
 
 ## Requirements
 - curl
+- git
 
 ## Usage
 

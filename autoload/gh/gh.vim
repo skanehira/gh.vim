@@ -17,7 +17,33 @@ endif
 function! gh#gh#init() abort
   setlocal nolist
   let bufname = bufname()
-  if bufname =~# '^gh:\/\/[^/]\+\/repos$' || bufname =~# '^gh:\/\/[^/]\+\/repos?\+'
+
+  if bufname =~# '^gh:\/\/bookmarks$'
+    call gh#bookmark#list()
+  elseif bufname =~# '^gh:\/\/\%(pulls\|issues\|readme\|projects\|actions\)$'
+        \ || bufname =~# '^gh:\/\/\%(pulls\|issues\|readme\|projects\|actions\)?\+'
+        \ || bufname =~# '^gh:\/\/[^/]\+\/files*'
+    try
+      let repo = gh#provider#git#repo_info()
+      let paths = split(bufname, '://')
+      let new_bufname = printf('gh://%s/%s/%s', repo.owner, repo.name, paths[1])
+      let oldbufid = bufnr()
+
+      if !bufexists(new_bufname)
+        exe 'e' new_bufname
+        call gh#gh#init()
+      else
+        if bufwinid(new_bufname) == -1
+          exe 'e' new_bufname
+        else
+          exe 'b' new_bufname
+        endif
+      endif
+      exe 'bw!' oldbufid
+    catch
+      call gh#gh#error_message(v:exception)
+    endtry
+  elseif bufname =~# '^gh:\/\/[^/]\+\/repos$' || bufname =~# '^gh:\/\/[^/]\+\/repos?\+'
     call gh#repos#list()
   elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/readme$'
     call gh#repos#readme()
@@ -52,8 +78,6 @@ function! gh#gh#init() abort
   elseif bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/.\+\/files$'
         \ || bufname =~# '^gh:\/\/[^/]\+\/[^/]\+\/.\+\/files?\+'
     call gh#files#tree()
-  elseif bufname =~# '^gh:\/\/bookmarks$'
-    call gh#bookmark#list()
   elseif bufname =~# '^gh:\/\/[^/]\+\/gists$'
         \ || bufname =~# '^gh:\/\/[^/]\+\/gists?\+'
     call gh#gists#list()
