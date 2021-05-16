@@ -334,12 +334,7 @@ endfunction
 function! s:on_accept() abort
   if win_gotoid(s:state['resultswinid'])
     if s:state['multi_select'] is# 0 || empty(s:state['selected_fitems'])
-      let l:index = line('.') - 1 " line is 1 index, list is 0 index
-      if l:index < 0
-        let l:items = []
-      else
-        let l:items = [s:state['fitems'][l:index]]
-      endif
+      let l:items = []
     else
       let l:items = s:state['selected_fitems']
     endif
