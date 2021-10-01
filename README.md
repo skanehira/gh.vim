@@ -57,7 +57,7 @@ currently `gh.vim` provides buffers is bellow.
 
 | buffer                                                        | description                                        |
 |---------------------------------------------------------------|----------------------------------------------------|
-| `gh://[pulls*|issues*|readme|projects*|actions*][?key=value]` | reopen buffer as current repository's :owner/:repo |
+| `gh://[pulls\|issues\|readme\|projects\|actions][?key=value]` | reopen buffer as current repository's :owner/:repo |
 | `gh://:owner/:repo/issues[?state=open&..]`                    | issue list                                         |
 | `gh://:owner/:repo/issues/:number`                            | edit issue                                         |
 | `gh://:owner/:repo/issues/new`                                | new issue                                          |
