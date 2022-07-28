@@ -1,4 +1,6 @@
 # gh.vim - Vim/Neovim plugin for GitHub
+## Development of gh.vim has stopped, please use [denops-gh.vim](https://github.com/skanehira/denops-gh.vim) instead
+
 gh.vim provides some featuers of GitHub use it on Vim.  
 For instance, you can see issue list or create issue, and GitHub Actions status, etc.  
 
